@@ -1,0 +1,15 @@
+---
+layout: post
+title:  "시작."
+date:   2020-12-30
+last_modified_at: 2020-12-30
+categories: [daily]
+tags: [3rd year, imperfection]
+---
+
+여느 때와 다름없이 작업을 하다 문득 이런 생각이 들었다. 개발을 시작한지 만 3년을 가득 채운 나에게 지난 과거는 잘 살았는가, 앞으로 계획한 일들은 잘 흘러가고있는가, 부족한 점이 너무 많았다. 그 계획에는 빈틈과 추상적인 구조물들로 엮여 나에게 불안감만 가져다 주었다. 과거 경험상 확신이 든 행동과 움직임은 아주 커다란 에너지가 되어 일을 추진하는데 핵심적인 역할을 했다. 그래서 나를 불안하지 않게 하는 삶의 루틴이 필요하다고 느껴졌다. 그 내용들은 진실되고 깊이 있으며 때로는 나를 위로해주기도 하고 생각을 정리할 수 있는 공간을 만들어보고자 이 작업을 시작한다. GitHub Blog를 통해 매일 기록하고 생각을 적어본다. 완벽하고 아름다운 결과물들은 세상에 많다. 그건 보이지 않는 피나는 노력과 준비가 있었기 때문이다. 이러한 결과물들을 만들기 위한 고민을 하기에 앞서 이곳이 불완전한 결과물을 기록하여 작업 물들을 밟아 단단한 성장판이 되었으면 한다.
+
+[jekyll-paper-docs]: https://github.com/ghosind/Jekyll-Paper/wiki
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-paper-issues]: https://github.com/ghosind/Jekyll-Paper/issues
+[jekyll-talk]: https://talk.jekyllrb.com/

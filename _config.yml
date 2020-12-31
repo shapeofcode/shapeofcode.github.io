@@ -38,8 +38,8 @@ analytics:   # the Google Analytics property ID, e.g. UA-XXXXX-Y
 paginate: 25
 paginate_path: "/page:num/"
 
-comments: false  # enable comments
-disqus:          # disqus account
+comments: true  # enable comments
+disqus: shapeofcodeblog     # disqus account
 
 mathjax: true # Mathematics
 mermaid: true # Diagrams
