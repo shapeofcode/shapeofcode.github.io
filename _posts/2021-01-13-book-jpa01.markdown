@@ -1,0 +1,23 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - JPA 소개"
+date:   2021-01-13
+last_modified_at: 2021-01-13
+categories: [book]
+tags: [book, JPA]
+---
+
+JPA(Java Persistence API) 자바 진영의 ORM 기술 표준이다.
+
+ORM이란 (Object-Relational Mapping) 객체와 관계형 데이터베이스를 매핑한다는 뜻
+- 패러다임의 불일치 해결 : 상속, 연관관계, 객체 그래프탐색, 비교하기 같은 문제를 해결
+- 성능 : 애플리케이션과 데이터베이스 사이에서 다양한 성능 최적화 기회를 제공
+- 데이터 접근 추상화와 벤더 독립성 (MySQL, Oracle, H2 ...)
+- 표준
+
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
