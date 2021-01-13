@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "새로운 책 정리 전 생각 정리"
-date:   2021-01-13
+date:   2021-01-12
 last_modified_at: 2021-01-13
 categories: [daily]
 tags: [book, daily]

@@ -21,7 +21,7 @@ description: >- # this means to ignore newlines until "baseurl:"
 keywords: [Your keywords]
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-domain: "example.com" # the domain name for your site, e.g. example.com
+domain: "shapeofcode.github.io" # the domain name for your site, e.g. example.com
 language: en
 # Supported languages list:
 # en: English
@@ -68,7 +68,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-archives
   - jekyll-seo-tag
-
+  - jekyll-category-pages
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
