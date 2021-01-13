@@ -15,7 +15,6 @@ ORM이란 (Object-Relational Mapping) 객체와 관계형 데이터베이스를 
 - 데이터 접근 추상화와 벤더 독립성 (MySQL, Oracle, H2 ...)
 - 표준
 
-
 <br/>
 
 출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
