@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 객체 생성과 파괴"
 date:   2021-01-01
 last_modified_at: 2021-01-01
-categories: [book]
+categories: [book, JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

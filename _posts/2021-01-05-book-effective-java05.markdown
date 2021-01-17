@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 열거타입과 애너테이션"
 date:   2021-01-05
 last_modified_at: 2021-01-05
-categories: [book]
+categories: [book, JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

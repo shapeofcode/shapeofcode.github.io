@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 동시성"
 date:   2021-01-10
 last_modified_at: 2021-01-10
-categories: [book]
+categories: [book, JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

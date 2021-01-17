@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 클래스와 인터페이스"
 date:   2021-01-03
 last_modified_at: 2021-01-03
-categories: [book]
+categories: [book, JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

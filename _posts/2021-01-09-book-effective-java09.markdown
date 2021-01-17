@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 예외"
 date:   2021-01-09
 last_modified_at: 2021-01-09
-categories: [book]
+categories: [book, JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 
