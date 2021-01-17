@@ -3,7 +3,7 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - JPA 시작"
 date:   2021-01-14
 last_modified_at: 2021-01-14
-categories: [book]
+categories: [book, JPA]
 tags: [book, JPA]
 ---
 

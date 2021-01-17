@@ -1,0 +1,97 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 연관관계 매핑 기초"
+date:   2021-01-17
+last_modified_at: 2021-01-17
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+단방향 연관관계
+1.	다대일
+
+Member 클래스
+
+```java
+@ManyToOne // 다대일(N:1) 관계라는 매핑 정보
+@JoinColumn(name=”TEAM_ID”) // 조인 컬럼은 외래 키를 매핑할 때 사용
+private Team team;
+```
+
+**@JoinColumn** 
+
+속성
+
+|---|:---:|
+|name|매핑할 외래 키 이름|
+|referencedColumnName|외래 키가 참조하는 대상 테이블의 컬럼명|
+|foreignKey(DDL)|외래 키 제약조건을 직접 지정할 수 있다. 테이블을 생성할 때만 사용|
+
+**@OneToOne** : 일대일 관계
+
+<br/>
+
+연관관계 사용
+
+1.	저장
+```java
+Team team1 = new Team(“team1”, “팀1”);
+em.persist(team1);
+//회원1 저장
+Member member1 = new Member(“member1”, “회원1”);
+Member1.setTeam(team1); //연관관계 설정 member1-> team1
+em.persist(member1);
+```
+
+2.	조회
+- 객체 그래프 탐색
+```java
+Member member = em.find(Member.class, “member1”);
+Team team = member.getTeam(); // 객체 그래프 탐색
+System.out.println(“팀 이름 = “ + team.getName());
+```
+- JPQL
+
+3.	수정
+```java
+Team team2 = new Team(“team2”, “팀2”);
+em.persist(team2);
+Member member = em.find(Member.class, “member1”);
+Member.setTeam(team2);
+```
+
+4.	삭제
+```java
+member1.setTeam(null); //회원1 연관관계 제거
+member2.setTeam(null); //회원2 연관관계 제거
+em.remove(team);	      //팀 삭제
+```
+
+양방향 매핑
+엔티티의 양방향 연관관계로 설정하면 객체의 참조는 둘인데 외래 키는 하나다.
+
+회원 -> 팀(Member.team) 방향
+```java
+class Member {
+    @ManyToOne
+    @JoinColumn(name=”TEAM_ID”)
+    private Team team;
+    …
+}
+```
+
+팀 -> 회원(Team.members) 방향
+```java
+class Team {
+    @OneToMany(mappedBy=”team”)  //MappedBy 속성의 값은 연관관계의 주인인 Member.team
+    private List<Member> members = new ArrayList<Member>();
+}
+```
+
+양방향의 장점은 반대방향으로 객체 그래프 탐색 기능이 추가된 것 뿐이다.
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>

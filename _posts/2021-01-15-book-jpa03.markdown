@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 영속성관리"
+date:   2021-01-15
+last_modified_at: 2021-01-15
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+엔티티 매니저 팩토리는 여러 스레드가 동시에 접근해도 안전, 엔티티 매니저는 동시성 문제가 발생하므로 스레드 간에 공유하면 안된다.
+
+영속성 컨텍스트란? 엔티티를 영구 저장하는 환경, 엔티티 매니저를 생성할 때 하나 만들어진다.
+
+<br/>
+
+엔티티의 생명주기
+- 비영속 : 영속성 컨텍스트와 전혀 관계가 없는 상태
+- 영속 : 영속성 컨테스트에 저장된 상태
+- 준영속 : 영속성 컨텍스트에 저장되었다가 분리된 상태 (detach, close, clear)
+- 삭제 : 삭제된 상태 (remove)
+
+<br/>
+
+영속성 컨텍스트의 장점
+1. 1차 캐시에서 조회
+```java
+em.persist(member); //1차 캐시에 저장됨
+Member findMember = em.find(Member.class, “member1”); //1차캐시에서 조회
+```
+2. 동일성 보장
+```java
+Member a = em.find(Member.class, “member1”);
+Member b = em.find9Member.class, “member1”);
+System.out.println(a == b); //true
+```
+3. 트랜잭션을 지원하는 쓰기 지연
+```java
+begin(); //트랜잭션 시작
+save(A);
+save(B);
+save(C);
+commit(); //트랜잭션 커밋
+```
+
+4. 변경 감지
+```java
+memberA.setUsername(“hi”);
+```
+모든 필드를 업데이트한다. @org.hibernate.annotations.DynamicUpdate는 수정된 데이터만 동적으로 업데이트. 약 30개 이상이 되면 동적 수정 쿼리를 사용하는데 30개 이상의 컬럼이 된다는 것은 테이블 설계에 대한 부분을 고려해보아야 한다.
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>

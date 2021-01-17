@@ -1,0 +1,113 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 엔티티 매핑"
+date:   2021-01-16
+last_modified_at: 2021-01-16
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+객체와 테이블 매핑 어노테이션
+
+**@Entity**
+
+테이블과 매핑할 클래스는 어노테이션 필수 
+- 기본 생성자는필수
+- final 클래스, enum, interface, inner 클래스에는 사용할 수 없다.
+- 저장할 필드에 final을 사용하면 안 된다.
+
+**@Table**
+
+엔티티와 매핑할 테이블을 지정
+
+속성
+
+|---|:---:|
+|name|매핑할 테이블 이름|
+|catalog|catalog 기능이 있는 데이터베이스에서 catalog 매핑|
+|schema|schema 기능이 있는 데이터베이스에서 schema 매핑|
+|uniqueConstraints|DDL 생성 시에 유니크 제약조건을 만든다.|
+
+<br/>
+
+[HBM2DDL] - 데이터베이스 스키마 자동 생성
+
+```xml
+<property name=”hibernate.hhm2ddl.auto” value=”create” />
+애플리케이션 실행 시점에 테이블을 자동으로 생성
+<property name=”hibernate.show_sql” value=”true” />
+테이블 생성 DDL을 콘솔 출력
+```
+
+속성
+
+|---|:---:|
+|create|기존 테이블을 삭제하고 새로 생성. DROP + CREATE|
+|create-drop|create 속성에 추가로 애플리케이션을 종료할 때 생성한 DDL을 제거한다. DROP + CREATE + DROP|
+|update|데이터베이스 테이블과 엔티티 매핑정보를 비교해서 변경 사항만 수정|
+|validate|데이터베이스 테이블과 엔티티 매핑정보를 비교해서 차이가 있으면 경고를 남기고 애플리케이션을 실행하지 않는다. 이 설정은 DDL을 수정하지 않는다.|
+|none|자동 생성 기능을 사용하지 않으려면 hibernate.hbm2d이.auto 속성 자체를 삭제하거나 유효하지 않은 옵션 값을 주면 된다.|
+
+HBM2DDL 주의사항
+- 개발 초기 단계는 create 또는 update
+- 초기화 상태로 자동화된 테스트를 진행하는 개발자 환경과 CI 서버는 create 또는 create-drop
+- 테스트 서버는 update 또는 validate
+- 스테이징과 운영 서버는 validate 또는 none
+
+```xml
+<property name=”hibernate.ejb.naming_strategy” value=”org.hibernate.cfg.ImprovedNamingStrategy” />
+<!--자바의 카멜 표기법을 테이블의 언더스코어 표기법으로 매핑-->
+```
+<br/>
+
+기본 키 매핑
+- 직접 할당
+- 자동 생성: 대리 키 사용 방식
+    - IDENTITY : 기본 키 생성을 데이터베이스에 위임 (주로 MySQL, PostgreSQL, SQL Server, DB2) 
+    - SEQUENCE : 데이터베이스 시퀀스를 사용해서 기본 키를 할당 (주로 오라클, PostgreSQL, DB2, H2)
+    - TABLE : 키 생성 테이블을 사용
+    - AUTO : 데이터베이스 방언에 따라 IDENTITY, SEQUENCE, TABLE 전략 중 하나를 자동으로 선택) @GeneratedValue(strategy = GenerationType.AUTO)
+
+<br/>
+
+필드와 컬럼 매핑
+
+**@Column** 
+
+객체 필드를 테이블 컬럼에 매핑 속성
+
+|---|:---:|
+|name|필드와 매핑할 테이블의 컬럼 이름|
+|insertable|기본값 true, 엔티티 저장 시 필드로 같이 저장|
+|updatable|기본값 true, 엔티티 수정 시 필드도 같이 수정|
+|table|하나의 엔티티를 두 개 이상의 데이틀에 매핑할 때 사용|
+|nullable(DDL)|null 값의 허용 여부를 설정|
+|unique(DDL)|@Table의 uniqueContraints와 같지만 한 컬럼에 간단히 유니크 제약조건을 걸 때 사용|
+|columnDefinition(DDL)|데이터베이스 컬럼 정보를 직접 줄 수 있다.|
+|length(DDL)|문자 길이 제약조건, String 타입에만 사용|
+|precision, scale(DDL)|BigDecimal 타입에서 사용한다(BigInteger도 사용). Precision은 소수점을 포함한 전체 자릿수를, scale은 소수의 자릿수.|
+
+**@Enumerated** 
+자바의 enum 타입을 매핑할 때 사용한다.
+
+**@Temporal**
+날짜 타입을 매핑할 때 사용 
+TemporalType.DATE : 날짜, 데이터베이스 date 타입과 매핑(예: 2013-10-11)
+TemporalType.TIME : 시간, 데이터베이스 time 타입과 매핑(예: 11:11:11)
+TemporalType.TIMESTAMP : 날짜와 시간, 데이터베이스 timestamp 타입과 매핑(예: 2013-10-11 11:11:11)
+
+**@Lob**
+데이터베이스 BLOB, CLOB 타입과 매핑
+
+**@Transient**
+이 필드는 매핑하지 않는다. 객체에 임시로 값을 보관하고 싶을 때 사용
+
+**@Access**
+필드 접근: AccessType.FIELD로 지정. 필드에 직접 접근
+프로퍼티 접근 : AccessType.PROPERTY로 지정. 접근자Getter  
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
