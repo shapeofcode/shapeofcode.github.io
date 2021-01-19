@@ -1,0 +1,325 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 다양한 연관관계 매핑"
+date:   2021-01-18
+last_modified_at: 2021-01-18
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+**다대일**
+
+1.다대일 단방향 [N:1]
+
+```java
+@Entity
+public class Member {
+	…
+	@ManyToOne
+	@JoinColumn(name = “TEAM_ID”)
+	private Team team;
+	…
+}
+@Entity
+public class Team {
+	@Id @GeneratedValue
+	@Column(name = “TEAM_ID”)
+	private Long id;
+…
+}
+```
+
+Member.team으로 팀 엔티티를 참조, 반대로 참조하는 필드 없음
+
+<br/>
+
+2.다대일 양방향[N:1, 1:N]
+
+```java
+@Entity
+public class Member {
+	…
+	@ManyToOne
+	@JoinColumn(name = “TEAM_ID”)
+	private Team team;
+	public void setTeam(Team team) {
+        this.team = team;
+        //무한루프에 빠지지 않도록 체크
+        if(!team.getMembers().contains(this)){
+            team.getMembers().add(this);
+        }	
+    }
+	…
+}
+@Entity
+public class Team {
+	…
+	@OneToMany(mappedBy = “team”)
+	private List<Member> members = new ArrayList<Member>();
+	
+	public void addMember(Member member) {
+		this.member.add(member);
+		if (member.getTeam() != this) {	//무한루프에 빠지지 않도록 체크
+			member.setTeam(this);
+        }
+    }
+…
+}
+```
+
+- 양방향은 외래 키가 있는 쪽이 연관관계의 주인이다. (Member.team이 주인)
+- 양방향 연관관계는 항상 서로를 참조해야한다. (편의 메소드 setTeam(), addMember())
+
+<br/>
+
+**일대다**
+
+1.일대다 단방향 [1:N]
+
+상황 – 하나의 팀은 여러 회원을 참조할 수 있고 반대로 회원은 팀을 참조하지 않으면 된다.
+
+```java
+@Entity
+public class Team {
+	…
+	@OneToMany(mappedBy = “team”)
+	@JoinColumn(name = “TEAM_ID”) // MEMBER 테이블의 TEAM_ID (FK)
+	private List<Member> members = new ArrayList<Member>();
+	…
+}
+@Entity
+public class Member {
+	@Id @GeneratedValue
+	@Column(name = “MEMBER_ID”)
+	private Long id;
+	…
+}
+```
+- 일대다 단방향 매핑을 사용하면 엔티티를 매핑한 테이블이 아닌 다른 테이블의 외래 키를 관리해야 하므로 다대일 양방향 매핑을 사용하자
+
+<br/>
+
+2.일대다 양방향 [1:N, N:1]
+
+```java
+@Entity
+public class Team {
+	…
+	@OneToMany(mappedBy = “team”)
+	@JoinColumn(name = “TEAM_ID”)
+	private List<Member> members = new ArrayList<Member>();
+	…
+}
+@Entity
+public class Member {
+	…
+	@ManyToOne
+	@JoinColumn(name = “TEAM_ID”, insertable = false, updatable = false)
+	private Team team;
+	…
+}
+```
+
+- 일대다 단방향 매핑 반대편에 다대일 단방향 매핑을 읽기 전용으로 추가해서 일대다 양방향처럼 보이도록 하는 방법
+
+<br/>
+
+**일대일[1:1]**
+
+주 테이블 외래 키 – 주 테이블만 확인해도 대상 테이블과 연관관계가 있는지 알 수 있다.
+
+대상 테이블 외래 키 – 테이블 관계를 일대일에서 일대다로 변경할 때 테이블 구조를 유지할 수 있다.
+
+1.주 테이블 외래 키
+
+1-1.단방향
+
+```java
+@Entity
+public class Member {
+	@Id @GemeratedValue
+	@Column(name = “MEMBER_ID”)
+	private Long id;
+	…
+	@OneToOne
+	@JoinColumn(name = “LOCKER_ID”)
+	private Locker locker;
+	…
+}
+
+@Entity
+public class Locker {
+	@Id @GeneratedValue
+	@Column(name = “LOCKER_ID”)
+	private Long id;
+	…
+}
+```
+
+1-2.양방향
+
+```java
+@Entity
+public class Member {
+	@Id @GemeratedValue
+	@Column(name = “MEMBER_ID”)
+	private Long id;
+	…
+	@OneToOne
+	@JoinColumn(name = “LOCKER_ID”)
+	private Locker locker;
+	…
+}
+
+@Entity
+public class Locker {
+	@Id @GeneratedValue
+	@Column(name = “LOCKER_ID”)
+	private Long id;
+	…
+	@OneToOne(mappedBy = “locker”)
+	private Member member;
+}
+```
+
+2.대상 테이블에 외래키 
+
+2-1.일대일 단방향 허용 X
+
+2-2.일대일 양방향
+
+```java
+@Entity
+public class Member {
+	@Id @GemeratedValue
+	@Column(name = “MEMBER_ID”)
+	private Long id;
+	…
+	@OneToOne(mappedBy = “member”)
+	private Locker locker;
+	…
+}
+
+@Entity
+public class Locker {
+	@Id @GeneratedValue
+	@Column(name = “LOCKER_ID”)
+	private Long id;
+	…
+	@OneToOne
+	@JoinColumn(name = “MEMBER_ID”)
+	private Member member;
+}
+```
+
+<br/>
+
+**다대다 [N:N]**
+
+1.단방향
+
+```java
+@Entity
+public class Member {
+    @Id @Column(name = “MEMBER_ID”)
+    private String id;
+    …
+    @ManyToMany
+    @JoinTable(name = “MEMBER_PRODUCT”, joinColumns = @JoinColumn(name=”MEMBER_ID”), inverseJoinColumns = @JoinColumn(name = “PRODUCT_ID”))
+    private List<Product> products = new ArryaList<Product>();
+}
+```
+
+2.양방향
+
+```java
+@Entity
+public class Product {
+	…
+	@ManyToMany(mappedBy = “products”) // 역방향 추가
+	private List<Member> members;
+	…
+}
+```
+
+다대다: 매핑의 한계와 극복, 연결 엔티티 사용
+
+```java
+@Entity
+public class Member {
+	@Id @Column(name = “MEMBER_ID”)
+	private String id;
+	//역방향
+	@OneToMany(mappedBy = “member”)
+	private List<MemberProduct> memberProducts;
+}
+
+@Entity
+public class Product {
+	@Id @Column(name = “PRODUCT_ID”)
+	private String id;
+	private String name;
+}
+
+@Enitty
+@IdClass(MemberProductId.class)
+public class MemberProduct {
+    @Id
+    @ManyToOne
+    @JoinColumn(name = “MEMBER_ID”)
+    private Member member; // MemberProductId.member와 연결
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = “PRODUCT_ID”)
+    private Product product; //MemberProductId.product와 연결
+
+}
+
+public class MemberProductId implements Serializable {
+
+	private String member; // MemberProduct.member 와 연결
+	private String product; // MemberProduct.product 와 연결
+
+	//hashCode and equals
+
+	@Override
+	public Boolean equals(Object o ) {…}
+	@Override
+	public int hashCode() {…}p
+}
+```
+
+특징
+- 복합 키는 별도의 식별자 클래스로 만들어야 한다.
+- Serializable을 구현해야 한다.
+- equals와 hashCode 메소드를 구현해야 한다.
+- 기본 생성자가 있어야 한다.
+- 식별자 클래스는 public이어야 한다.
+- @IdClass를 사용하는 방법 외에 @EmbeddedId를 사용하는 방법도 있다.
+
+다대다: 새로운 기본 키 사용
+
+```java
+@Entity
+public class Order {
+	@Id @GeneratedValue
+	@Column(name = “ORDER_ID”)
+	private Long Id;
+
+	@ManyToOne
+	@JoinColumn(name = “MEMBER_ID”)
+	private Member member;
+
+	@ManyToOne
+	@JoinColumn(name = “PRODUCT_ID”)
+	private Product product;
+
+}
+```
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
