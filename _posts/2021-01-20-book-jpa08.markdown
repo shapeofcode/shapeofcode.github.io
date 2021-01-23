@@ -1,0 +1,143 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 프록시와 연관관계 정리"
+date:   2021-01-20
+last_modified_at: 2021-01-20
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+**프록시**
+
+엔티티를 실제 사용하는 시점까지 데이터베이스 조회를 미루 싶으면 EntityManager.getReference() 메소드를 사용
+
+- 프록시와 식별자
+
+```java
+Team team = em.getReference(Team.class, “team1”); //식별자 보관
+team.getId(); //초기화 되지 않음
+```
+엔티티 접근 방식을 필드(@Access(AccessType.FIELD))로 설정하면 프록시 객체를 초기화
+
+<br/>
+
+- 프록시 확인
+
+프록시 인스턴스의 초기화 여부를 확인
+
+```java
+boolean isLoad = em.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(entity);
+```
+
+<br/>
+
+- 즉시 로딩과 지연 로딩
+
+--즉시로딩 : 엔티티를 조회할 때 연관된 엔티티도 조회
+
+em.find(Member.class, “member1”)를 호출할 때 회원 엔티티와 연관된 팀 엔티티도 함께 조회
+
+@ManyToOne(fetch = FetchType.EAGER) 로 사용
+
+<br/>
+
+--지연로딩 : 연관된 엔티티를 실제 사용할 때 조회
+
+member.getTeam().getName()처럼 조회한 팀 엔티티를 실제 사용하는 시점에 JPA가 SQL을 호출
+
+@ManyToOne(fetch = FetchType.LAZY)
+
+<br/>
+
+**JPA 기본 페치 전략**
+
+@ManyToOne, @OneToOne: 즉시 로딩(FetchType.EAGER)
+
+- (optional = false) : 내부 조인
+- (optional = true) : 외부 조인
+
+@OneToMany, @ManyToMany: 지연 로딩(FetchType.LAZY)
+
+- (optional = false): 외부 조인
+- (optional = true): 외부 조인
+
+<br/>
+
+연관된 엔티티가 하나면 즉시 로딩, 컬렉션이면 지연 로딩
+
+모든 연관관계에 지연 로딩을 사용하고 APP개발이 완료 단계에 왔을 때 즉시 로딩을 최적화
+
+<br/>
+
+**영속성 전이 : CASCADE**
+
+부모와 자식 엔티티를 한 번에 영속화
+
+```java
+@Entity
+public class Parent {
+	…
+	@OneToMany(mappedBy = “parent”, cascade = CascadeType.PERSIST)
+	private List<Child> children = new ArrayList<Child>();
+	…
+}
+```
+
+<br/>
+
+저장
+
+```java
+private static void saveWidthCascade(EntityManager em) {
+	Child child1 = new Child();
+	Child child2 = new Child();
+
+	Parent parent = new Parent();
+	child1.setParent(parent);	//연관관계 추가
+	child2.setParent(parent);  //연관관계 추가
+	parent.getChildren().add(child1);
+	parent.getChildren().add(child2);
+
+	//부모 저장, 연관된 자식들 저장
+	em.persist(parent);
+}
+```
+
+<br/>
+
+삭제
+
+```java
+CascadeType.REMOVE
+Parent findParent = em.find(Parent.class, 1L);
+em.remove(findParent); 
+```
+
+부모 엔티티만 삭제하면 연관된 자식 엔티티도 함께 삭제
+
+<br/>
+
+**고아 객체**
+
+부모 엔티티와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제하는 기능을 제공
+
+```java
+@Entity
+public class Parent {
+	@Id @GeneratedValue
+	private Long id;
+
+	@OneToMany(mappedBy = “parent”, orphanRemoval = true)
+	private List<Child> children = new ArrayList<Child>();
+	…
+}
+
+```
+
+삭제한 엔티티를 다른 곳에서도 참조한다면 문제가 발생할 수 있으므로 @OneToOne, @OneToMany에만 사용할 수 있다.
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>

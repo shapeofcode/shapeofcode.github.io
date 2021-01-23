@@ -1,0 +1,74 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 값 타입"
+date:   2021-01-21
+last_modified_at: 2021-01-21
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+**값 타입**
+- 기본값 타입
+    - 자바 기본 타입
+    - 래퍼 클래스
+    - string
+- 임베디드 타입
+- 컬렉션 값 타입
+
+<br/>
+
+1. 임베디드 타입
+
+```java
+@Entity 
+public class Member {
+	@Id @GeneratedValue
+	private Long id;
+	private String name;
+
+	@Embedded Period workPeriod; //근무기간 … 값 타입을 정의하는 곳에 표시
+	@Embedded Address homeAddress; 
+        …
+}
+
+@Embeddable  …값 타입을 사용하는곳에 표시
+public class Period {
+	@Temporal(TemporalType.DATE) java.util.Date startDate;
+	@Temporal(TemporalType.DATE) java.util.Date endDate;
+
+	public boolean isWork(Date date) {
+        …
+        }
+}
+```
+
+<br/>
+
+@AtrributeOverride: 속성 재정의
+
+임베디드 타입에 정의한 매핑 정보를 재정의
+
+```java
+@Embedded
+@AttributeOverrides({
+	@AttributeOverride(name=”city”, column=@Column(name = “COMPANY_CITY”)),
+	@AttributeOverride(name=”street”, column=@Column(name = “COMPANY_STREET”)),
+	@AttributeOverride(name=”zipcode”, column=@Column(name = “COMPANY_ZIPCODE”))
+})
+Address companyAddress;
+```
+
+<br/>
+
+임베디드 타입이 null이면 매핑한 컬럼 값은 모두 null
+
+```java
+member.setAddress(null); //null 입력
+em.persist(member);
+```
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>

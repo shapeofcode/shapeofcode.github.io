@@ -1,0 +1,299 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 고급 매핑"
+date:   2021-01-19
+last_modified_at: 2021-01-19
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+**상속 관계 매핑**
+
+1.조인전략 : 엔티티를 모두 테이블로 만들고 자식 테이블이 부모 테이블의 기본키 를 받아서 외래키로 사용하는 전략
+
+```java
+@Entity
+@Inheritance(strategy = IngeritanceType.JOINED) … 부모 클래스에 쓰는 매핑
+@DiscriminatorColumn(name = “DTYPE”) … 부모 클래스에 구분 컬럼을 지정
+public abstract class Item {
+…
+}
+
+@Entity
+@DiscriminatorValue(“A”) … 엔티티를 저장할 때 구분 컬럼에 입력할 값을 지정
+@PrimayKeyJoinColumn(name = “BOOK_ID”) … 자식 테이블의 기본 키 컬럼명을 변경하고 싶을 때
+public class Album extends Item {
+…
+}
+
+```
+
+2.단일 테이블 전략 
+
+- 테이블 하나만 사용
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+…
+
+@Entity
+@DiscriminatorValue(“A”)
+public class Album extends Item {…}
+```
+
+- 구현 클래스마다 테이블 전략
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+```
+
+<br/>
+
+**@MappedSuperclass**
+
+부모 클래스는 테이블과 매핑하지 않고 부모 클래스를 상속 받는 자식 클래스에게 매핑 정보만 제공하고 싶을 때
+
+```java
+@MappedSuperclass
+public abstract class BaseEntity {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+}
+
+@Entity
+public class Member extends BaseEntity {
+    //ID 상속
+    //NAME 상속
+    private String email;
+    …
+}
+```
+
+<br/>
+
+부모로부터 물려받은 매핑 정보를 재정의하려면
+
+```java
+@Entity
+@AttributeOverrides({
+    @AttributeOverride(name = “id”, column = @Column(name = “MEMBER_ID”)),
+    @AttributeOverride(name = “name”, column = Column(name = “MEMBER_NAME”))
+})
+public class Member extends BaseEntity{…}
+```
+
+<br/>
+
+**복합 키와 식별 관계 매핑**
+
+- 식별 관계 : 부모 테이블의 기본 키를 내려받아서 자식 테이블의 기본키 + 외래키로 사용하는 관계
+- 비식별 관계 : 부모 테이블의 기본 키를 받아서 자식 테이블의 외래 키로만 사용
+
+<br/>
+
+1.복합키:비식별 관계 매핑
+
+```java
+@Entity
+@IdClass(ParentId.class)
+public class Parent {
+
+	@Id
+	@Column(name = “PARENT_ID1”)
+	private String id1; //ParentId.id1 과 연결
+	@Column(name = “PARENT_ID2”)
+	private String id2; //ParentId.id2 과 연결
+    …
+}
+
+public class ParentId implements Serializable {
+	private String id1; //Parent.id1 매핑
+	private Stringid2; //Parent.id2 매핑
+	
+    public ParentId() {
+
+    }
+
+    public ParentId(String id1, String id2) {
+        this.id1 = id1;
+        this.id2 = id2;
+    }
+
+    @Override
+    public Boolean equals(Object o) {…}
+    @Override
+    public int hashCode () {…}
+}
+```
+@IdClass 사용 조건
+- 식별자 클래스의 속성명과 엔티티에서 사용하는 식별자의 속성명이 같아야 한다.
+- Serializable 인터페이스를 구현해야 한다.
+- Equals, hashCode를 구현해야 한다.
+- 기본 생성자가 있어야 한다.
+- 식별자 클래스는 public 이어야 한다.
+
+<br/>
+
+2.@EmbeddedId
+
+```java
+@Entity
+public class Parent {
+    @EmbeddedId
+    private ParentId id;
+    private String name;
+    …
+}
+
+@Embeddable
+public class ParentId implements Serializable {
+		@Column(name = “PARENT_ID1”)
+		private String id1;
+		@Column(name = “PARENT_ID2”)
+		private String id2;
+		… //@IdClass와 다르게 @EmbeddedId를 적용한 식별자 클래스는 식별자 클래스에 기본 키를 직접 매핑 그 외에는 동일(equals, hashCode 등…)
+}
+```
+
+<br/>
+
+3.일대일 식별 관계
+
+자식 테이블의 기본 키 값으로 부모 테이블의 기본 키 값만 사용 
+
+```java
+@Entity
+public class Board {
+    @Id @GeneratedValue
+    @Column(name = “BOARD_ID”)
+    private Long id;
+    private String title;
+    @OneToOne(mappedBy = “board”)
+    private BoardDetail boardDetail;
+    …
+}
+
+//자식
+@Entity
+public class BoardDetail {
+    @Id
+    private Long boardId;
+    
+    @MapsId //BoardDetail.boardId 매핑
+    @OneToOne
+    @JoinColumn(name=”BOARD_ID”)
+    private Board board;
+    
+    private String content;
+    …
+}
+```
+
+<br/>
+
+**조인 테이블**
+- 조인 컬럼 사용 (외래 키)
+- 조인 테이블 사용 (테이블 사용)
+
+<br/>
+
+1.일대일 조인 테이블
+
+```java
+//부모
+@Entity
+public class Parent {
+    @Id @GeneratedValue
+    @Column(name = “PARENT_ID”)
+    private Long id;
+    private String name;
+
+    @OneToOne
+    @JoinTable(name = “PARENT_CHILD”, joinColumns = @JoinColumn(name = “PARENT_ID), inverseJoinColumns = @JoinColumn(name = “CHILD_ID”))
+    private Child child;
+    …
+}
+//자식 
+@Entity
+public class child {
+    @Id @GeneratedValue
+    @Column(name = “CHILD_ID”)
+    private Long id;
+    private String name;
+    …
+}
+```
+
+@JoinTable 속성
+- Name: 매핑할 조인 테이블 이름
+- joinColumns: 현재 엔티티를 참조하는 외래 키
+- inverseJoinColumns: 반대방향 엔티티를 참조하는 외래 키
+
+<br/>
+
+양방향 매핑 추가 코드
+```java
+@OneToOne(mappedBy = “child”)
+private Parent parent;p
+```
+
+<br/>
+
+2.일대다 조인 테이블
+```java
+@OneToMany
+@JoinTable(name = “PARENT_CHILD”, joinColumns = @JoinColumn(name = “PARENT_ID), inverseJoinColumns = @JoinColumn(name = “CHILD_ID”))
+private List<Child> child = new ArrayList<Child>();
+```
+
+<br/>
+
+3.다대일
+```java
+@Entity
+public class Child {
+    …
+    @ManyToOne(optional = false)
+    @JoinTable(name = “PARENT_CHILD”, joinColumns = @JoinColumn(name = “CHILD_ID), inverseJoinColumns = @JoinColumn(name = “PARENT_ID”))
+    private Parent parent;
+}
+```
+
+<br/>
+
+4.다대다 조인 테이블
+
+```java
+@OneToMany
+@JoinTable(name = “PARENT_CHILD”, joinColumns = @JoinColumn(name = “PARENT_ID), inverseJoinColumns = @JoinColumn(name = “CHILD_ID”))
+private List<Child> child = new ArrayList<Child>();
+```
+
+<br/>
+
+**엔티티 하나에 여러 테이블 매핑하기**
+
+```java
+@Entity
+@Table(name=”BOARD”)
+@SecondaryTable(name=”BOARD_DETAIL”, pkJoinColumns = @PrimaryKeyJoinColumn(name =”BOARD_DETAIL_ID”))
+public class Board {
+    …
+    @Column(table = “BOARD_DETAIL”) //BOARD_DETAIL 테이블에 매핑
+    private String content;
+    …
+}
+```
+
+@SecondaryTable.name : 매핑할 다른 테이블의 이름
+
+@SecondaryTable.pkJoinColumns: 매핑할 다른 테이블의 기본 키 컬럼 속성
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
