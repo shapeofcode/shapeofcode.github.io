@@ -1,0 +1,308 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - 객체지향 쿼리 언어"
+date:   2021-01-22
+last_modified_at: 2021-01-22
+categories: [book, JPA]
+tags: [book, JPA]
+---
+
+- JPQL
+- Criteria 쿼리 : JPQL을 편하게 작성하도록 도와주는 API, 빌더 클래스 모음
+- 네이티브 SQL: JPA에서 JPQL 대신 직접 SQL 사용
+- QueryDSL : Criteria 쿼리처럼 JPQL을 작성하도록 도와주는 빌더 클래스, 비표준 오픈소스
+- JDBC 직접 사용, MyBatis 같은 SQL 매퍼 프레임워크 사용
+
+ 현재는 JPQL만 정리 나머지는 JPQL을 편하게 사용해주는 기술
+
+<br/>
+
+JPQL
+
+1.select문
+
+SELECT m FROM Member AS m where m.username = ‘hello’
+- 엔티티 소성은 대소문자 구분(Member, username)
+- 엔티티 이름 Member는 @Entity(name=”Member”)로 지정
+- 별칭 필수 (Member AS m 또는 Member m)
+
+<br/>
+
+2.TypedQuery,Query
+```java
+TypedQuery<Member> query = em.createQuery(“SELECT m FROM Member m”, Member.class);
+    List<Member> resultList = query.getResultList();
+    for(Member member : resultList) {
+}
+Query query = em.createQuery(“SELECT m.username, m age from Member m”);
+List resultList = query.getResultList();
+for(Object o : resultList){
+	Object[] result = (Object[]) o;
+}
+```
+<br/>
+
+3.파라미터 바인딩
+
+- 이름기준
+
+```java
+TypedQuery<Member> query = em.createQuery(“SELECT m FROM Member m where m.username = :username”, Member.class);
+query.setParameter(“username”,usernameParam);
+```
+
+- 위치기준
+
+```java
+List<Member> members = em.createQuery(“SELECT m FROM Member m where m.username =?1”,Member.class).setParameter(1, usernameParam).getResultList();
+```
+
+<br/>
+
+4.페이징 API
+```java
+TypedQuery<Member> query = em.createQuery(“SELECT m FROM Member m ORDER BY m.username DESC”, Member.class);
+query.setFirstResult(10);	//조회 시작 위치
+query.setMaxResults(20);	//조회할 데이터 수
+query.getResultList();
+```
+
+<br/>
+
+5.집합/정렬
+
+ex) 평균 나이가 10살 이상인 그룹 조회
+
+select t.name, COUNT(m.age), SUM(m.age), AVG(m.age), MAX(m.age), MIN(m.age) from Member m LEFT JOIN m.team t GROUP BY t.name HAVING AVG(m.age) >= 10
+
+select t.name, COUNT(m.age) as 춧 from Member m LEFT JOIN m.team t GROUP BY t.name ORDER BY cnt
+
+<br/>
+
+6.조인
+
+- 내부조인
+
+SELECT m FROM Member m INNER JOIN m.team t WHERE t.name = :teamName
+
+
+- 외부조인
+
+SELECT m FROM Member m LEFT [OUTER] JOIN m.team t
+
+
+- 컬렉션 조인
+
+SELECT t, m FROM Team t LEFT JOIN t.members m 
+
+팀과 팀이 보유한 회원 목록을 컬렉션 값 연관 필드로 외부 조인
+
+- 세타조인
+
+SELECT COUNT(m) from Member m, Team t where  m.username = t.name 
+
+관계없는 엔티티 조인 가능
+
+
+- JOIN ON 절(JPA 2.1)
+
+SELECT m,t from Member m left join m.team t on t.name = ‘A’
+
+- 페치 조인 – 연곤된 엔티티나 컬렉션을 한번에 같이 조회
+
+select m from Member m join fetch m.team
+
+	SELECT M.*,T.* FROM MEMBER T INNER JOIN TEAM T ON M.TEAM_ID = T.ID
+
+- 컬렉션 페치 조인
+
+select t from Team t join fetch t.members where t.name = ‘팀A’
+
+	SELECT T.*,M.* FROM TEAM T INNER JOIN MEMBER M ON T.ID=M.TEAM_ID WHERE T.NAME = ‘팀A’
+
+- 페치 조인과 DISTINCT
+
+select distinct t from Team t join fetch t.members where t.name = ‘팀A’
+
+<br/>
+
+7.서브쿼리
+
+- EXISTS
+
+서브쿼리에 결과가 존재하면 TURE NOT은 반대
+
+select m from Member m where exists (select t from m.team t where t.name = ‘팀A’)
+
+- ALL, ANY, SOME
+    - ALL : 조건을 모두 만족하면 참
+    - ANY or SOME : 조건을 하나라도 만족하면 참
+
+select o from Order o where o.orderAmount > ALL (select p.stockAmount from Product p)
+
+- IN 
+
+서브 쿼리 결과 중 하나라도 같은 것이 있으면 참
+
+select t from Team t where t IN (select t2 From Team t2 JOIN t2.members m2 where m2.age >= 20)
+
+<br/>
+
+8.조건식
+
+- Between
+
+select m from Member m where m.age between 10 and 20
+
+- IN
+
+select m from Member m where m.username in (‘회원1’,’회원2’)
+
+- LIKE
+
+% : 아무 값들이 입력되어도 된다 ( 값이 없어도 됨)
+
+_ : 한 글자는 아무 값이 입력되어도 되지만 값이 있어야함
+
+where m.username like ‘%원%’	//회원3
+
+where m.username like ‘회원_’	//회원3
+
+<br/>
+
+9.컬렉션 식
+
+- 빈 컬렉션 비교 식
+
+select m from Member m where m.orders is not empty
+
+- 컬렉션의 멤버 식
+
+select t from Team t where :memberParam member of t.members
+
+엔티티나 값이 컬렉션에 포함되어 있으면 참
+
+<br/>
+
+10.스칼라식
+
+- 수학 식 
+
+    - + , - : 단항 연산자
+
+    - *, /, +, -: 사칙 연산자
+
+- 문자함수
+
+CONCAT(문자1, 문자2, …) 문자 합치기
+
+SUBSTRING(문자, 위치, [길이]) 특정 위치 문자
+
+TRIM([[LEADING | TRAILING | BOTH] [트림 문자] FROM] 문자)
+
+-	LEADING: 왼쪽만 , TRAILING 오른쪽만, BOTH 양쪽 다 트림 문자 제거, 기본값은 BOTH, 트림문자 기본 값은 SPACE
+
+LOWER (문자)	소문자
+
+UPPER(문자)	대문자
+
+LENGTH(문자)	문자 길이
+
+LOCATE(찾을 문자, 원본 문자, [검색시작위치])	문자 위치
+
+- 수학함수
+
+ABS(수학식)	절대값
+
+SQRT(수학식)	제곱근
+
+MOD(수학식, 나눌 수)	나머지
+
+SIZE(컬렉션 값 연관 경로식)	컬렉션 크기
+
+INDEX(별칭)	LIST 타입 컬렉션의 위치값 단 컬렉션이 @OrderColumn을 사용하는 LIST 타입
+
+<br/>
+
+11.CASE 식
+
+- 기본 CASE
+
+select
+	case when m.age <= 10 then ‘학생요금’
+	     when m.age >= 60 then ‘경로요금’
+	     else ‘일반요금’
+	end
+from Member m
+
+- 심플 CASE (조건 식 사용 불가)
+
+select
+	case t.name
+when ‘팀A’ then ‘인센티브110%’
+	     when ‘팀B’ then ‘인센티브120%’
+	     else ‘인센티브105%’
+	end
+from Member m
+
+- COALESCE (null 이 아니면 반환)
+
+select coalesce(m.username, ‘이름 없는 회원’) from Member m
+
+- NULLIF (두 값이 같으면 null을 반환 다르면 첫 번째 값을 반환)
+
+select NULLIF(m.username, ‘관리자’) from Member m
+
+<br/>
+
+12.다형성 쿼리
+
+- Item의 자식으로 Book, Album, Movie 가 있을 때
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = “DTYPE”)
+public abstract class Item{…}
+
+@Entity
+@DiscriminatorValue(“B”)
+public class Book extends Item {
+    …
+	private String author;
+}
+List resultList = em.createQuery(“select i from Item i”).getResultList();
+```
+
+
+//SQL
+
+SELECT i.ITEM_ID, i.DTYPE, i.name, i.price, i.stockQuantity,
+	b.author, b.isbn,
+	a.artist, a.etc,
+	m.actor, m.director
+FROM
+	Item i
+left outer join
+	Book b on i. ITEM_ID=b.ITEM_ID
+left outer join
+	Album a on i. ITEM_ID=a.ITEM_ID
+left outer join
+	Movie m on i. ITEM_ID=m.ITEM_ID
+
+
+- TYPE (엔티티 상속 구조에서 조회 대상을 특정 자식 타입으로 한정)
+
+select i from Item i where type(i) IN (Book, Movie)
+
+- TREAT(JPA 2.1)
+
+상속 구조에서 부모 타입을 측정 자식 타입으로 다룰 때 사용
+
+select i from Item i where treat(i as Book).author = ‘kim’
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
