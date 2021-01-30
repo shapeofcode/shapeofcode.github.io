@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "자바 성능 튜닝 이야기 - 5,6장 (반복문 관련, static 관련)"
-date:   2021-01-24
-last_modified_at: 2021-01-24
+date:   2021-01-25
+last_modified_at: 2021-01-25
 categories: [book, JAVA, TUNNING]
 tags: [book, JAVA, TUNNING]
 ---
