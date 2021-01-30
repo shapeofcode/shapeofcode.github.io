@@ -13,8 +13,11 @@ tags: [book, JAVA, TUNNING]
 - static void exit(int satus) – 자바 VM중지
 - static void runFinalization() – 호출 하면 참조 해제 작업을 기다리는 모든 객체의 finalize() 메서드를 수동으로 수행해야 한다.
 
+<br/>
 
 **System.nanoTime 이 System.currentTimeMillis() 보다 빠르다. JDK5.0 이상 사용**
+
+<br/>
 
 **JMH 사용해볼것!**
 ```java
