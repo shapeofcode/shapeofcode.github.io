@@ -11,6 +11,7 @@ tags: [book, JAVA, TUNNING]
 - BufferedReader > 버퍼 포함한 FileReader > 버퍼 없이 FileRader 속도 순으로 빠르다.
 - DirectByteBuffer를 사용할 때 주의해야한다. ByteBuffer 객체를 생성하는 메서드 중 allocateDirect()가 있는데 OS 메모리에 할당된 메모리를 Native한 JNI로 처리하는 DirectByteBuffer 객체를 생성한다. DirectByteBuffer 생성자는 java.nio에 아무런 접근 제어자가 없이 선언된 Bits라는 클래스의 reverseMemory() 메서드를 호출하고 이 메서드는 JVM에 할당되어 있는 메모리보다 더 많은 메모리를 요구할 경우 System.gc() 메서드를 호출하도록 되어있다. singleton 패턴을 사용하여 해당 JVM에는 하나의 객체만 생성하도록 권장한다.
 - lastModified() 대신 WatchService를 사용하는 실습
+
 ```java
 public class WatchSample {
 	public static void main(String[] args) {
