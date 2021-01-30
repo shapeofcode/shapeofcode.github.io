@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "자바 성능 튜닝 이야기 - 3,4장 (String관련..., Collection 관련)"
+title:  "자바 성능 튜닝 이야기 - 3,4장 (String 관련, Collection 관련)"
 date:   2021-01-24
 last_modified_at: 2021-01-24
 categories: [book, JAVA, TUNNING]
