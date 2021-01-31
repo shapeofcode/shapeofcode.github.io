@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EFFECTIVE JAVA 람다와 스트림 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="EFFECTIVE JAVA 람다와 스트림" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Item42 – 익명 클래스보다는 람다를 사용하라." />
+<meta property="og:description" content="Item42 – 익명 클래스보다는 람다를 사용하라." />
+<link rel="canonical" href="http://localhost:4000/2021/01/06/book-effective-java06" />
+<meta property="og:url" content="http://localhost:4000/2021/01/06/book-effective-java06" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-06T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="EFFECTIVE JAVA 람다와 스트림" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"EFFECTIVE JAVA 람다와 스트림","dateModified":"2021-01-06T00:00:00+09:00","datePublished":"2021-01-06T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/06/book-effective-java06"},"url":"http://localhost:4000/2021/01/06/book-effective-java06","description":"Item42 – 익명 클래스보다는 람다를 사용하라.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,EFFECTIVE JAVA 3/E" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>EFFECTIVE JAVA 람다와 스트림</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <blockquote>
+  <p>Item42 – 익명 클래스보다는 람다를 사용하라.</p>
+</blockquote>
+
+<p>타입을 명시해야 코드가 더 명확할 때만 제외하고는, 람다의 모든 매개변수 타입은 생략하자, 이유는 컴파일러가 타입 정보 대부분을 제네릭에서 얻기 때문이다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item43 – 람다보다는 메서드 참조를 사용하라.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>메소드 참조 유형</th>
+      <th style="text-align: center">예</th>
+      <th>같은 기능을 하는 람다</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>정적</td>
+      <td style="text-align: center">Integer::parseInt</td>
+      <td>str -&gt; Integer.parseInt(str)</td>
+    </tr>
+    <tr>
+      <td>한정적(인스턴스)</td>
+      <td style="text-align: center">Instant.now()::isAfter</td>
+      <td>Instant then = Instant.now(); <br /> t -&gt; then.isAfter(t)</td>
+    </tr>
+    <tr>
+      <td>비한정적(인스턴스)</td>
+      <td style="text-align: center">String::toLowerCase</td>
+      <td>str -&gt; str.toLowerCase()</td>
+    </tr>
+    <tr>
+      <td>클래스생성자</td>
+      <td style="text-align: center">TreeMap&lt;K,V&gt;::new</td>
+      <td>() -&gt; new TreeMap&lt;K,V&gt;()</td>
+    </tr>
+    <tr>
+      <td>배열생성자</td>
+      <td style="text-align: center">int[]::new</td>
+      <td>len -&gt;new int[len]</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item45 - 스트림은 주의해서 사용하라.</p>
+</blockquote>
+
+<p>스트림에 맞는 상황</p>
+
+<ul>
+  <li>원소들의 시퀀스를 일관되게 변환한다.</li>
+  <li>원소들의 시퀀스를 필터링한다.</li>
+  <li>원소들의 시퀀스를 하나의 연산을 사용해 결합한다.(더하기, 연결하기, 최솟값 구하기 등)</li>
+  <li>원소들의 시퀀스를 컬렉션에 모은다.(공통된 속성을 기준으로 묶어가며)</li>
+  <li>원소들의 시퀀스에서 특정 조건을 만족하는 원소를 찾는다.</li>
+</ul>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item48 - 스트림 병렬화는 주의해서 적용하라</p>
+</blockquote>
+
+<p>스트림의 소스가 ArrayList, HashMap, HashSet, ConcurrentHashMap의 인스턴스거나 배열, int 범위, long 범위일 때 병렬화의 효과가 가장 좋다.</p>
+
+<p><br /></p>
+
+<p>출처 : EFFECTIVE JAVA 3/E 조슈아 블로크 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-06, updated at 2021-01-06.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/effective-java-3-e" class="post-tag">EFFECTIVE JAVA 3/E</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/07/book-effective-java07">EFFECTIVE JAVA 메서드</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/05/book-effective-java05">EFFECTIVE JAVA 열거타입과 애너테이션</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

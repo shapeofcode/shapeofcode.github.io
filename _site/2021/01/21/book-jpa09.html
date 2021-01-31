@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>자바 ORM표준 JPA 프로그래밍 - 값 타입 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="자바 ORM표준 JPA 프로그래밍 - 값 타입" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="값 타입 기본값 타입 자바 기본 타입 래퍼 클래스 string 임베디드 타입 컬렉션 값 타입" />
+<meta property="og:description" content="값 타입 기본값 타입 자바 기본 타입 래퍼 클래스 string 임베디드 타입 컬렉션 값 타입" />
+<link rel="canonical" href="http://localhost:4000/2021/01/21/book-jpa09" />
+<meta property="og:url" content="http://localhost:4000/2021/01/21/book-jpa09" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-21T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="자바 ORM표준 JPA 프로그래밍 - 값 타입" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"자바 ORM표준 JPA 프로그래밍 - 값 타입","dateModified":"2021-01-21T00:00:00+09:00","datePublished":"2021-01-21T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/21/book-jpa09"},"url":"http://localhost:4000/2021/01/21/book-jpa09","description":"값 타입 기본값 타입 자바 기본 타입 래퍼 클래스 string 임베디드 타입 컬렉션 값 타입","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,JPA" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>자바 ORM표준 JPA 프로그래밍 - 값 타입</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <p><strong>값 타입</strong></p>
+<ul>
+  <li>기본값 타입
+    <ul>
+      <li>자바 기본 타입</li>
+      <li>래퍼 클래스</li>
+      <li>string</li>
+    </ul>
+  </li>
+  <li>임베디드 타입</li>
+  <li>컬렉션 값 타입</li>
+</ul>
+
+<p><br /></p>
+
+<ol>
+  <li>임베디드 타입</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Entity</span> 
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Member</span> <span class="o">{</span>
+	<span class="nd">@Id</span> <span class="nd">@GeneratedValue</span>
+	<span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+
+	<span class="nd">@Embedded</span> <span class="nc">Period</span> <span class="n">workPeriod</span><span class="o">;</span> <span class="c1">//근무기간 … 값 타입을 정의하는 곳에 표시</span>
+	<span class="nd">@Embedded</span> <span class="nc">Address</span> <span class="n">homeAddress</span><span class="o">;</span> 
+        <span class="err">…</span>
+<span class="o">}</span>
+
+<span class="nd">@Embeddable</span>  <span class="err">…</span><span class="n">값</span> <span class="n">타입을</span> <span class="n">사용하는곳에</span> <span class="n">표시</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Period</span> <span class="o">{</span>
+	<span class="nd">@Temporal</span><span class="o">(</span><span class="nc">TemporalType</span><span class="o">.</span><span class="na">DATE</span><span class="o">)</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Date</span> <span class="n">startDate</span><span class="o">;</span>
+	<span class="nd">@Temporal</span><span class="o">(</span><span class="nc">TemporalType</span><span class="o">.</span><span class="na">DATE</span><span class="o">)</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Date</span> <span class="n">endDate</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isWork</span><span class="o">(</span><span class="nc">Date</span> <span class="n">date</span><span class="o">)</span> <span class="o">{</span>
+        <span class="err">…</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>@AtrributeOverride: 속성 재정의</p>
+
+<p>임베디드 타입에 정의한 매핑 정보를 재정의</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Embedded</span>
+<span class="nd">@AttributeOverrides</span><span class="o">({</span>
+	<span class="nd">@AttributeOverride</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="err">”</span><span class="n">city</span><span class="err">”</span><span class="o">,</span> <span class="n">column</span><span class="o">=</span><span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="err">“</span><span class="no">COMPANY_CITY</span><span class="err">”</span><span class="o">)),</span>
+	<span class="nd">@AttributeOverride</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="err">”</span><span class="n">street</span><span class="err">”</span><span class="o">,</span> <span class="n">column</span><span class="o">=</span><span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="err">“</span><span class="no">COMPANY_STREET</span><span class="err">”</span><span class="o">)),</span>
+	<span class="nd">@AttributeOverride</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="err">”</span><span class="n">zipcode</span><span class="err">”</span><span class="o">,</span> <span class="n">column</span><span class="o">=</span><span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="err">“</span><span class="no">COMPANY_ZIPCODE</span><span class="err">”</span><span class="o">))</span>
+<span class="o">})</span>
+<span class="nc">Address</span> <span class="n">companyAddress</span><span class="o">;</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>임베디드 타입이 null이면 매핑한 컬럼 값은 모두 null</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">member</span><span class="o">.</span><span class="na">setAddress</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span> <span class="c1">//null 입력</span>
+<span class="n">em</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">member</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-21, updated at 2021-01-21.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/jpa" class="post-category">JPA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/jpa" class="post-tag">JPA</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/22/book-jpa10">자바 ORM표준 JPA 프로그래밍 - 객체지향 쿼리 언어</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/20/book-jpa08">자바 ORM표준 JPA 프로그래밍 - 프록시와 연관관계 정리</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

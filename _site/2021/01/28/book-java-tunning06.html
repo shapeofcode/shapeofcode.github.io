@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련) | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="기초 법칙 – 암달의 법칙 성능 개선율 = 1 / (1-P) + P/S P 성능 개선 가능한 부분의 비율 S 개선된 정도 ex) 성능 개선 가능한 부분이 100% P = 1, 2배의 성능 향상이 이루어 졌다면 S = 2 성능 개선율 2" />
+<meta property="og:description" content="기초 법칙 – 암달의 법칙 성능 개선율 = 1 / (1-P) + P/S P 성능 개선 가능한 부분의 비율 S 개선된 정도 ex) 성능 개선 가능한 부분이 100% P = 1, 2배의 성능 향상이 이루어 졌다면 S = 2 성능 개선율 2" />
+<link rel="canonical" href="http://localhost:4000/2021/01/28/book-java-tunning06" />
+<meta property="og:url" content="http://localhost:4000/2021/01/28/book-java-tunning06" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-28T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련)" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련)","dateModified":"2021-01-28T00:00:00+09:00","datePublished":"2021-01-28T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/28/book-java-tunning06"},"url":"http://localhost:4000/2021/01/28/book-java-tunning06","description":"기초 법칙 – 암달의 법칙 성능 개선율 = 1 / (1-P) + P/S P 성능 개선 가능한 부분의 비율 S 개선된 정도 ex) 성능 개선 가능한 부분이 100% P = 1, 2배의 성능 향상이 이루어 졌다면 S = 2 성능 개선율 2","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,JAVA,TUNNING" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련)</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <p><strong>기초 법칙 – 암달의 법칙</strong>
+성능 개선율 = 1 / (1-P) + P/S
+P 성능 개선 가능한 부분의 비율 S 개선된 정도
+ex) 성능 개선 가능한 부분이 100% P = 1, 2배의 성능 향상이 이루어 졌다면 S = 2 성능 개선율 2</p>
+
+<p><br /></p>
+
+<p><strong>성능 튜닝 절차</strong></p>
+<ol>
+  <li>원인 파악</li>
+  <li>목표 설정</li>
+  <li>튜닝 실시</li>
+  <li>개선율 확인</li>
+  <li>결과 정리 및 반영</li>
+</ol>
+
+<p><br /></p>
+
+<p><strong>성능 튜닝 비법</strong></p>
+<ul>
+  <li>하나만 보지 말아라 (서버장비, OS, Application, Webserver, Network, Client)</li>
+  <li>큰 놈을 없애라</li>
+  <li>깊게 알아야 한다.</li>
+  <li>결과 공유는 선택이 아닌 필수!</li>
+</ul>
+
+<p><br /></p>
+
+<p>출처 : 자바 성능 튜닝 이야기 이상민 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-28, updated at 2021-01-28.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+      <a href="/category/tunning" class="post-category">TUNNING</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/java" class="post-tag">JAVA</a>
+      
+      <a href="/tag/tunning" class="post-tag">TUNNING</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/27/book-java-tunning05">자바 성능 튜닝 이야기 - 17장 (자바 메모리 관련)</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

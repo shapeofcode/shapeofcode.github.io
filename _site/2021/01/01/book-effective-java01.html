@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EFFECTIVE JAVA 객체 생성과 파괴 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="EFFECTIVE JAVA 객체 생성과 파괴" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Item1 – 생성자대신 팩터리 메서드를 고려하라." />
+<meta property="og:description" content="Item1 – 생성자대신 팩터리 메서드를 고려하라." />
+<link rel="canonical" href="http://localhost:4000/2021/01/01/book-effective-java01" />
+<meta property="og:url" content="http://localhost:4000/2021/01/01/book-effective-java01" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="EFFECTIVE JAVA 객체 생성과 파괴" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"EFFECTIVE JAVA 객체 생성과 파괴","dateModified":"2021-01-01T00:00:00+09:00","datePublished":"2021-01-01T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/01/book-effective-java01"},"url":"http://localhost:4000/2021/01/01/book-effective-java01","description":"Item1 – 생성자대신 팩터리 메서드를 고려하라.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,EFFECTIVE JAVA 3/E" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>EFFECTIVE JAVA 객체 생성과 파괴</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <blockquote>
+  <p>Item1 – 생성자대신 팩터리 메서드를 고려하라.</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Date</span> <span class="n">now</span> <span class="o">=</span> <span class="nc">Date</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">instant</span><span class="o">);</span>
+<span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Asset</span><span class="o">&gt;</span> <span class="n">portFolio</span> <span class="o">=</span> <span class="nc">EnumSet</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="no">STOCK</span><span class="o">,</span><span class="no">GOLD</span><span class="o">,</span><span class="no">COIN</span><span class="o">);</span>
+<span class="nc">BigInteger</span> <span class="n">prime</span> <span class="o">=</span> <span class="nc">BigInteger</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">);</span>
+</code></pre></div></div>
+<p>위 함수를 보면 그동안 from , of , valueOf 메소드를 아무렇지 않게 사용하고 있었다. 하지만 메소드를 쓰는데 너무 자연스러운 이유는 잘 지어진 이름으로 인한 반한 될 객체의 특성을 잘 알 수 있기 때문이다. 불필요한 객체 생성을 할 필요도 없어진다.<br />
+<br /></p>
+
+<p>알아두면 좋은 정적 팩터리 메서드 명명 방식</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>from</td>
+      <td>하나의 매개 변수를 받아서 해당 타입의 인스턴스를 형 변환하여 반환할 때</td>
+    </tr>
+    <tr>
+      <td>of</td>
+      <td>여러 개의 매개변수를 받아 적합한타입의 인스턴스를 반환할 때</td>
+    </tr>
+    <tr>
+      <td>valueOf</td>
+      <td>from 과 of의 자세한 버전</td>
+    </tr>
+    <tr>
+      <td>instance or getInstance</td>
+      <td>같은 인스턴스라는 것을 보장하지 않으면서 인스턴스 반환할 때</td>
+    </tr>
+    <tr>
+      <td>create or newInstsance</td>
+      <td>새로운 인스턴스를 생성해 반환을 보장할 때</td>
+    </tr>
+    <tr>
+      <td>getType</td>
+      <td>다른 클래스에 팩터리 메서드를 정의할 때</td>
+    </tr>
+    <tr>
+      <td>newType</td>
+      <td>다른 클래스에 팩터리 메서드를 정의할 때</td>
+    </tr>
+    <tr>
+      <td>type</td>
+      <td>getType과 newType의 간결한 버전</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item2 – 생성자에 매개변수가 많다면 빌더를 고려하라.</p>
+</blockquote>
+
+<p>점층적 생성자 패턴, 흔히 매개변수가 늘어날 경우 많이 사용한다.<br />
+자바빈즈 패턴, 이 또한 많이 사용하는 패턴으로 메서드 호출을 여러 번 해야하는 단점이 있다.<br />
+빌더 패턴, 최근에는 자바 라이브러리를 사용하면서 많이 접하는 패턴이다. 메소드 채이닝이라고도 하며 매개변수가 4개 이상 많아질 경우 큰 장점이 있다. 간결하고 안전한 특징이있다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item7 – 다 쓴 객체 참조를 해제하라.</p>
+</blockquote>
+
+<p>메모리를 직접 관리하는 클래스는 메모리 누수에 주의해야함을 이야기하고 있다. Java는 GC를 갖추고 있어서 메모리 관리에 신경 쓰지 않는 경우가 많은데 메모리를 다루는 자바 코드는 null 처리와 같은 참조 해제를 행해 주어야 한다. 캐시,리스너,콜백 또한 마찬가지이다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item9 – try-finally 보다는 try-with-resources를 사용하라.</p>
+</blockquote>
+
+<p>BufferedReader, InputStream, OutpuStream 자원을 항상 닫아주는 코드로 finally 이후에 써주는 걸로 익숙하다. 여러 개가 쓰일 경우 코드가 지저분해지며 오류 사항에 대하여 놓치는 부분이 생길 수 있다.</p>
+
+<p><a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources 오라클 문서</a></p>
+
+<p><br /></p>
+
+<p>출처 : EFFECTIVE JAVA 3/E 조슈아 블로크 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-01, updated at 2021-01-01.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/effective-java-3-e" class="post-tag">EFFECTIVE JAVA 3/E</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/02/book-effective-java02">EFFECTIVE JAVA 모든 객체의 공통 메서드</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2020/12/31/daily01">책 정리</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

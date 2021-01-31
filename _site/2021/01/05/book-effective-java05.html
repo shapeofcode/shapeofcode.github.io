@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EFFECTIVE JAVA 열거타입과 애너테이션 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="EFFECTIVE JAVA 열거타입과 애너테이션" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Item34 – int 상수 대신 열거 타입을 사용하라." />
+<meta property="og:description" content="Item34 – int 상수 대신 열거 타입을 사용하라." />
+<link rel="canonical" href="http://localhost:4000/2021/01/05/book-effective-java05" />
+<meta property="og:url" content="http://localhost:4000/2021/01/05/book-effective-java05" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-05T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="EFFECTIVE JAVA 열거타입과 애너테이션" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"EFFECTIVE JAVA 열거타입과 애너테이션","dateModified":"2021-01-05T00:00:00+09:00","datePublished":"2021-01-05T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/05/book-effective-java05"},"url":"http://localhost:4000/2021/01/05/book-effective-java05","description":"Item34 – int 상수 대신 열거 타입을 사용하라.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,EFFECTIVE JAVA 3/E" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>EFFECTIVE JAVA 열거타입과 애너테이션</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <blockquote>
+  <p>Item34 – int 상수 대신 열거 타입을 사용하라.</p>
+</blockquote>
+
+<p>필요한 원소를 컴파일 타임에 알 수 있는 상수 집합이라면 열거타입을 사용해야한다. (가독성, 타입 안전성)</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item36 – 비트 필드 대신 EnumSet을 사용하라.</p>
+</blockquote>
+
+<p>EnumSet 내부는 비트 백터로 구성되어있고 비트 필드 수준의 명료함과 성능을 제공한다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item39 - 명명 패턴보다 애너테이션을 사용하라.</p>
+</blockquote>
+
+<p>명명패턴의 단점</p>
+
+<ul>
+  <li>오타로 인한 점검 누락</li>
+  <li>올바른 프로그램 요소에 사용된다는 보장을 해주지 못함</li>
+  <li>프로그램 요소를 매개변수로 전달할 방법이 없다</li>
+</ul>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item40 - @Override 애너테이션을 일관되게 사용하라</p>
+</blockquote>
+
+<p>예를 들어 equals를 재정의하려고 그대로 함수명을 사용하게 되면 overloading이 된다.</p>
+
+<p>재정의법</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span> <span class="kd">public</span> <span class="nc">Boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Bigram</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+	<span class="k">return</span> <span class="n">b</span><span class="o">.</span><span class="na">first</span> <span class="o">==</span> <span class="n">first</span> <span class="o">&amp;&amp;</span> <span class="n">b</span><span class="o">.</span><span class="na">second</span> <span class="o">==</span> <span class="n">second</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>출처 : EFFECTIVE JAVA 3/E 조슈아 블로크 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-05, updated at 2021-01-05.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/effective-java-3-e" class="post-tag">EFFECTIVE JAVA 3/E</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/06/book-effective-java06">EFFECTIVE JAVA 람다와 스트림</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/04/book-effective-java04">EFFECTIVE JAVA 제네릭</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

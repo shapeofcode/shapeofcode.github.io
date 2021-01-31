@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>자바 성능 튜닝 이야기 - 9장 (IO 관련) | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="자바 성능 튜닝 이야기 - 9장 (IO 관련)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="IO 처리 BufferedReader &gt; 버퍼 포함한 FileReader &gt; 버퍼 없이 FileRader 속도 순으로 빠르다. DirectByteBuffer를 사용할 때 주의해야한다. ByteBuffer 객체를 생성하는 메서드 중 allocateDirect()가 있는데 OS 메모리에 할당된 메모리를 Native한 JNI로 처리하는 DirectByteBuffer 객체를 생성한다. DirectByteBuffer 생성자는 java.nio에 아무런 접근 제어자가 없이 선언된 Bits라는 클래스의 reverseMemory() 메서드를 호출하고 이 메서드는 JVM에 할당되어 있는 메모리보다 더 많은 메모리를 요구할 경우 System.gc() 메서드를 호출하도록 되어있다. singleton 패턴을 사용하여 해당 JVM에는 하나의 객체만 생성하도록 권장한다. lastModified() 대신 WatchService를 사용하는 실습" />
+<meta property="og:description" content="IO 처리 BufferedReader &gt; 버퍼 포함한 FileReader &gt; 버퍼 없이 FileRader 속도 순으로 빠르다. DirectByteBuffer를 사용할 때 주의해야한다. ByteBuffer 객체를 생성하는 메서드 중 allocateDirect()가 있는데 OS 메모리에 할당된 메모리를 Native한 JNI로 처리하는 DirectByteBuffer 객체를 생성한다. DirectByteBuffer 생성자는 java.nio에 아무런 접근 제어자가 없이 선언된 Bits라는 클래스의 reverseMemory() 메서드를 호출하고 이 메서드는 JVM에 할당되어 있는 메모리보다 더 많은 메모리를 요구할 경우 System.gc() 메서드를 호출하도록 되어있다. singleton 패턴을 사용하여 해당 JVM에는 하나의 객체만 생성하도록 권장한다. lastModified() 대신 WatchService를 사용하는 실습" />
+<link rel="canonical" href="http://localhost:4000/2021/01/26/book-java-tunning04" />
+<meta property="og:url" content="http://localhost:4000/2021/01/26/book-java-tunning04" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-26T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="자바 성능 튜닝 이야기 - 9장 (IO 관련)" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"자바 성능 튜닝 이야기 - 9장 (IO 관련)","dateModified":"2021-01-26T00:00:00+09:00","datePublished":"2021-01-26T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/26/book-java-tunning04"},"url":"http://localhost:4000/2021/01/26/book-java-tunning04","description":"IO 처리 BufferedReader &gt; 버퍼 포함한 FileReader &gt; 버퍼 없이 FileRader 속도 순으로 빠르다. DirectByteBuffer를 사용할 때 주의해야한다. ByteBuffer 객체를 생성하는 메서드 중 allocateDirect()가 있는데 OS 메모리에 할당된 메모리를 Native한 JNI로 처리하는 DirectByteBuffer 객체를 생성한다. DirectByteBuffer 생성자는 java.nio에 아무런 접근 제어자가 없이 선언된 Bits라는 클래스의 reverseMemory() 메서드를 호출하고 이 메서드는 JVM에 할당되어 있는 메모리보다 더 많은 메모리를 요구할 경우 System.gc() 메서드를 호출하도록 되어있다. singleton 패턴을 사용하여 해당 JVM에는 하나의 객체만 생성하도록 권장한다. lastModified() 대신 WatchService를 사용하는 실습","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,JAVA,TUNNING" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>자바 성능 튜닝 이야기 - 9장 (IO 관련)</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <p><strong>IO 처리</strong></p>
+<ul>
+  <li>BufferedReader &gt; 버퍼 포함한 FileReader &gt; 버퍼 없이 FileRader 속도 순으로 빠르다.</li>
+  <li>DirectByteBuffer를 사용할 때 주의해야한다. ByteBuffer 객체를 생성하는 메서드 중 allocateDirect()가 있는데 OS 메모리에 할당된 메모리를 Native한 JNI로 처리하는 DirectByteBuffer 객체를 생성한다. DirectByteBuffer 생성자는 java.nio에 아무런 접근 제어자가 없이 선언된 Bits라는 클래스의 reverseMemory() 메서드를 호출하고 이 메서드는 JVM에 할당되어 있는 메모리보다 더 많은 메모리를 요구할 경우 System.gc() 메서드를 호출하도록 되어있다. singleton 패턴을 사용하여 해당 JVM에는 하나의 객체만 생성하도록 권장한다.</li>
+  <li>lastModified() 대신 WatchService를 사용하는 실습</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WatchSample</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">WatcherThread</span> <span class="n">thread</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WatcherThread</span><span class="o">(</span><span class="s">"C:\\Temp"</span><span class="o">);</span>
+		<span class="n">thread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.nio.file.FileSystems</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.file.Path</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.file.Paths</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.file.WatchEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.file.WatchKey</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.nio.file.WatchService</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">file</span><span class="o">.</span><span class="na">StandardWatchEventKinds</span><span class="o">.</span><span class="na">ENTRY_CREATE</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">file</span><span class="o">.</span><span class="na">StandardWatchEventKinds</span><span class="o">.</span><span class="na">ENTRY_DELETE</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">nio</span><span class="o">.</span><span class="na">file</span><span class="o">.</span><span class="na">StandardWatchEventKinds</span><span class="o">.</span><span class="na">ENTRY_MODIFY</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WatcherThread</span> <span class="kd">extends</span> <span class="nc">Thread</span><span class="o">{</span>
+	<span class="nc">String</span> <span class="n">dirName</span><span class="o">;</span>
+	<span class="kd">public</span> <span class="nf">WatcherThread</span><span class="o">(</span><span class="nc">String</span> <span class="n">dirName</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">dirName</span><span class="o">=</span><span class="n">dirName</span><span class="o">;</span>
+	<span class="o">}</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+		<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Watcher is started"</span><span class="o">);</span>
+		<span class="n">fileWatcher</span><span class="o">();</span>
+		<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Watcher is ended"</span><span class="o">);</span>
+	<span class="o">}</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">fileWatcher</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="nc">Path</span> <span class="n">dir</span> <span class="o">=</span> <span class="nc">Paths</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">dirName</span><span class="o">);</span>
+			<span class="nc">WatchService</span> <span class="n">watcher</span> <span class="o">=</span> <span class="nc">FileSystems</span><span class="o">.</span><span class="na">getDefault</span><span class="o">().</span><span class="na">newWatchService</span><span class="o">();</span>
+			<span class="n">dir</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">watcher</span><span class="o">,</span> <span class="no">ENTRY_CREATE</span><span class="o">,</span> <span class="no">ENTRY_DELETE</span><span class="o">,</span> <span class="no">ENTRY_MODIFY</span><span class="o">);</span>
+			
+			<span class="nc">WatchKey</span> <span class="n">key</span><span class="o">;</span>
+			<span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">loop</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">loop</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">;</span> <span class="n">loop</span><span class="o">++)</span> <span class="o">{</span>
+				<span class="n">key</span> <span class="o">=</span> <span class="n">watcher</span><span class="o">.</span><span class="na">take</span><span class="o">();</span>
+				<span class="nc">String</span> <span class="n">watchedTime</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Date</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+				<span class="nc">List</span><span class="o">&lt;</span><span class="nc">WatchEvent</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">eventList</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="na">pollEvents</span><span class="o">();</span>
+				<span class="k">for</span><span class="o">(</span><span class="nc">WatchEvent</span><span class="o">&lt;?&gt;</span> <span class="n">event</span> <span class="o">:</span> <span class="n">eventList</span><span class="o">)</span> <span class="o">{</span>
+					<span class="nc">Path</span> <span class="n">name</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Path</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">context</span><span class="o">();</span>
+					<span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">kind</span><span class="o">()</span> <span class="o">==</span> <span class="no">ENTRY_CREATE</span><span class="o">)</span> <span class="o">{</span>
+						<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%s created at %s%n"</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">watchedTime</span><span class="o">);</span>
+					<span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">kind</span><span class="o">()</span> <span class="o">==</span> <span class="no">ENTRY_DELETE</span><span class="o">)</span> <span class="o">{</span>
+						<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%s deleted at %s%n"</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">watchedTime</span><span class="o">);</span>
+					<span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">kind</span><span class="o">()</span> <span class="o">==</span> <span class="no">ENTRY_MODIFY</span><span class="o">)</span> <span class="o">{</span>
+						<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%s modified at %s%n"</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">watchedTime</span><span class="o">);</span>
+					<span class="o">}</span>
+				<span class="o">}</span>
+				<span class="n">key</span><span class="o">.</span><span class="na">reset</span><span class="o">();</span>
+			<span class="o">}</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>출처 : 자바 성능 튜닝 이야기 이상민 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-26, updated at 2021-01-26.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+      <a href="/category/tunning" class="post-category">TUNNING</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/java" class="post-tag">JAVA</a>
+      
+      <a href="/tag/tunning" class="post-tag">TUNNING</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/27/book-java-tunning05">자바 성능 튜닝 이야기 - 17장 (자바 메모리 관련)</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/25/book-java-tunning03">자바 성능 튜닝 이야기 - 5,6장 (반복문 관련, static 관련)</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

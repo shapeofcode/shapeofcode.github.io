@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EFFECTIVE JAVA 일반적인 프로그래밍 원칙 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="EFFECTIVE JAVA 일반적인 프로그래밍 원칙" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Item57 – 지역변수의 범위를 최소화하라." />
+<meta property="og:description" content="Item57 – 지역변수의 범위를 최소화하라." />
+<link rel="canonical" href="http://localhost:4000/2021/01/08/book-effective-java08" />
+<meta property="og:url" content="http://localhost:4000/2021/01/08/book-effective-java08" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-08T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="EFFECTIVE JAVA 일반적인 프로그래밍 원칙" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"EFFECTIVE JAVA 일반적인 프로그래밍 원칙","dateModified":"2021-01-08T00:00:00+09:00","datePublished":"2021-01-08T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/08/book-effective-java08"},"url":"http://localhost:4000/2021/01/08/book-effective-java08","description":"Item57 – 지역변수의 범위를 최소화하라.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,EFFECTIVE JAVA 3/E" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>EFFECTIVE JAVA 일반적인 프로그래밍 원칙</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <blockquote>
+  <p>Item57 – 지역변수의 범위를 최소화하라.</p>
+</blockquote>
+
+<p>가장 강력한 기법은 가장 처음 쓰일 때 선언하기 또한 모든 지역변수는 선언과 동시에 초기화해야 한다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item58 – 전통적인 for 문보다는 for-each문을 사용하라.</p>
+</blockquote>
+
+<p>성능 저하도 없고 버그도 예방해준다.</p>
+
+<p>쓸 수 없는 세가지 상황</p>
+
+<ul>
+  <li>파괴적인 필터링 – 컬렉션을 순회하면서 선택된 원소를 제거해야 한다면 반복자의 remove 메서드를 호출해야 한다.</li>
+  <li>변형 – 리스트나 배열을 순회하면서 그 원소의 값 일부 혹은 전체를 교체해야 한다면 인덱스를 사용해야한다.</li>
+  <li>병렬 반복 – 여러 컬렉션을 병렬로 순회해야 한다면 각각의 반복자와 인덱스 변수를 사용해 엄격하고 명시적으로 제어해야 하다.</li>
+</ul>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item59 - 라이브러리를 익히고 사용하라.</p>
+</blockquote>
+
+<p>앞서 사용한 다른 프로그래머들의 경험을 활용한 단단한 코드 사용 가능. java.lang, java.util, java.io와 그 하위 패키지들에는 익숙해져야 한다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item60 - 정확한 답이 필요하다면 float와 double은 피하라.</p>
+</blockquote>
+
+<p>금융 관련 계산과는 맞지 않다. 금융 계산에는 BigDecimal, int 혹은 long을 사용해야한다.
+(개인적으로 금융권 프로그램에서는 주로 어떻게 쓰는지 궁금하다…)</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item61 - 박싱된 기본 타입보다는 기본 타입을 사용하라.</p>
+</blockquote>
+
+<p>박싱된 기본 타입에 == 연산자를 사용하면 오류가 일어난다. 언박싱 과정에서 NullPointerException을 던질 수 있다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item63 - 문자열 연결은 느리지 주의하라.</p>
+</blockquote>
+
+<p>문자열 연결 연산자로 문자열 n개를 잇는 시간은 n제곱에 비례한다. StringBuilder의 append를 사용하라.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item64 - 객체는 인터페이스를 사용해 참조하라.</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">클래스를</span> <span class="n">타입으로</span> <span class="n">사용</span>
+<span class="nc">LinkedHashSet</span><span class="o">&lt;</span><span class="nc">Son</span><span class="o">&gt;</span> <span class="n">sonSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedHashSet</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">인터페이스를</span> <span class="n">타입으로</span> <span class="n">사용</span>
+<span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Son</span><span class="o">&gt;</span> <span class="n">sonSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedHashSet</span><span class="o">&lt;&gt;();</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item66 – 네이티브 메서드는 신중히 사용하라.</p>
+</blockquote>
+
+<p>저수준 자원이나 네이티브 라이브러리를 사용해야만 하는 상황을 제외하고는 지양한다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item67 – 최적화는 신중히 하라.</p>
+</blockquote>
+
+<p>최적화 격언</p>
+<ul>
+  <li>(맹목적인 어리석음을 포함해) 그 어떤 핑계보다 효율성이라는 이름 아래 행해진 컴퓨팅 죄악이 더 많다(심지어 효율을 높이지도 못하면서). – 윌리엄울프[Wulf72]</li>
+  <li>(전체의 97% 정도인) 자그마한 효율성을 모두 잊자. 섣부른 최적화가 만악의 근원이다. – 도널드 크누스[Knuth74]</li>
+  <li>최적화를 할 때는 다음 두 규칙을 따르라.
+    <ul>
+      <li>첫 번째, 하지마라.</li>
+      <li>두 번째, (전문가 한정) 아직 하지 마라. 다시 말해, 완전히 명백하고 최적화되지 않은 해법을 찾을 때까지는 하지 마라. - M. A. 잭슨[Jackson75]</li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item68 – 일반적으로 통용되는 명명 규칙을 따르라.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>식별자 타입</th>
+      <th style="text-align: center">예</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>패키지와 모듈</td>
+      <td style="text-align: center">org.junit.jupiter.api, com.google.common.collect</td>
+    </tr>
+    <tr>
+      <td>클래스와 인터페이스</td>
+      <td style="text-align: center">Stream, FutureTask, LinkedHashMap, HttpClient</td>
+    </tr>
+    <tr>
+      <td>메서드와 필드</td>
+      <td style="text-align: center">remove, groupingBy, getCrc</td>
+    </tr>
+    <tr>
+      <td>상수 필드</td>
+      <td style="text-align: center">MIN_VALUE, MEGATIVE_INFINITY</td>
+    </tr>
+    <tr>
+      <td>타입 매개변수</td>
+      <td style="text-align: center">T, E, K, V, X, R, U, V, T1, T2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<p>출처 : EFFECTIVE JAVA 3/E 조슈아 블로크 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-08, updated at 2021-01-08.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/effective-java-3-e" class="post-tag">EFFECTIVE JAVA 3/E</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/09/book-effective-java09">EFFECTIVE JAVA 예외</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/07/book-effective-java07">EFFECTIVE JAVA 메서드</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>

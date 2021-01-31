@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>EFFECTIVE JAVA 메서드 | Steady / Focus / Life</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="EFFECTIVE JAVA 메서드" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Item49 – 매개변수가 유효한지 검사하라." />
+<meta property="og:description" content="Item49 – 매개변수가 유효한지 검사하라." />
+<link rel="canonical" href="http://localhost:4000/2021/01/07/book-effective-java07" />
+<meta property="og:url" content="http://localhost:4000/2021/01/07/book-effective-java07" />
+<meta property="og:site_name" content="Steady / Focus / Life" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-07T00:00:00+09:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="EFFECTIVE JAVA 메서드" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"EFFECTIVE JAVA 메서드","dateModified":"2021-01-07T00:00:00+09:00","datePublished":"2021-01-07T00:00:00+09:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2021/01/07/book-effective-java07"},"url":"http://localhost:4000/2021/01/07/book-effective-java07","description":"Item49 – 매개변수가 유효한지 검사하라.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<meta name="keywords" content="book,EFFECTIVE JAVA 3/E" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/favicon.ico"/>
+<link rel="alternate" type="application/rss+xml" title="Steady / Focus / Life - Write an awesome description for your new site here." href="/feed.xml" />
+<link rel="stylesheet" type="text/css" href="/assets/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/assets/css/highlight.css" />
+
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async ></script>
+
+
+<script src="/assets/script/jekyllpaper.js" async ></script>
+<script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js" onload="javascript:loadMermaid();" async></script>
+
+
+</head>
+<body>
+  <div class="container-wrapper">
+    <header class="container-header">
+      <div class="header-info">
+  <span class="header-info-name">Steady / Focus / Life</span>
+  <span class="header-info-desc">Write an awesome description for your new site here.</span>
+</div>
+<nav class="header-nav">
+  <ul class="header-main-nav">
+  
+    <li class="header-main-nav-item"><a href="/">Index</a></li>
+  
+    <li class="header-main-nav-item"><a href="/category">Categories</a></li>
+  
+    <li class="header-main-nav-item"><a href="/about">About</a></li>
+  
+  </ul>
+</nav>
+    </header>
+    <main class="container-main">
+      <article class="container-post">
+  <div class="post-title">
+    <h1>EFFECTIVE JAVA 메서드</h1>
+  </div>
+  <div class="post-author">
+    <span>JinKim</span>
+  </div>
+  <div class="post-content">
+    <blockquote>
+  <p>Item49 – 매개변수가 유효한지 검사하라.</p>
+</blockquote>
+
+<p>JAVA7에 추가된 java.util.Objects.requireNonNull 메서드는 null 검사에 유용하다.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">this</span><span class="o">.</span><span class="na">strategy</span> <span class="o">=</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">requireNonNull</span><span class="o">(</span><span class="n">strategy</span><span class="o">,</span><span class="err">”</span><span class="n">전략</span><span class="err">”</span><span class="o">);</span>
+</code></pre></div></div>
+<p>매개 변수들의 제약들은 문서화하고 코드 시작 부분에서 명시적으로 검사해야한다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item50 – 적시에 방어적 복사본을 만들라.</p>
+</blockquote>
+
+<p>클래스가 클라이언트로부터 받은 혹은 클라이언트로 반환하는 구성요소가 가변이라면 반드시 방어적으로 복사해야한다.
+Date 대신 Instant를 사용한다. (LocalDateTime이나 ZonedDateTime 도 가능)</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item51 – 메서드 시그니처를 신중히 설계하라.</p>
+</blockquote>
+
+<ul>
+  <li>메서드 이름을 신중히 짓자</li>
+  <li>편의 메서드를 너무 많이 만들지 말자</li>
+  <li>매개변수 목록을 짧게 유지하자 (4개 이하) – 같은 타입의 매개변수가 여러 개 연달아 나오는 경우는 지양</li>
+  <li>매개변수의 타입으로는 클래스보다는 인터페이스가 더 낫다.</li>
+  <li>boolean보다는 원소 2개짜리 열거 타입이 낫다. (가독성, 확장성)</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Thermometer</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+<span class="nc">Thermometer</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="nc">TemperatureScale</span><span class="o">.</span><span class="na">CELSIUS</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item53 - 가변인수는 신중히 사용하라.</p>
+</blockquote>
+
+<p>필수 매개변수는 가변인수앞에 두고, 성능 문제까지 고려하자.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item54 - null이 아닌, 빈 컬렉션이나 배열을 반환하라.</p>
+</blockquote>
+
+<p>null을 반환하는 API는 사용하기 어렵고 오류 처리 코드도 늘어난다.</p>
+
+<p><br /></p>
+
+<blockquote>
+  <p>Item56 - 공개된 API 요소에는 항상 문서화 주석을 작성하라.</p>
+</blockquote>
+
+<p>API를 올바로 문서화하려면 공개된 모든 클래스, 인터페이스, 메서드, 필드 선언에 문서화 주석을 달아야 한다. 메서드용 문서화 주석에는 클라이언트가 해당 메서드를 호출하기 위한 전제조건을 모두 나열하고 사후 조건도 모두 나열해야한다.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+*이 리스트에서 지정한 위치의 원소를 반환한다.
+*
+* &lt;p&gt;이 메서드는 상수 시간에 수행됨을 보장하지 &lt;i&gt;않는다&lt;/i&gt;.구현에 따라 원소의 위치에 
+* 비례해 시간이 걸릴 수 도 있다.
+*
+* @param index 반환할 원소의 인덱스; 0 이상이고 리스트 크기보다 작아야 한다.
+* @return 이 리스트에서 지정한 위치의 원소
+* @throws IndexOutofBoundsException index가 범위를 벗어나면,
+*		즉, ({@code index &lt; 0 || index &gt;= this.size()})이면 발생한다.
+*/</span>
+<span class="no">E</span> <span class="nf">get</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>출처 : EFFECTIVE JAVA 3/E 조슈아 블로크 지음</p>
+
+<p><br /></p>
+
+  </div>
+  <div class="post-info">
+    <div class="post-date">
+      Written on 2021-01-07, updated at 2021-01-07.
+    </div>
+    <div class="post-categories">
+      <span>Categories: </span>
+      
+      <a href="/category/book" class="post-category">book</a>
+      
+      <a href="/category/java" class="post-category">JAVA</a>
+      
+    </div>
+    <div class="post-tags">
+      <span>Tags: </span>
+      
+      <a href="/tag/book" class="post-tag">book</a>
+      
+      <a href="/tag/effective-java-3-e" class="post-tag">EFFECTIVE JAVA 3/E</a>
+      
+    </div>
+    <div class="post-tools">
+      
+      <div>
+        <span>Next: </span><a href="/2021/01/08/book-effective-java08">EFFECTIVE JAVA 일반적인 프로그래밍 원칙</a>
+      </div>
+      
+      
+      <div>
+        <span>Previous: </span><a href="/2021/01/06/book-effective-java06">EFFECTIVE JAVA 람다와 스트림</a>
+      </div>
+      
+    </div>
+    
+      
+  <div id="disqus_thread"></div>
+<script>
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://shapeofcodeblog.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+    
+  </div>
+</article>
+    </main>
+    <footer class="container-footer">
+      <div class="footer-copyright">
+  <span class="footer-copyright-text float-left">Copyright &copy; 2021. shapeofcode.github.io.</span>
+  <span class="footer-copyright-text float-right">
+    Powered by <a href="https://jekyllrb.com/">Jekyll</a>, themed by <a href="https://github.com/ghosind/Jekyll-Paper">Jekyll-Paper</a>.
+  </span>
+</div>
+    </footer>
+  </div>
+</body>
+</html>
