@@ -4,7 +4,9 @@ title: About
 permalink: /about/
 ---
 
-주요 관심사: GIS, 아키텍처, 마이크로서비스
+주요 관심사: GIS, 아키텍처
 
 [jekyll-paper]: https://github.com/ghosind/Jekyll-Paper
+[jekyll-paper-github]: https://github.com/ghosind/Jekyll-Paper-Github
 [jekyll-paper-issues]: https://github.com/ghosind/Jekyll-Paper/issues
+[jekyll-paper-github-issues]: https://github.com/ghosind/Jekyll-Paper-Github/issues
