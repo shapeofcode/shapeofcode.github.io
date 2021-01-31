@@ -4,7 +4,7 @@ title:  "책 정리"
 date:   2020-12-31
 last_modified_at: 2020-12-31
 categories: [daily]
-tags: [book, daily]
+tags: [book]
 ---
 
 책을 읽게 되는 동기는 너무나 많다. 하고있는 일에 필요해서, 기초가 부족하다고 느껴서, 유명한 개발 책이라고 들어서, 표지가 예뻐서(사실 이것도 상당히 중요한 선택 요인이다…).

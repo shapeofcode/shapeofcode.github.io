@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - 객체지향 쿼리 언어"
 date:   2021-01-22
 last_modified_at: 2021-01-22
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 - JPQL

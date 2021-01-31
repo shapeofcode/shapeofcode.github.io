@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - 프록시와 연관관계 정리"
 date:   2021-01-20
 last_modified_at: 2021-01-20
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 **프록시**

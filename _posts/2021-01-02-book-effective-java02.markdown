@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 모든 객체의 공통 메서드"
 date:   2021-01-02
 last_modified_at: 2021-01-02
-categories: [book, JAVA]
+categories: [JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

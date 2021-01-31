@@ -3,13 +3,16 @@ layout: post
 title:  "자바 성능 튜닝 이야기 - 23장 (튜닝 절차 관련)"
 date:   2021-01-28
 last_modified_at: 2021-01-28
-categories: [book, JAVA, TUNNING]
-tags: [book, JAVA, TUNNING]
+categories: [TUNNING]
+tags: [book]
 ---
 
 **기초 법칙 – 암달의 법칙**
+
 성능 개선율 = 1 / (1-P) + P/S
-P 성능 개선 가능한 부분의 비율 S 개선된 정도
+
+P - 성능 개선 가능한 부분의 비율, S - 개선된 정도
+
 ex) 성능 개선 가능한 부분이 100% P = 1, 2배의 성능 향상이 이루어 졌다면 S = 2 성능 개선율 2
 
 <br/>

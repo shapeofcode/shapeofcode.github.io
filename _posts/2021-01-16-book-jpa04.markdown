@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - 엔티티 매핑"
 date:   2021-01-16
 last_modified_at: 2021-01-16
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 객체와 테이블 매핑 어노테이션

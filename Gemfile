@@ -21,7 +21,6 @@ group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.11"
   gem "jekyll-paginate"
   gem "jekyll-sitemap"
-  gem "jekyll-archives"
   gem "jekyll-seo-tag"
 end
 

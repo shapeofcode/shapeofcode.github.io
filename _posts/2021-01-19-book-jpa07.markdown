@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - 고급 매핑"
 date:   2021-01-19
 last_modified_at: 2021-01-19
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 **상속 관계 매핑**

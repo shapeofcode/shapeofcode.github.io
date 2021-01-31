@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 일반적인 프로그래밍 원칙"
 date:   2021-01-08
 last_modified_at: 2021-01-08
-categories: [book, JAVA]
+categories: [JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

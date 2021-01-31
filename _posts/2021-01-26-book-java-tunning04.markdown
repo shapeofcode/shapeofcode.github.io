@@ -3,8 +3,8 @@ layout: post
 title:  "자바 성능 튜닝 이야기 - 9장 (IO 관련)"
 date:   2021-01-26
 last_modified_at: 2021-01-26
-categories: [book, JAVA, TUNNING]
-tags: [book, JAVA, TUNNING]
+categories: [TUNNING]
+tags: [book]
 ---
 
 **IO 처리**

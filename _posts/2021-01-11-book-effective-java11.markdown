@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 직렬화"
 date:   2021-01-11
 last_modified_at: 2021-01-11
-categories: [book, JAVA]
+categories: [JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

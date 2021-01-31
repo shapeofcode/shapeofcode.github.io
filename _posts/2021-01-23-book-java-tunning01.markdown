@@ -3,8 +3,8 @@ layout: post
 title:  "자바 성능 튜닝 이야기 - 내가 만든 프로그램의 속도를 알고 싶다"
 date:   2021-01-23
 last_modified_at: 2021-01-23
-categories: [book, JAVA, TUNNING]
-tags: [book, JAVA, TUNNING]
+categories: [TUNNING]
+tags: [book]
 ---
 
 **절대 사용하면 안되는 메서드**

@@ -3,8 +3,8 @@ layout: post
 title:  "자바 성능 튜닝 이야기 - 17장 (자바 메모리 관련)"
 date:   2021-01-27
 last_modified_at: 2021-01-27
-categories: [book, JAVA, TUNNING]
-tags: [book, JAVA, TUNNING]
+categories: [TUNNING]
+tags: [book]
 ---
 
 **자바 메모리 간략**

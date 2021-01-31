@@ -17,6 +17,7 @@ title: Steady / Focus / Life
 email: jinmyung0269@gmail.com
 name: JinKim
 description: >- # this means to ignore newlines until "baseurl:"
+  결과를 만드는 법
 keywords: [Your keywords]
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
@@ -49,15 +50,12 @@ sass:
   sass_dir: _sass
   style: expanded # compressed, compact, expanded or compressed
 
-# Category settings
-jekyll-archives:
-  enabled: 
-    - categories
-    - tags
-  layout: archive
-  permalinks:
-    category: /category/:name/
-    tag: /tag/:name/
+category_archive:
+  type: liquid
+  path: /categories/
+tag_archive:
+  type: liquid
+  path: /tags/
 
 # Build settings
 markdown: kramdown
@@ -65,7 +63,6 @@ plugins:
   - jekyll-feed
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll-archives
   - jekyll-seo-tag
 
 # Exclude from processing.

@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - JPA 시작"
 date:   2021-01-14
 last_modified_at: 2021-01-14
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 이 책은 JPA 구현체로 하이버네이트를 사용한다(hibernate version.4.3.10.Final)

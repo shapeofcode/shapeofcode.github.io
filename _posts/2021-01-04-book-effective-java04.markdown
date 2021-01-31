@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 제네릭"
 date:   2021-01-04
 last_modified_at: 2021-01-04
-categories: [book, JAVA]
+categories: [JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title:  "EFFECTIVE JAVA 람다와 스트림"
 date:   2021-01-06
 last_modified_at: 2021-01-06
-categories: [book, JAVA]
+categories: [JAVA]
 tags: [book, EFFECTIVE JAVA 3/E]
 ---
 

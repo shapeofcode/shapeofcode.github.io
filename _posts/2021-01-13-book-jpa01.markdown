@@ -3,8 +3,8 @@ layout: post
 title:  "자바 ORM표준 JPA 프로그래밍 - JPA 소개"
 date:   2021-01-13
 last_modified_at: 2021-01-13
-categories: [book, JPA]
-tags: [book, JPA]
+categories: [JPA]
+tags: [book]
 ---
 
 JPA(Java Persistence API) 자바 진영의 ORM 기술 표준이다.
