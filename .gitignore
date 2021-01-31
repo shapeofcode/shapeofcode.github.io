@@ -1,5 +1,5 @@
 # output
-#_site
+_site
 
 # cache
 .sass-cache
