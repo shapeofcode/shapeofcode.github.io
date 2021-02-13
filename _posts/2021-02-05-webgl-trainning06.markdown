@@ -1,139 +1,62 @@
 ---
 layout: post
-title:  "WebGL - 이미지 처리"
-date:   2021-02-06
-last_modified_at: 2021-02-06
-categories: [WEBGL]
-tags: [WEBGL]
+title:  "GLSL/Shader(5)"
+date:   2021-02-05
+last_modified_at: 2021-02-05
+categories: [GLSL]
+tags: [GLSL]
 ---
 
-fragment shader를 사용해서 각 픽섹을 그릴 때 vertex shader에 제공한 값을 보간한다.
+**voronoi**
 
-```html
-<script id="fragment-shader-2d" type="x-shader/x-fragment">
+=Cellular Noise
+
+```javascript
+#ifdef GL_ES
 precision mediump float;
-//texture
-uniform sampler2D u_image;
-//vertex sahder에서 전달된 texCoords
-varying vec2 v_texCoord;
+#endif
+
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
 
 void main() {
-    // texture의 색상 탐색
-    gl_FragColor = texture2D(u_image, v_texCoord);
-}
-</script>
-```
-```javascript
-function main() {
-    var image = new Image();
-    image.src = "http://someimage/on/our/server";
-    image.onload = function() {
-        render(image);
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+    st.x *= u_resolution.x/u_resolution.y;
+
+    vec3 color = vec3(.0);
+
+    // Cell positions
+    vec2 point[5];
+    point[0] = vec2(0.83,0.75);
+    point[1] = vec2(0.60,0.07);
+    point[2] = vec2(0.28,0.64);
+    point[3] =  vec2(0.31,0.26);
+    point[4] = u_mouse/u_resolution;
+
+    float m_dist = 1.;  // minimum distance
+
+    // Iterate through the points positions
+    for (int i = 0; i < 5; i++) {
+        float dist = distance(st, point[i]);
+
+        // Keep the closer distance
+        m_dist = min(m_dist, dist);
     }
-}
 
-function render(image) {
-    var canvas = document.querySelector("#canvas");
-    var gl = canvas.getContext("webgl");
-    if (!gl) {
-       return;
-    }
+    // Draw the min distance (distance field)
+    color += m_dist;
 
-    var program = webglUtils.createProgramFromScripts(gl, ["vertex-shader-2d", "fragment-shader-2d"]);
-    
-    var positionLocation = gl.getAttribLocation(program, "a_position");
-    var texcoordLocation = gl.getAttribLocation(program, "a_texCoord");
+    // Show isolines
+    // color -= step(.7,abs(sin(50.0*m_dist)))*.3;
 
-    var positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    setRectangle(gl, 0, 0, image.width, image.height);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        0.0, 0.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0,
-    ]), gl.STATIC_DRAW);
-
-    var texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-
-    var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-    
-    webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-     gl.useProgram(program);
-    
-      // Turn on the position attribute
-      gl.enableVertexAttribArray(positionLocation);
-    
-      // Bind the position buffer.
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    
-      // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-      var size = 2;          // 2 components per iteration
-      var type = gl.FLOAT;   // the data is 32bit floats
-      var normalize = false; // don't normalize the data
-      var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-      var offset = 0;        // start at the beginning of the buffer
-      gl.vertexAttribPointer(
-          positionLocation, size, type, normalize, stride, offset);
-    
-      // Turn on the texcoord attribute
-      gl.enableVertexAttribArray(texcoordLocation);
-    
-      // bind the texcoord buffer.
-      gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-    
-      // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
-      var size = 2;          // 2 components per iteration
-      var type = gl.FLOAT;   // the data is 32bit floats
-      var normalize = false; // don't normalize the data
-      var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-      var offset = 0;        // start at the beginning of the buffer
-      gl.vertexAttribPointer(
-          texcoordLocation, size, type, normalize, stride, offset);
-    
-      // set the resolution
-      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
-    
-      // Draw the rectangle.
-      var primitiveType = gl.TRIANGLES;
-      var offset = 0;
-      var count = 6;
-      gl.drawArrays(primitiveType, offset, count);
-}
-
-function setRectangle(gl, x, y, width, height) {
-  var x1 = x;
-  var x2 = x + width;
-  var y1 = y;
-  var y2 = y + height;
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-     x1, y1,
-     x2, y1,
-     x1, y2,
-     x1, y2,
-     x2, y1,
-     x2, y2,
-  ]), gl.STATIC_DRAW);
+    gl_FragColor = vec4(color,1.0);
 }
 ```
 
 출처 
 
-[https://webglfundamentals.org/webgl/lessons/ko/webgl-image-processing.html](https://webglfundamentals.org/webgl/lessons/ko/webgl-image-processing.html)
+[https://learnopengl.com/Getting-started/Coordinate-Systems](https://learnopengl.com/Getting-started/Coordinate-Systems)
+[https://thebookofshaders.com/](https://thebookofshaders.com/)
+[https://opentutorials.org/module/3659/21954](https://opentutorials.org/module/3659/21954)
 <br/>
