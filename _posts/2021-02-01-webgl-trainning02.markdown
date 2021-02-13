@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "WebGL - GLSL/Shader(1)"
+title:  "GLSL/Shader(1)"
 date:   2021-02-01
 last_modified_at: 2021-02-01
-categories: [3D]
-tags: [webgl]
+categories: [GLSL]
+tags: [GLSL]
 ---
 **GLSL (OpenGL Shading Language)**
 

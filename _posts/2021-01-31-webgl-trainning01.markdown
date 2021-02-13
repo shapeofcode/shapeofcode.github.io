@@ -3,8 +3,8 @@ layout: post
 title:  "WebGL 기초 개념"
 date:   2021-01-31
 last_modified_at: 2021-01-31
-categories: [3D]
-tags: [webgl]
+categories: [WEBGL]
+tags: [WEBGL]
 ---
 
 - WebGl은 웹브라우저에서 3D 그래픽을 만드는 크로스 플랫폼, 무료 API이다.

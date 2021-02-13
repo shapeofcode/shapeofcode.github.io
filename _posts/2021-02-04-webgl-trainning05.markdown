@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "WebGL - GLSL/Shader(4)"
+title:  "GLSL/Shader(4)"
 date:   2021-02-04
 last_modified_at: 2021-02-04
-categories: [3D]
-tags: [webgl]
+categories: [GLSL]
+tags: [GLSL]
 ---
 
 **patterns**

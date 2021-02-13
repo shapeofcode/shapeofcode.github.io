@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "WebGL - GLSL/Shader(2)"
+title:  "GLSL/Shader(2)"
 date:   2021-02-02
 last_modified_at: 2021-02-02
-categories: [3D]
-tags: [webgl]
+categories: [GLSL]
+tags: [GLSL]
 ---
 
 **colors**

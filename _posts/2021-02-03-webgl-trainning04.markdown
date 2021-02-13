@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "WebGL - GLSL/Shader(3)"
+title:  "GLSL/Shader(3)"
 date:   2021-02-03
 last_modified_at: 2021-02-03
-categories: [3D]
-tags: [webgl]
+categories: [GLSL]
+tags: [GLSL]
 ---
 
 **Matrices**
