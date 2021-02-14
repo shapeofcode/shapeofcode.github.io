@@ -1,0 +1,67 @@
+---
+layout: post
+title:  "Data Structure - 배열과 문자열"
+date:   2021-02-09
+last_modified_at: 2021-02-09
+categories: [Data Structure]
+tags: [Data Structure]
+---
+
+[사전 개념]
+
+**ASCII**
+
+컴퓨터 기본 저장 단위 1바이트(8비트), 아스키 코드는 7비트, 1비트는 통신 에러 검출을 위해 사용(Parity Bit)
+
+8비트로 확장한 아스키코드 = ANSI 코드
+
+<br/>
+
+**UNICODE**
+
+용량을 확장한 2byte의 유니코드 등장
+
+유니코드 포인트를 8비트 숫자의 집합으로 나타냄 = UTF-8
+
+<br/>
+
+**비트 시프트 연산자**
+- <<: 왼쪽으로 이동
+- >>: 오른쪽으로 이동
+- >>>: unsigned, 오른쪽으로 이동
+
+ex) A << B, A 비트 값을 B만큼 왼쪽으로 이동
+
+<br/>
+
+**대입 연산자**
+a |= b   a = a|b 와 같은 의미
+
+<br/>
+
+**유용한 메서드**
+Character.getNumericValue('z');
+
+char를 int로 반환
+<br/>
+
+**연습문제** 
+- 중복이 없는가
+- 순열 확인
+- URL화
+- 회문 순열
+- 하나 빼기
+- 문자열 압축
+- 행렬 회전
+- 0행렬
+- 문자열 회전
+
+<br/>
+
+출처
+
+[https://whatisthenext.tistory.com/103](https://whatisthenext.tistory.com/103)
+[https://secretroute.tistory.com/entry/%EC%9E%90%EB%B0%94%EC%9D%98%E7%A5%9E-Vol1-%EB%B9%84%ED%8A%B8-%EC%8B%9C%ED%94%84%ED%8A%B8-%EC%97%B0%EC%82%B0%EC%9E%90](https://secretroute.tistory.com/entry/%EC%9E%90%EB%B0%94%EC%9D%98%E7%A5%9E-Vol1-%EB%B9%84%ED%8A%B8-%EC%8B%9C%ED%94%84%ED%8A%B8-%EC%97%B0%EC%82%B0%EC%9E%90)
+[https://www.geeksforgeeks.org/array-data-structure/](https://www.geeksforgeeks.org/array-data-structure/)
+
+<br/>
