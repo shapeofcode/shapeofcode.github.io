@@ -26,20 +26,22 @@ tags: [Data Structure]
 <br/>
 
 **비트 시프트 연산자**
-- <<: 왼쪽으로 이동
-- >>: 오른쪽으로 이동
-- >>>: unsigned, 오른쪽으로 이동
+- '<<': 왼쪽으로 이동
+- '>>': 오른쪽으로 이동
+- '>>>': unsigned, 오른쪽으로 이동
 
 ex) A << B, A 비트 값을 B만큼 왼쪽으로 이동
 
 <br/>
 
 **대입 연산자**
+
 a |= b   a = a|b 와 같은 의미
 
 <br/>
 
 **유용한 메서드**
+
 Character.getNumericValue('z');
 
 char를 int로 반환
