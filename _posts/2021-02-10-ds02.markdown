@@ -1,0 +1,30 @@
+---
+layout: post
+title:  "Data Structure - 연결리스트"
+date:   2021-02-10
+last_modified_at: 2021-02-10
+categories: [Data Structure]
+tags: [Data Structure]
+---
+
+선형 데이터 구조, 포인터를 사용하여 연결된 노드를 표현. 특정 인덱스를 상수 시간에 접근 가능.
+
+<br/>
+
+**연습문제**
+- 중복 없애기
+- 뒤에서 k번째 원소 구하기
+- 중간 노드 삭제
+- 분할
+- 리스트의 합
+- 회문
+- 교집합
+- 루프 발견
+
+<br/>
+
+출처
+
+[https://www.geeksforgeeks.org/data-structures/linked-list/](https://www.geeksforgeeks.org/data-structures/linked-list/)
+
+<br/>
