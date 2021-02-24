@@ -1,0 +1,29 @@
+---
+layout: post
+title:  "Data Structure - 스택과 큐"
+date:   2021-02-11
+last_modified_at: 2021-02-11
+categories: [Data Structure]
+tags: [Data Structure]
+---
+
+Stack - LIFO or FILO
+
+Queue - FIFO
+
+<br/>
+
+**연습문제**
+- 배열로 스택구현
+- 스택 Min 반환 함수 구현
+- 저장 용량이 제한된 스택 구현
+- 스택으로 큐 구현
+- 스택 정렬
+- 특정 요소룰 먼저 반환하는 큐
+
+
+<br/>
+
+출처
+[https://www.geeksforgeeks.org/stack-data-structure/](https://www.geeksforgeeks.org/stack-data-structure/)
+<br/>

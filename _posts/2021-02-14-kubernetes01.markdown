@@ -1,0 +1,123 @@
+---
+layout: post
+title:  "Kubernetes - Components"
+date:   2021-02-14
+last_modified_at: 2021-02-14
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+쿠버네티스를 실행하면 클러스터를 갖는다. 클러스터는 노드라 불리는 워커 머신의 셋으로 구성되는데 이는 컨테이너화된 애플리케이션이다.
+
+워커 노드는 PODS으로 구성되며 Control plane이 워커 노드와 클러스터를 관리한다. 
+
+<br/>
+
+<img src="../../../assets/images/k8s-cluster.svg" alt="k8s-cluster" />
+
+<br/>
+
+## Control Plane Components
+
+**kube-apiserver**
+
+API Server는 쿠버네티스 Control plane의 프론트엔드이며 API 를 노출하는 컴포넌트이다.
+
+여러개의 kube-apiserver를 가동하여 트래픽을 조절할 수 있다.
+
+<br/>
+
+**etcd**
+
+key value로 구성된 저장소이다.
+
+<br/>
+
+**kube-scheduler**
+
+새로 생성된 PODS를 노드에 할당하고 스케줄링 내용에는 개별 자원 할당과 제한 등이 있다.
+
+<br/>
+
+**kube-controller-manager**
+
+각각의 컨트롤러들은 단일 바이너리로 컴파일되며 단일 프로세스로 구동된다.
+
+- Node controller :  노드가 내려갔을 때 알려주고 반응하는 역할
+- Replication controller :  현재 pods 갯수를 유지하는 역할
+- Endpoints controller : services와 pods 같은 Endpoints 객체를 채우는 역할
+- Service Account & Token controllers : 새로운 namespaces들에 default 계정과 API 접속 토큰을 발행하는 역할
+
+<br/>
+
+**cloud-controller-manager**
+
+클러스터를 cloud provider API로 연결 , own premises의 경우 없음.
+
+clound provider 의존성을 갖을 수 있는 controller들
+
+- Node controlelr : cloud 내 node가 지워졌는지 체크
+- route controller : cloud infrastructure에 routes 설정
+- service controller : cloud provider load balancer의 생성, 업데이트 삭제
+
+<br/>
+
+## Node Components
+
+**kubelet**
+
+클러스터내에 모든 node에서 실행하는 agent. container들이 pod에서 실행중인지 확인한다.
+
+kubelet은 PodSpecs를 갖고 해당 PodSpecs으로 표현한 container들이 잘 실행 중인지 체크하며 Kubernetes로 만들지 않은 container들은 관리하지 않는다.
+
+<br/>
+
+**kube-proxy**
+
+모든 node에 있는 network proxy로 쿠버네티스 service 컨셉의 도구이다.
+
+kube-proxy는 node에서 network rules을 유지한다. 클러스터 내/외부의 network session으로 부터 pods로 network communication을 허용한다.
+
+kube-proxy는 가능하면 O/S의 packet filtering layer를 사용하고 아닌경우 자체적으로 traffic을 forward한다.
+
+<br/>
+
+**Container runtime**
+
+container runtime은 container 구동의 책임있는 software이다.
+
+쿠버네티스는 다양한 container runtime들을 지원한다. Docker, containerd, CRI-O, Kubernetes CRI
+
+<br/>
+
+## Addons
+
+Addons들은 쿠버네티스 리소스(DaemonSet, Deployment)들을 가지고 클러스터 요소들을 표현한다.
+
+**DNS**
+
+Kubernetes services의 DNS 기록을하는 역할 
+
+<br/>
+
+**WEB UI(Dashboard)**
+
+Kubernetes cluster의 웹 기반 UI. troubleshooting과 관리를 위한 역할
+
+<br/>
+
+**Container Resource Monitoring**
+
+중앙 데이터베이스에서의 컨테이너들의 generic time-series metrics를 기록
+
+<br/>
+
+**Cluster-level Logging**
+
+continer logs들을 central log 저장소에 저장하는 역할
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/overview/components/](https://kubernetes.io/docs/concepts/overview/components/)

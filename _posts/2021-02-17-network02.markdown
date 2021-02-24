@@ -1,0 +1,76 @@
+---
+layout: post
+title:  "Network - Router"
+date:   2021-02-17
+last_modified_at: 2021-02-17
+categories: [Network]
+tags: [Network]
+---
+
+LAN - ARP Request 패킷이 도달하는 범위의 네트워크.
+
+다른 LAN과의 통신을 위해서는 Router or Routing이 가능한 장비가 필요
+
+다른 라우터 인터페이스 MAC address를 알아와서 그 라우터 interface의 MAC address를 달고 패킷을 보내야한다.
+
+ARP Request를 길(route)을 아는 라우터 IP를 destination으로 해서 보낸다.
+
+router 갯수 + 1 = hop count
+
+switch = hop count(1)
+
+routing table을 보는 횟수는 갈 때 올때 : hop count * 2
+
+routing table 과 arp table 은 한쌍이다. (Routing Table을 검색해서 next hop IP를 찾고 next hop IP에 대한 MAC address를 ARP Table에서 찾는다.)
+
+<br/>
+
+**IP Class**
+<img src="../../../assets/images/ipclass.jpg" alt="ipclass" />
+
+A클래스 : 앞자리 수가 항상 0인 경우(1.0.0.0 ~ 126.0.0.0)
+B클래스 : 앞자리 수가 항상 10인 경우(128.0.0.0 ~ 191.255.255.255)
+c클래스 : 앞자리 수가 항상 110인 경우(192.0.0.0 ~ 223.255.255.255)
+
+<br/>
+
+**서브넷 마스크**
+- 서브네팅 : 네트워크 영역과 호스트 영역을 효율적으로 분배.
+- 서브넷 마스크 : 1과 0 으로 구성 32자리 2진수로 표현. 1이 연속으로 나와야한다. 
+255.255.255.0 -> 1111 1111.1111 1111.1111 1111.0000 0000 연속으로 1이 24개 
+
+<br/>
+
+**NAT**
+Network Address Translation , IP 패킷의 TCP/UDP 포트 숫자와 소스 및 목적지의 IP 주소 등을 재기록하면서 라우터를 통해 네트워크 트래픽을 주고 받는 기술
+
+<br/>
+
+**OSI7**
+
+| 계층 | 이름 | 의미 |
+| --- | --- | --- |
+|7|응용 계층|HTTP, FTP, SMTP, POP3, IMAP, Telnet등과 같은 프로토콜. 응용 서비스를 수행.|
+|6|표현 계층|코드간의 번역을 담당. MIME 인코딩이나 암호화 등의 동작|
+|5|세션 계층|세션 설정, 유지, 종료, 전송 중단시 복구 기능. TCP/IP 세션을 만들고 없애는 책임|
+|4|전송 계층|TCP/UDP 프로토콜을 사용. 종단간 통신을 다루는 최하위 계층으로 신뢰성 있고 효율적인 데이터를 전송. 패킷 생성(Assembly/Sequencing/Deassembly/Error detection/Request repeat/Flow control) 및 전송|
+|3|네트워크 계층|데이터를 목적지까지 가장 안전하고 빠르게 전달하는 기능(라우팅), 주소부여(IP), 경로설정(Route)|
+|2|데이터 링크|브릿지나 스위치를 통해 물리적주소(MAC Address)를 가지고 정보를 전달.(ETHERNET, HDLC, ADCCP)|
+|1|물리 계층|통신단위 비트, 통신 케이블로 데이터를 전송|
+
+<br/>
+
+**L2, L3, L4, L7 Switch**
+- L2 스위치 : 이더넷, 프레임릴레이, ATM 등에서 스위칭 기능을 수행. 목적지는 Ethernet 주소로 이해
+- L3 스위치 : IP, IPX 등에서 스위칭 기능을 수행. 라우터 기능도 갖고 잇다.
+- L4 스위치 : TCP, UDP 등을 스위칭. FTP, HTTP, TFTP, SMTP 등의 프로토콜 중 어느 것에 대한 요구가 우선하는지 파악한 후 스위칭
+- L7 스위치 : HTTP의 URL, FTP 파일명, 쿠키 정보, 특정 바이러스의 패턴 등을 분석해서 로드 밸런싱이 가능하다. 
+
+<br/>
+
+출처
+
+[https://m.blog.naver.com/goduck2/220142854627](https://m.blog.naver.com/goduck2/220142854627)
+[https://jwprogramming.tistory.com/30](https://jwprogramming.tistory.com/30)
+[https://se-sik.tistory.com/74](https://se-sik.tistory.com/74)
+[https://limkydev.tistory.com/166](https://limkydev.tistory.com/166)

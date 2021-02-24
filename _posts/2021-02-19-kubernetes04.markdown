@@ -1,0 +1,74 @@
+---
+layout: post
+title:  "Kubernetes - Deployments"
+date:   2021-02-19
+last_modified_at: 2021-02-19
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+
+## Deplyments란?
+
+pods와 replicaset의 선언적 업데이트를 제공한다.
+
+**Use Case**
+
+- replicaset의 rollout 
+- 새로운 pods 선언
+- 이전 deployment로 rollback
+- deployment scale up
+- pause deployment
+- use the status of the deployment
+- clean up older ReplicaSets
+
+<br/>
+
+**Creating a Deployment**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+<br/>
+
+**간단한 명령어**
+
+kubectl get deployments   // deployments 조회
+
+kubectl describe deployments    // deployments 상세 조회
+
+kubectl rollout history deployment.v1.apps/nginx-deployment // rollout history 조회
+
+kubectl rollout undo deployment.v1.apps/nginx-deployment --to-revision=2 // 이전 버전으로 돌리기
+
+kubectl scale deployment.v1.apps/nginx-deployment --replicas=10 // scale up
+
+kubectl rollout pause deployment.v1.apps/nginx-deployment // pause 
+
+kubectl rollout resume deployment.v1.apps/nginx-deployment // resume
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/workloads/controllers/deployment/](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)

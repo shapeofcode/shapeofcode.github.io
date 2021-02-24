@@ -1,0 +1,65 @@
+---
+layout: post
+title:  "Kubernetes - Namespaces"
+date:   2021-02-20
+last_modified_at: 2021-02-20
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+
+## Namespaces란?
+
+쿠버네티스는 동일한 물리적 클러스터가 지원하는 가상의 클러스터를 제공하는데 이걸 Namespaces라 한다.
+
+<br/>
+
+**사용 용도**
+
+많은 사람들과 여러개의 팀 또는 프로젝트를 위해 쓰인다. cluster resources를 많은 사용자간에 나눌 수 있도록 하는데 
+단순히 같은 software의 버전만 다르게 할 때에는 Namespaces 대신 라벨을 사용하면 된다.
+
+<br/>
+
+**사용 방법**
+
+prefix로 kube- 는 피하는게 좋다. kubernetes system namespaces가 쓰이기 떄문이다.
+
+쿠버네티스는 4가지 namespaces로 시작한다.
+
+- default : 객체에 namespace가 없을 때
+- kube-system : kubernetes system으로 만들어 졌을 때 
+- kube-public : 자동적으로 생성되며 모든 사용자에게 읽혀진다.
+- kube-node-lease : 클러스터가 확장됨에 따라 노드 heartbeats의 성능을 향상시키는 각 노드와 연관된 임대 개체를 위한것
+
+<br/>
+
+**간단 명령어**
+
+kubectl get namespace //조회
+
+kubectl run nginx --image=nginx --namespace=<insert-namespace-name-here>
+
+kubectl get pods --namespace=<insert-namespace-name-here>
+
+kubectl config set-context --current --namespace=<insert-namespace-name-here> //모든 kubectl 명령어에 namespace 적용
+
+//Validate it
+
+kubectl config view --minify | grep namespace:
+
+<br/>
+
+모든 객체가 Namespaces에 있진 않다. nodes, persistentVolumes 같은 low-level resources는 namespace에 안들어있다.
+
+// In a namespace
+kubectl api-resources --namespaced=true
+
+// Not in a namespace
+kubectl api-resources --namespaced=false
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)

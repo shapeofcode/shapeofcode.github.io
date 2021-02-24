@@ -1,0 +1,45 @@
+---
+layout: post
+title:  "Kubernetes - Pods"
+date:   2021-02-15
+last_modified_at: 2021-02-15
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+
+## Pod란?
+쿠버네티스에서 생성하고 관리하는 가장 작은 단위.
+
+pod는 하나 이상의 container 그룹을 의미하며 공유 자원, 네트워크 리소스 및 상세 내용을 담고 있다.
+
+shared context 위에서 작동하며 리눅스의 namespaces, cgroups, 독립된 측면의 셋이다. 
+
+docker 컨셉으로 pods는 공유된 namespaces와 filesystem volumes을 가진 docker container들의 그룹이다.
+
+일반적으로는 pods를 Deployment 나 Job으로 생성한다.
+
+**pod template**
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello
+spec:
+  template:
+    # This is the pod template
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+      restartPolicy: OnFailure
+    # The pod template ends here
+```
+
+
+
+출처
+
+[https://kubernetes.io/docs/concepts/workloads/pods/](https://kubernetes.io/docs/concepts/workloads/pods/)

@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "Network - ARP"
+date:   2021-02-16
+last_modified_at: 2021-02-16
+categories: [Network]
+tags: [Network]
+---
+
+ARP란? (Address Resolution Protocol)
+
+IP 주소를 이용하여 하드웨어 주소를 알아내는 프로토콜.
+ 
+RFC826 '장비들이 같은 네트워크에 있는 다른 IP 호스트의 이더넷 하드웨어 주소를 파악하는 데 유용한 방식'
+
+<br/>
+
+**ARP Process**
+
+two step process - request and response
+
+ARP Request를 전체 network에 broadcast한다. 왜냐하면 타겟 MAC address를 모르기 때문이다. 
+응답은 unicast로 한다. 
+
+<br/>
+
+**ARP Header구조**
+<img src="../../../assets/images/traditional-arp-request-arp.png" alt="arp request header" /></p>
+
+- Hardrware type : 요청된 하드웨어 주소의 종류
+- Protocol type : 사용되는 상위 계층 프로토콜 필드. 
+- Hardware size : Source 및 Destination Hardware address 길이
+- Protocol size : Source 및 Destination Protocol address의 상위 계층 프로토콜 주소의 길이. IP일 경우 4로 고정(32bit/8 = 4byte)
+- Opcode : ARP 패킷의 목적
+<br/>
+
+**ARP 속도 향상항법**
+1.ARP Cache - ARP Cache Table에 일정 시간 동안 저장하여 브로드캐스트를 이용하지 않는다.
+
+Cache Table에 저장된 Entry는 일정 시간이 지나면 지워지고 이를 Life Time이라고 한다. 
+
+유닉스의 경우 20분, 윈도우 95,2000, 윈도우서버 2003의 경우 기본적으로 2분이며, 2분 이내 다시 사용될 경우 최대 10분까지 저장된다.
+
+2.ARP Refinement
+다른 호스트들의 ARP Request에 담겨있는 호스트의 IP 주소와 하드웨어 주소를 참조하여 자신의 APR Cache Table에 저장하는 방법
+
+3.Static Entry
+ARP Cache Table에 고정으로 IP주소와 하드웨어 주소(MAC Address)를 맵핑하느 방법. 실무에서 거의 쓰이지 않는다.
+
+<br/>
+
+출처
+
+[http://blog.naver.com/lemonaroma98.do](http://blog.naver.com/lemonaroma98.do)
+[https://www.practicalnetworking.net/series/arp/traditional-arp/](https://www.practicalnetworking.net/series/arp/traditional-arp/)
