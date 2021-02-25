@@ -1,0 +1,61 @@
+---
+layout: post
+title:  "Kubernetes - Label&Selector"
+date:   2021-02-22
+last_modified_at: 2021-02-22
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+
+## label 이란?
+pods와 같은 오브젝트에 첨부된 키와 값의 쌍이다.
+
+```json
+"metadata": {
+  "labels": {
+    "key1" : "value1",
+    "key2" : "value2"
+  }
+}
+```
+
+- 유효한 레이블 값은 63자 미만 또는 공백이며 시작과 끝은 알파벳과 숫자([a-z0-9A-Z])이며, 대시(-), 밑줄(_), 점(.)과 함께 사용할 수 있다.
+
+label은 고유하지 않기 때문에 label selector를 통해 오브젝트를 식별한다.
+
+<br/>
+
+**Equality-based requirement**
+
+연산자를 통해 필터링
+
+environment = production
+
+tier != frontend
+
+비교 연산자 = , ==, !=
+
+ex) kubectl get pods -l environment=production,tier=frontend
+
+<br/>
+
+**Set-based requirement**
+
+값을 이용한 필터링 (in, notin exists)
+
+environment in (production, qa)
+
+tier notin (frontend, backend)
+
+partition
+
+!partition
+
+ex)kubectl get pods -l 'environment in (production),tier in (frontend)'
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
