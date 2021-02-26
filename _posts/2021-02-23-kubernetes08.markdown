@@ -1,0 +1,147 @@
+---
+layout: post
+title:  "Kubernetes - Assign Pods to Node"
+date:   2021-02-23
+last_modified_at: 2021-02-23
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+일반적으로는 스케쥴러가 알아서 합리적인 nodes에 pods를 위치시키는데, 직접 node를 지정할 수 도 있다.
+
+<br/>
+
+**nodeSelector**
+
+순서
+
+1. node 에 label을 붙인다. kubectl label nodes <node-name> <label-key>=<label-value>
+2. pod configuration에 nodeSelector field 를 추가한다.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    disktype: ssd
+```
+
+<br/>
+
+**Node affinity**
+
+- requiredDuringSchedulingIgnoredDuringExecution : hard, 무조건 해당 조건의 노드에서 실행
+- preferredDuringSchedulingIgnoredDuringExecution : soft, 조건에서 실행하나 불가능하면 다른곳에서도 가능
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/e2e-az-name
+            operator: In
+            values:
+            - e2e-az1
+            - e2e-az2
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: another-node-label-key
+            operator: In
+            values:
+            - another-node-label-value
+  containers:
+  - name: with-node-affinity
+    image: k8s.gcr.io/pause:2.0
+```
+
+<br/>
+
+**Inter-pod affinity and anti-affinity**
+이미 실행중인 pods의 label들을 기준으로 스케쥴
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: topology.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: security
+              operator: In
+              values:
+              - S2
+          topologyKey: topology.kubernetes.io/zone
+  containers:
+  - name: with-pod-affinity
+    image: k8s.gcr.io/pause:2.0
+```
+ex) security key를 갖고 S1 값을 갖는 라벨로 돌아가는 pod가 적어도 하나 이상 돌고 있는 zone. 더 정확히 말하면 node가 topology.kubernetes.io/zone key를 갖고 ...
+
+anti-affinity rule은 security key를 갖고 S2 값을 갖는것.
+
+topologyKey는 라벨 키 인데 보안과 퍼포먼스 이유로 제약이 있다.
+
+1. requiredDuringSchedulingIgnoredDuringExecution 와 preferredDuringSchedulingIgnoredDuringExecution에 비어있는 topologyKey는 허용되지 않는다.
+2. anti-affinity도 마찬가지
+3. requiredDuringSchedulingIgnoredDuringExecution pod anti-affinity에서 topologykey를 kubernetes.io/hostname로 제한하기 위해 LimitPodHardAntiAffinityTopology가 나왔다. 사용자 지정 topology를 사용하려면 admission controller를 수정하거나 비활성화해야한다.
+
+<br/>
+
+**nodeName**
+가장 간단한 node 제한법
+
+몇가지 제한사항이 있다.
+
+- 지정된 node 이름이 없다면 pod가 실행되지 않는다. 자동 삭제
+- node 에 자원할당이 불가하면 OutOfmemory or OutOfcpu 에러를 낸다.
+- cloud 환경의 node names은 예측하거나 안정적이지 못하다.
+
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  nodeName: kube-01
+```
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
