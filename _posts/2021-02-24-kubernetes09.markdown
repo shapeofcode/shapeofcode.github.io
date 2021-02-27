@@ -1,0 +1,90 @@
+---
+layout: post
+title:  "Kubernetes - Taints and Tolerations"
+date:   2021-02-24
+last_modified_at: 2021-02-24
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## Taints 란?
+
+node affinity와 반대로 node가 pod를 제외 할 수 있다.
+
+toleration은 일치하는 taint가 있는 노드에 스케줄 되게 한다.
+
+kubectl taint nodes node1 key1=value1:NoSchedule
+
+node1 노드에 taint를 배치한다.키 key1, 값 value1 및 taint effect NoSchedule이 있다. 일치하는 toleration이 없으면 node1에 스케줄할 수 없다.
+
+<br/>
+
+podSpec에도 선언 가능하다.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "example-key"
+    operator: "Exists"
+    effect: "NoSchedule"
+```
+
+- operator의 default 값은 Equal이다.
+- 두가지 특별 케이스가 있다. 1. Exists에 key가 없으면 모든 key에 맞춘다. 2. effect에 값이 없으면 key1에 모든걸 맞춘다.
+
+<br/>
+
+**동일한 node에 multi taint, 동일한 pod에 multi toleration**
+
+- NoSchedule effect가 있는 무시되지 않는 taint가 하나 이상 있으면 해당 node에 pod를 스케줄하지 않는다.
+- PreferNoSchedule effect 가 있는 무시되지 않는 taint가 하나 이상 있으면 쿠버네티스는 pod를 node에 스케줄하지 않으려고 시도한다.
+- NoExecute effect가 있는 무시되지 않는 taint가 하나 이상 있으면 node에서 실행 중인 경우 pod가 축출된다.
+
+<br/>
+
+**use case**
+
+- 전용 node : 특정 사용자들이 독점적으로 사용하도록 node에 taint 추가 kubectl taint nodes nodename dedicated=groupName:NoSchedule
+- 특별한 하드웨어가 있는 node : 예를 들어 GPU가 있는 클러스테에서는 필요없는 pod를 분리
+
+<br/>
+
+**taint 기반 축출**
+
+특정 조건이 참일 때 자동으로 node를 taint 시킨다. (built in taint)
+
+- node.kubernetes.io/not-ready : node가 준비되지 않았다. NodeCondition ready가 false로 됨에 해당
+- node.kubernetes.io/unreacheable : node가 node-controller에 도달할 수 없다. 이는 NodeCondition Ready 가 unknow로 됨에 해당한다.
+- node.kubernetes.io/out-of-disk : node에 disk가 부족하다.
+- node.kubernetes.io/memory-pressure : node에 disk 할당 압박이 있다.
+- node.kubernetes.io/network-unavailable : node의 네트워크를 사용할 수 없다.
+- node.kubernetes.io/unschedulable : node를 스케줄할 수 없다.
+- node.cloudprovider.kubernetes.io/uninitialized : 외부 클라우드 공급자로 kubelet을 시작하면, 이 taint가 node에서 사용 불가능으로 표시되도록 설정된다.
+
+<br/>
+
+ex) 로컬 상태가 많은 application은 네트워크 분할의 장애에서 네트워크가 복구된 후에 파드가 축출되는 것을 피하기 위해 오랫동안 node에 바인딩된 상태를 유지하려고 할 수 있다.
+
+```yaml
+tolerations:
+- key: "node.kubernetes.io/unreachable"
+  operator: "Exists"
+  effect: "NoExecute"
+  tolerationSeconds: 6000
+```
+
+<br/>
+
+출처
+
+[https://kubernetes.io/ko/docs/concepts/scheduling-eviction/taint-and-toleration/](https://kubernetes.io/ko/docs/concepts/scheduling-eviction/taint-and-toleration/)
