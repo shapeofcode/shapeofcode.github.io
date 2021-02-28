@@ -1,0 +1,123 @@
+---
+layout: post
+title:  "Kubernetes - DaemonSets"
+date:   2021-02-26
+last_modified_at: 2021-02-26
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## DaemonSets 란?
+
+DaemonSets은 모든 node가 pods의 사본을 실행하도록 한다. node가 cluster에 추가되면 pod가 추가되고 node가 cluster에서 제거되면
+pod는 garbage collecting 된다. DaemonSets을 삭제하면 DaemonSets이 생성한 pods가 정리된다.
+
+<br/>
+
+**사용용도**
+- 모든 node에 cluster storage daemon 실행
+- 모든 node에 logs collection daemon 실행
+- 모든 node에 node monitoring daemon 실행
+
+<br/>
+
+**생성**
+fluentd-elasticsearch docker image를 실행하는 예제
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch
+    spec:
+      tolerations:
+      # this toleration is to have the daemonset runnable on master nodes
+      # remove it if your masters can't run pods
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: fluentd-elasticsearch
+        image: quay.io/fluentd_elasticsearch/fluentd:v2.5.2
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+```
+
+* DaemonSet 객체의 이름은 DNS subdomain name에 의거해야한다.
+* .spec.template은 pod template으로 Pod와 같은 schema를 갖고 있다. (apiVersion 또는 kind가 없는것을 빼고)
+Pod Template에서 DaemonSet은 RestartPolicy가 반드시 있어야 한다.
+* .spec.selector field는 pod selector이며 Job의 .spec.selector와 같은 역할을 한다.
+.spec.selector는 두가지 필드로 구성된다. 
+
+- matchLables : ReplicationController의 .spec.selector과 같은 역할
+- matchExpressions : key와 values로 좀 더 복잡한 selector로 빌드해준다.
+
+* .spec.selector가 특정되어지면 .spec.template.metadata.labels과 일치해야한다.
+
+* .spec.template.spec.nodeSelector를 특정했으면, DaemonSet controller는 node selector에 맞게 nodes에 pods를 생성할 것이다.
+.spec.template.spec.affinity를 특정했으면, DaemonSet controller는 node affinity에 맞게 nodes에 pods를 생성할 것이다.
+
+<br/>
+
+**Taints 와 Tolerations**
+DaemonSet pods는 tains와 tolerations를 존중하지만, 다음과 같은 기능에 따라 자동적으로 DaemonSet pod에 toleration을 추가한다.
+
+|toleration key|effect|version|description|
+|---|---|---|---|
+|node.kubernetes.io/not-ready|NoExecute|1.13+|network partition과 같은 node 문제가 발생해도 DaemonSet pod는 축출되지 않는다.|
+|node.kubernetes.io/unreachable|NoExecute|1.13+|위와 동일|
+|node.kubernetes.io/disk-pressure|NoSchedule|1.8+||
+|node.kubernetes.io/memory-pressure|NoSchedule|1.8+||
+|node.kubernetes.io/unchedulable|NoSchedule|1.12+|DaemonSet pod는 기본 스케줄러의 스케줄할 수 없는 속성을 극복한다.|
+|node.kubernetes.io/network-unavailable|NoSchedule|1.12+|호스트 네트워크를 사용하는 daemon set pod는 기본 스케줄러에 의해 이용할 수 없는 네트워크 속성을 극복한다.|
+
+<br/>
+
+**Daemon pod와 통신**
+
+- push : daemonSet pod는 통계 데이터베이스와 같은 다른 서비스로 업데이트를 보내도록 구성되어있다. 
+- NodeIP and Known Port : DaemonSet의 Pods는 hostport를 사용할 수 있다. node IP들을 통해 pods는 닿을 수 있다.
+- DNS : 같은 pod selector로 headless service를 만들고, endpoints 또는 DNS로부터 여러개의 A records를 검색해서 DaemonSets을 찾는다.
+- Service : 같은 pod selector로 service를 만들고, random node에 닿는다.
+
+<br/>
+
+**DaemonSet 업데이트**
+
+node label이 바뀌면 DaemonSet은 즉시 맞는 node에 pods를 배치하고 안맞는 node의 pods를 제거한다.
+DaemonSet이 만든 Pods를 바꿀 수 있다. 그러나 모든 필드가 바뀌진 않을것이다. 또한, 다음번에 node가 만들어질때 기존의 template을 사용할 것이다.
+--cascade=false 옵션을 주고 kubectl로 DaemonSet을 삭제하면 pods는 node에 남아있다. 다시 같은 selector로 DaemonSet를 만들면 새로운 DaemonSet은 존재하는 Pods를 채택한다.
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
