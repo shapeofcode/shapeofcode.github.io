@@ -1,0 +1,23 @@
+---
+layout: post
+title:  "Kubernetes - Static PODs"
+date:   2021-02-27
+last_modified_at: 2021-02-27
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## Static PODs 란?
+
+kubelet daemon이 API server의 감시 없이 특정 node에서 직접 관리된다. kubelet을 사용하여 control plane components들을 관리한다.
+
+kubelet은 Kubernetes API server에서 mirror Pod를 만든다. 이는 API server에서 pods는 보이지만, 거기서 조정받을 수는 없다는 것이다.
+
+kubelet은 static pod를 지우지 않는다. 주기적으로, 설정된 디렉토리(ex. /etc/kubelet.d)에서 변경 사항을 스캔하고, 파드를 생성/삭제 한다.
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/concepts/workloads/pods/](https://kubernetes.io/docs/concepts/workloads/pods/)
+[https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
