@@ -1,0 +1,286 @@
+---
+layout: post
+title:  "Kubernetes - Monitoring, Logging and Debugging(1)"
+date:   2021-02-28
+last_modified_at: 2021-02-28
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## 간단한 debugging
+
+- kubectl get nodes
+- kubectl describe node <nodeName>
+- kubectl get pods
+- kubectl describe pod <podName>
+- kubectl get events --namespace=my-namespace
+
+* container state : Waiting, Running or Terminated
+
+<br/>
+
+## Auditing
+
+감사 기록은 kube-apiserver component 안에서 생명주기를 갖는다. 각 단계의 request 실행은 audit event를 생성하고 
+특정 정책에 따라 미리 실행되고 backend에 기록된다. backend 구현은 log 파일들과 webhooks이 포함된다.
+
+- RequestReceived : audit handler가 request를 받으면 event가 생성된다. handler chain 아래로 위임되기 전에.
+- ResponseStarted : response header가 보내진다.(response body가 보내지기전) long-running request가 생성되는 단계
+- ResponseComplete : reponse body가 다 보내진 단계 
+- Panic : panic이 발생하면 이벤트 생성
+
+<br/>
+
+**Audit policy**
+event가 기록될지 어떤 데이터가 포함되어야하는지 정하는 룰.
+
+* None - events를 로깅하지 않는다.
+* Metadata - request metadata(requesting user, timestamp, resource, verb, etc) 로깅, request 또는 response body 미포함
+* Request - event metadata 그리고 request body는 로깅 하지만 response body는 미포함
+* RequestResponse - event metadata, request and response bodies 로깅
+
+- kube-apiverser로 --audit-policy-file을 사용하면 file을 보낼 수 있다.
+
+```yaml
+apiVersion: audit.k8s.io/v1 # This is required.
+kind: Policy
+# Don't generate audit events for all requests in RequestReceived stage.
+omitStages:
+  - "RequestReceived"
+rules:
+  # Log pod changes at RequestResponse level
+  - level: RequestResponse
+    resources:
+    - group: ""
+      # Resource "pods" doesn't match requests to any subresource of pods,
+      # which is consistent with the RBAC policy.
+      resources: ["pods"]
+  # Log "pods/log", "pods/status" at Metadata level
+  - level: Metadata
+    resources:
+    - group: ""
+      resources: ["pods/log", "pods/status"]
+
+  # Don't log requests to a configmap called "controller-leader"
+  - level: None
+    resources:
+    - group: ""
+      resources: ["configmaps"]
+      resourceNames: ["controller-leader"]
+
+  # Don't log watch requests by the "system:kube-proxy" on endpoints or services
+  - level: None
+    users: ["system:kube-proxy"]
+    verbs: ["watch"]
+    resources:
+    - group: "" # core API group
+      resources: ["endpoints", "services"]
+
+  # Don't log authenticated requests to certain non-resource URL paths.
+  - level: None
+    userGroups: ["system:authenticated"]
+    nonResourceURLs:
+    - "/api*" # Wildcard matching.
+    - "/version"
+
+  # Log the request body of configmap changes in kube-system.
+  - level: Request
+    resources:
+    - group: "" # core API group
+      resources: ["configmaps"]
+    # This rule only applies to resources in the "kube-system" namespace.
+    # The empty string "" can be used to select non-namespaced resources.
+    namespaces: ["kube-system"]
+
+  # Log configmap and secret changes in all other namespaces at the Metadata level.
+  - level: Metadata
+    resources:
+    - group: "" # core API group
+      resources: ["secrets", "configmaps"]
+
+  # Log all other resources in core and extensions at the Request level.
+  - level: Request
+    resources:
+    - group: "" # core API group
+    - group: "extensions" # Version of group should NOT be included.
+
+  # A catch-all rule to log all other requests at the Metadata level.
+  - level: Metadata
+    # Long-running requests like watches that fall under this rule will not
+    # generate an audit event in RequestReceived.
+    omitStages:
+      - "RequestReceived"
+```
+<br/>
+
+**Log backend**
+kube-apiserver 옵션
+
+* --audit-log-path : log 파일 위치
+* --audit-log-maxage : 오래된 log 파일 유지 날짜
+* --audit-log-maxbackup : log 파일 최대 유지 갯수
+* --audit-log-maxsize : log 파일 최대 megabytes
+
+<br/>
+
+```yaml
+...
+volumeMounts:
+  - mountPath: /etc/kubernetes/audit-policy.yaml
+    name: audit
+    readOnly: true
+  - mountPath: /var/log/audit.log
+    name: audit-log
+    readOnly: false
+
+...
+- name: audit
+  hostPath:
+    path: /etc/kubernetes/audit-policy.yaml
+    type: File
+
+- name: audit-log
+  hostPath:
+    path: /var/log/audit.log
+    type: FileOrCreate
+```
+
+<br/>
+
+**Webhook backend**
+
+* --audit-webhook-config-file : webhook configuration file path 지정. 
+* --audit-webhhok-initial-backoff : 첫번째 실패 후 retrying하기까지 시간
+
+<br/>
+
+## Debug a StatefulSet
+
+app=myapp이라는 라벨의 StatefulSet 조회
+
+kubectl get pods -l app=myapp
+
+<br/>
+
+## Debug Init Containers
+
+kubectl get pod nginx --template '{{.status.initContainerStatuses}}'
+
+**Pod status**
+- Init:N/M : M개 중 N개 완료
+- Init:Error : Init Container 실패
+- Init:CrashLoopBackOff : Init Container 계속 실패
+- Pending : Pod가 Init Containers를 아직 시작 안했음
+- PodInitializing OR Running : Pod가 이미 Init Containers 실행을 완료 
+
+<br/>
+
+## Debug Pods and ReplicationControllers
+
+**불충분한 resource**
+- cluster에 node 추가
+- 불필요한 pod 삭제
+- pod가 node보다 큰지 확인
+
+<br/>
+
+node 수용량 확인
+kubectl get nodes -o yaml | egrep '\sname:|cpu:|memory:'
+kubectl get nodes -o json | jq '.items[] | {name: .metadata.name, cap: .status.capacity}'
+
+<br/>
+
+**pod가 waiting일때**
+- image 이름이 맞는지 확인
+- repository에 image를 넣었는지 확인
+- docker pull <image>로 machine에 image가 받아지는지 확인
+
+<br/>
+
+**Debugging ReplicationCotrollers**
+
+kubectl describe rc ${CONTROLLER_NAME}
+
+<br/>
+
+## Debug Running Pods 
+
+**pod logs 조사**
+
+kubectl logs ${POD_NAME} ${CONTAINER_NAME}
+kubectl logs --previous ${POD_NAME} ${CONTAINER_NAME}   //이전 container
+
+<br/>
+
+**container exec로 debugging**
+linux 또는 window OS image base면 kubectl exec 사용
+
+kubectl exec ${POD_NAME} -c ${CONTAINER_NAME} -- ${CMD} ${ARG1} ${ARG2} ... ${ARGN}
+
+kubectl exec cassandra -- cat /var/log/cassandra/system.log
+
+<br/>
+
+**임시 debug container로 debugging**
+
+버전 1.18부터 제공. container가 충돌했거나 debugging utilities를 제공하지 않을때 사용
+
+kubectl run ephemeral-demo --image=k8s.gcr.io/pause:3.1 --restart=Never // 먼저 pod 생성
+
+kubectl debug -it ephemeral-demo --image=busybox --target=ephemeral-demo // 임시 컨테이너
+
+<br/>
+
+## Debgging using a copy of the Pod
+
+**새로운 container 생성 시 pod 복제**
+
+kubectl run myapp --image=busybox --restart=Never -- sleep 1d   // debugging utilities가 없는 상태
+
+kubectl debug myapp -it --image=ubuntu --share-processes --copy-to=myapp-debug
+
+* --container flag를 쓰지 않으면 container명 자동 생성
+* -i 를 쓰면 kubectl이 새로운 container에 default로 붙음. --attach=false를 사용해야함. kubectl attach를 통해 disconnected 재연결
+* --share-processes는 다른 컨테이너의 프로세스를 볼 수 있음
+
+kubectl delete pod myapp myapp-debug // debug 후 삭제
+
+<br/>
+
+**command 변경 시 pod 복사**
+
+kubectl run --image=busybox myapp -- false //crashing application 연출
+
+kubectl debug myapp -it --copy-to=myapp-debug --container=myapp -- sh   //command로 debug copy 생성
+
+<br/>
+
+**container 이미지 변경하는 동안 pod 복제**
+
+kubectl run myapp --image=busybox --restart=Never -- sleep 1d
+
+kubectl debug myapp --copy-to=myapp-debug --set-image=*=ubuntu  // 모든 container를 ubuntu로 변경
+
+<br/>
+
+## Debugging via a shell on the node
+
+kubectl debug node/mynode -it --image=ubuntu
+
+debugging session을 node에 만들때 주의사항
+
+- Node 이름으로 자동으로 새로운 Pod 이름 생성
+- container가 host IPC, Network and PID namespaces에서 실행
+- Node의 root filesystem이 /host에 mount
+
+
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-application-introspection/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-application-introspection/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/audit/](https://kubernetes.io/docs/tasks/debug-application-cluster/audit/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-stateful-set/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-stateful-set/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-init-containers/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-init-containers/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-pod-replication-controller/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-running-pod/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-running-pod/)
