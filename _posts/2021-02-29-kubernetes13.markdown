@@ -1,0 +1,319 @@
+---
+layout: post
+title:  "Kubernetes - Monitoring, Logging and Debugging(2)"
+date:   2021-02-29
+last_modified_at: 2021-02-29
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## Debug Services
+
+kubectl get svc hostnames
+
+nslookup hostnames //DNS name을 통해 service 확인
+
+nslookup hostnames.default // namespace
+
+nslookup hostnames.default.svc.cluster.local    // fully-qualified name
+
+pod에서 /etc/resolv.conf file 확인 
+
+<br/>
+
+nameserver 10.0.0.10                // cluster dns service (kubelet의 --cluster-dns flag로 전송)
+search default.svc.cluster.local svc.cluster.local cluster.local example.com    //service name
+options ndots:5     // dns client library considers search path
+
+<br/>
+
+위 내용들이 조회가 안된다면 
+
+[명령]
+nslookup kubernetes.default
+
+<br/>
+
+Kubernetes master Service는 항상 작동한다.
+
+[결과]
+Server:    10.0.0.10
+Address 1: 10.0.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      kubernetes.default
+Address 1: 10.0.0.1 kubernetes.default.svc.cluster.local
+
+<br/>
+
+이것도 안되면 kube-proxy쪽을 확인.
+
+<br/>
+
+**service가 IP로 작동하는지 확인**
+
+[명령]
+
+for i in $(seq 1 3); do 
+    wget -qO- 10.0.1.175:80
+done
+
+[결과]
+
+hostnames-632524106-bbpiw
+hostnames-632524106-ly40y
+hostnames-632524106-tlaok
+
+<br/>
+
+**service가 제대로 정의되었는지**
+
+kubectl get service hostnames -o json
+
+<br/>
+
+**Service가 Endpoints가 있는지**
+service가 정확히 정의되고 DNS가 해결됐다면 Pods가 Service에 제대로 선택되었는지 확인
+
+<br/>
+
+[명령]
+kubectl get endpoints hostnames
+
+[결과]
+NAME        ENDPOINTS
+hostnames   10.244.0.5:9376,10.244.0.6:9376,10.244.0.7:9376
+ 
+<br/>
+
+**kube-proxy가 잘 실행되는지 확인**
+
+[명령]
+ps auxw | grep kube-proxy
+
+[결과]
+root  4194  0.4  0.1 101864 17696 ?    Sl Jul04  25:43 /usr/local/bin/kube-proxy --master=https://kubernetes-master --kubeconfig=/var/lib/kube-proxy/kubeconfig --v=2
+
+- 파일로 확인 : /var/log/kube-proxy.log
+
+<br/>
+
+**Iptables mode**
+iptables-save | grep hostnames
+
+<br/>
+
+**IPVS mode**
+ipvsadm -ln
+
+<br/>
+
+**Userspace mode**
+iptables-save | grep hostnames
+
+<br/>
+
+## Pod 실패 이유 정하기
+
+container 시작시 command 설정
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: termination-demo
+spec:
+  containers:
+  - name: termination-demo-container
+    image: debian
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 10 && echo Sleep expired > /dev/termination-log"]
+```
+
+<br/>
+
+## 실행중인 Container의 shell접근
+
+kubectl exec --stdin --tty shell-demo -- /bin/bash
+
+ex)
+
+ls /
+
+cat /proc/mounts
+
+cat /proc/1/maps
+
+apt-get update
+
+apt-get install -y tcpdump
+
+tcpdump
+
+apt-get install -y lsof
+
+lsof
+
+apt-get install -y procps
+
+ps aux
+
+ps aux | grep nginx
+
+<br/>
+
+**하나 이상의 container를 갖고 있는 pod**
+
+kubectl exec -i -t my-pod --container main-app -- /bin/bash
+
+--container 또는 -c를 사용하여 특정 컨테이너 지정
+
+<br/>
+
+## Node 상태 Monitoring
+
+몇몇 클라우드 제공자는 Addon으로 Node Problem Detector를 제공한다. Addon pod를 생성함으로 kubectl로도 할 수 있다.
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-problem-detector-v0.1
+  namespace: kube-system
+  labels:
+    k8s-app: node-problem-detector
+    version: v0.1
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: node-problem-detector  
+      version: v0.1
+      kubernetes.io/cluster-service: "true"
+  template:
+    metadata:
+      labels:
+        k8s-app: node-problem-detector
+        version: v0.1
+        kubernetes.io/cluster-service: "true"
+    spec:
+      hostNetwork: true
+      containers:
+      - name: node-problem-detector
+        image: k8s.gcr.io/node-problem-detector:v0.1
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "100Mi"
+          requests:
+            cpu: "20m"
+            memory: "20Mi"
+        volumeMounts:
+        - name: log
+          mountPath: /log
+          readOnly: true
+      volumes:
+      - name: log
+        hostPath:
+          path: /var/log/
+```
+
+- Kernel Monitor는 Node Problem Detector에서 제공하는 system log monitor daemon이다.
+
+config/kernel-monitor.json 에 condition 정의를 생성한다.
+
+```json
+{
+  "type": "NodeConditionType",
+  "reason": "CamelCaseDefaultNodeConditionReason",
+  "message": "arbitrary default node condition message"
+}
+```
+
+- 새로운 문제를 발견하려면 아래와 같이 정의한다.
+
+```json
+{
+  "type": "temporary/permanent",
+  "condition": "NodeConditionOfPermanentIssue",
+  "reason": "CamelCaseShortReason",
+  "message": "regexp matching the issue in the kernel log"
+}
+```
+
+## Troubleshoot Clusters
+
+kubectl get nodes
+
+kubectl cluster-info dump // cluster 자세한 정보
+
+<br/>
+
+**로그 확인**
+* Master
+- /var/log/kube-apiserver.log - API Server, responsible for serving the API
+- /var/log/kube-scheduler.log - Scheduler, responsible for making scheduling decisions
+- /var/log/kube-controller-manager.log - Controller that manages replication controllers
+
+<br/>
+
+* Worker Nodes
+- /var/log/kubelet.log - Kubelet, responsible for running containers on the node
+- /var/log/kube-proxy.log - Kube Proxy, responsible for service load balancing
+
+
+**cluster 실패의 일반적 개요**
+
+* 근본원인
+
+- VM(s) shutdown
+- Network partition within cluster, or between cluster and users
+- Crashes in Kubernetes software
+- Data loss or unavailability of persistent storage (e.g. GCE PD or AWS EBS volume)
+- Operator error, for example misconfigured Kubernetes software or application software
+
+<br/>
+
+* 특정 시나리오
+
+- Apiserver VM shutdown 또는 apiserver 충돌
+    - 결과
+        - 새로운 pods, services, replication controller 중지, 업데이트, 시작 불가
+        - Kubernetes API 따라 존재하는 pods와 service는 정상 작동
+- Apiserver backing storage lost
+    - 결과
+        - apiserver가 나타나지 않음
+        - kubelets이 닿을 수 없지만 계속 같은 pods에서 작동하고 같은 service proxying 제공
+        - apiserver가 재시작되기전에 수동 회복 또는 재생성이 필요
+- Supporting services (node controller, replication controller manager, scheduler, etc) VM shutdown or crashes
+    - apiserver와 같이 배치되어있으며, 비가용성은 apiserver와 유사하다.
+    - 미래에는 이것들이 복제될것이며 같이 있지 않을 것이다.
+    - 지속적인 상태를 갖고 있지 않다.
+- Individual node (VM or physical machine) shuts down
+    - 결과
+        - node에 있는 pods 중지
+- Network partition
+    - 결과
+        - partition A는 partition B에 있는 nodes들이 멈추었다고 보고 partition B는 apiserver가 내려갔다고 본다.
+- Kubelet software fault
+    - 결과
+        - crashing kubelet은 node에서 새로운 pods 시작 불가
+        - kubelet pods를 삭제해야할지도 모른다
+        - node marked unhealthy
+        - replication controllers 새로운 pods를 다른곳에서 시작
+- Cluster operator error
+    - 결과
+        - pods, services, etc 손실
+        - apiserver backing store 손실
+        - 사용자가 API를 읽을 수 없음
+<br/>
+
+출처
+
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-failure/](https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-failure/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/get-shell-running-container/](https://kubernetes.io/docs/tasks/debug-application-cluster/get-shell-running-container/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/monitor-node-health/](https://kubernetes.io/docs/tasks/debug-application-cluster/monitor-node-health/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/)
+[https://kubernetes.io/docs/tasks/debug-application-cluster/troubleshooting/](https://kubernetes.io/docs/tasks/debug-application-cluster/troubleshooting/)
