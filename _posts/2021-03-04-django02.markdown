@@ -1,0 +1,287 @@
+---
+layout: post
+title:  "django - tutorial(2)"
+date:   2021-03-04
+last_modified_at: 2021-03-04
+categories: [django]
+tags: [django]
+---
+
+### 여러개 views 작성
+
+django는 mysite.urls를 로드하고 (settings.py의 ROOT_URLCONF 기반) 다양한 urlpattern을 찾은 후 polls를 찾으면 polls.urls를 찾는다.
+
+/polls/34 를 찾으면
+
+polls/urls.py의 <int:question_id>에 34가 매핑 된다.
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    # ex: /polls/
+    path('', views.index, name='index'),
+    # ex: /polls/5/
+    path('<int:question_id>/', views.detail, name='detail'),
+    # ex: /polls/5/results/
+    path('<int:question_id>/results/', views.results, name='results'),
+    # ex: /polls/5/vote/
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+]
+```
+
+<br/>
+
+#### 페이지 지정
+polls 폴더 밑에 templates 폴더를 만들면 django는 해당 폴더 내의 내용을 본다. 
+
+settings.py의 TEMPLATES 옵션을 보면 APP_DIRS가 True로 되어있다. INSTALLED_APPS의 하위 templates 폴더를 본다.
+
+template 폴더를 polls 밑에 넣는 이유는 django가 다른 프로젝트의 같은 이름의 template을 구분하기 위해서다.
+
+polls/templates/polls/index.html
+```html
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
+
+#### 하드코드 삭제
+hardcode 
+```html
+<li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+```
+
+change 
+```html
+<li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+```
+
+polls.urls 모듈을 보면 
+
+```python
+...
+# the 'name' value as called by the {% url %} template tag
+path('<int:question_id>/', views.detail, name='detail'),
+...
+```
+
+polls/specifics/12/로 요청하고 싶다면
+
+```python
+...
+# added the word 'specifics'
+path('specifics/<int:question_id>/', views.detail, name='detail'),
+...
+```
+
+#### namespacing 추가
+
+앱이 많아 질경우 app_name 설정 url namespacing 가능
+
+polls/urls.py
+
+```python
+from django.urls import path
+
+from . import views
+
+app_name = 'polls'
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('<int:question_id>/', views.detail, name='detail'),
+    path('<int:question_id>/results/', views.results, name='results'),
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+]
+```
+
+```html
+<li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+```
+
+<br/>
+
+polls/views.py 의 index부분을 변경
+
+```python
+from django.shortcuts import get_object_or_404,render
+
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    context = {'latest_question_list': latest_question_list}
+    return render(request, 'polls/index.html', context)
+
+def detail(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/detail.html', {'question': question})
+
+```
+
+<br/>
+
+* render() 함수 : request object를 첫번째 변수, template 이름을 두번째 변수 dictionary를 세번째 변수로 넘긴다.(optional)
+* get_object_or_404() 함수 : get() 함수를 먼저 실행하고, object가 없으면 Http404를 실행 (get_list_or404()도 있다. - get() 대신 filter() 사용)
+<br/>
+
+
+#### template system 사용
+
+polls/templates/polls/detail.html
+
+```html
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }}</li>
+{% endfor %}
+</ul>
+```
+question.choice_set.all 은 Phython code question.choice_set.all()와 같다.
+
+<br/>
+
+#### 최소한의 form 작성
+
+polls/templates/polls/detail.html
+
+```html
+<h1>{{ question.question_text }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+{% csrf_token %}
+{% for choice in question.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+{% endfor %}
+<input type="submit" value="Vote">
+</form>
+```
+
+* 모든 POST form에는 {% csrf_token %}을 넣어서 Cross Site 요청 위조를 막는다.
+
+polls/views.py
+
+```python
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+
+from .models import Choice, Question
+# ...
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(request, 'polls/detail.html', {
+            'question': question,
+            'error_message': "You didn't select a choice.",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+```
+
+* request.POST는 key name으로 data access를 할 수 있다. 이는 ID를 string으로 return 한다.
+* choice가 없으면 KeyError 발생 시킨다. 
+* HttpResponseRedirect로 redirect 시킨다.
+
+reverse() 함수 : view function에 url을 하드코드할 필요가 없다. /polls/3/results/ 를 return 한다.
+
+race condition : 두 사용자가 동시에 눌렀을 경우 두번째 스레드는 원래 값을 기준으로 저장하기 때문에 첫번째 스레드는 날라간다. F() 함수를 이용해 해결 할 수 있다.
+
+```python
+reporter = Reporters.objects.get(name='Tintin')
+reporter.stories_filed = F('stories_filed') + 1
+reporter.save()
+
+reporter.name = 'Tintin Jr.'
+reporter.save()
+```
+
+stories_filed 는 두번 업데이트 된다. 초기값이 1이면 결과값은 3
+
+<br/>
+
+#### generic views 사용
+
+* Amend URLconf
+
+polls/urls.py
+```python
+from django.urls import path
+
+from . import views
+
+app_name = 'polls'
+urlpatterns = [
+    path('', views.IndexView.as_view(), name='index'),
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+    path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+]
+```
+
+<question_id> 가 <pk>로 바뀐다.
+
+* Amend views
+
+polls/views.py
+```pyhon
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.views import generic
+
+from .models import Choice, Question
+
+
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by('-pub_date')[:5]
+
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'polls/results.html'
+
+
+def vote(request, question_id):
+    ... # same as above, no changes needed.
+```
+
+default로 DetailView generic view는 <app name>/<model name>_detail.html을 부른다. 따라서 template_name 변수 지정. (ListView도 동일)
+
+<br/>
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/intro/tutorial03/](https://docs.djangoproject.com/en/3.1/intro/tutorial03/)
+[https://docs.djangoproject.com/en/3.1/intro/tutorial04/](https://docs.djangoproject.com/en/3.1/intro/tutorial04/)
