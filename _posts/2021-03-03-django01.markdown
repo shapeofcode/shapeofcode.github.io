@@ -125,6 +125,21 @@ path() 함수는 4개의 변수를 보내는데 route, view는 필수고 kwargs,
 #### database 세팅
 다른 벤더사를 쓸 수 있다. 이번 튜토리얼을 sqllite로 진행 (프로젝트내에 포함)
 
+ex) 다른 벤더사 세팅 시 settings.py에 작성
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'xe',
+        'USER': 'a_user',
+        'PASSWORD': 'a_password',
+        'HOST': 'dbprod01ned.mycompany.com',
+        'PORT': '1540',
+    }
+}
+```
+
+
 필수 테이블 구성
 ```shell script
 py manage.py migrate

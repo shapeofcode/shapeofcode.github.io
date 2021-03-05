@@ -1,0 +1,198 @@
+---
+layout: post
+title:  "django - tutorial(3)"
+date:   2021-03-05
+last_modified_at: 2021-03-05
+categories: [django]
+tags: [django]
+---
+
+### TEST
+
+polls/test.py
+```python
+def test_was_published_recently_with_old_question(self):
+    """
+    was_published_recently() returns False for questions whose pub_date
+    is older than 1 day.
+    """
+    time = timezone.now() - datetime.timedelta(days=1, seconds=1)
+    old_question = Question(pub_date=time)
+    self.assertIs(old_question.was_published_recently(), False)
+
+def test_was_published_recently_with_recent_question(self):
+    """
+    was_published_recently() returns True for questions whose pub_date
+    is within the last day.
+    """
+    time = timezone.now() - datetime.timedelta(hours=23, minutes=59, seconds=59)
+    recent_question = Question(pub_date=time)
+    self.assertIs(recent_question.was_published_recently(), True)
+```
+
+```shell script
+py manage.py test polls
+```
+
+<br/>
+
+### STYLE
+
+#### 스타일 추가
+images,javascript, CSS를 static files라고 부른다.
+
+settings.py에 STATIC_URL의 경로가 INSTALLED_APPS별로 폴더 경로를 바라본다.
+
+polls/static 폴더 생성
+
+template과 유사하게 style.css 파일을 polls/static/polls/style.css에 위치해야 polls/style.css로 경로를 읽을 수 있다.
+
+polls/static/polls/style.css
+```css
+li a {
+    color: green;
+}
+```
+
+polls/templates/polls/index.html
+```html
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+```
+{% static %} template tag가 절대 url을 만든다.
+
+<br/>
+
+#### 이미지 추가
+이미지 추가
+
+polls/static/polls/images/background.gif
+
+<br/>
+
+polls/static/polls/style.css
+```css
+body {
+    background: white url("images/background.gif") no-repeat;
+}
+```
+
+<br/>
+
+### Customize admin form
+
+생략... 개인 필요에 따라 customize
+
+<br/>
+
+### Reusable Apps
+
+* small app polls packaging
+
+1. 원래 django 프로젝트 밖에 django-polls 폴더를 만든다.
+(django- prefix를 붙이는것은 PyPI가 resource 겹치는걸 피하도록... application label은 INSTALLED_APPS에서 unique해야한다.)
+
+2. polls 폴더 django-polls 이동
+
+3. django-polls/README.rst 파일 작성
+```rst
+=====
+Polls
+=====
+
+Polls is a Django app to conduct Web-based polls. For each question,
+visitors can choose between a fixed number of answers.
+
+Detailed documentation is in the "docs" directory.
+
+Quick start
+-----------
+
+1. Add "polls" to your INSTALLED_APPS setting like this::
+
+    INSTALLED_APPS = [
+        ...
+        'polls',
+    ]
+
+2. Include the polls URLconf in your project urls.py like this::
+
+    path('polls/', include('polls.urls')),
+
+3. Run ``python manage.py migrate`` to create the polls models.
+
+4. Start the development server and visit http://127.0.0.1:8000/admin/
+   to create a poll (you'll need the Admin app enabled).
+
+5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
+```
+
+4. django-polls/LICENSE 파일 작성
+
+5. setup.cfg & setup.py 작성 (build와 install 어떻게 할지 상세)
+
+[setuptools documentation](https://setuptools.readthedocs.io/en/latest/) 에서 상세 정보 확인 가능
+
+```cfg
+[metadata]
+name = django-polls
+version = 0.1
+description = A Django app to conduct Web-based polls.
+long_description = file: README.rst
+url = https://www.example.com/
+author = Your Name
+author_email = yourname@example.com
+license = BSD-3-Clause  # Example license
+classifiers =
+    Environment :: Web Environment
+    Framework :: Django
+    Framework :: Django :: X.Y  # Replace "X.Y" as appropriate
+    Intended Audience :: Developers
+    License :: OSI Approved :: BSD License
+    Operating System :: OS Independent
+    Programming Language :: Python
+    Programming Language :: Python :: 3
+    Programming Language :: Python :: 3 :: Only
+    Programming Language :: Python :: 3.6
+    Programming Language :: Python :: 3.7
+    Programming Language :: Python :: 3.8
+    Topic :: Internet :: WWW/HTTP
+    Topic :: Internet :: WWW/HTTP :: Dynamic Content
+
+[options]
+include_package_data = true
+packages = find:
+```
+
+```python
+from setuptools import setup
+
+setup()
+```
+
+6. django-polls/MANIFEST.in 파일 작성 (Python module과 package만 포함되는게 default라 추가로 include해야함.)
+
+```in
+include LICENSE
+include README.rst
+recursive-include polls/static *
+recursive-include polls/templates *
+recursive-include docs *
+```
+
+* docs 폴더는 따로 파일을 추가하지 않는 이상 포함시키지 않는편 [readthedocs.org](readthedocs.org) 같은 사이트에서 제공
+
+7. django-polls에서 패키지 빌드 실행 (dist 폴더와 django-polls-0.1.tar.gz 생성)
+```shell script
+py setup.py sdist
+```
+
+<br/>
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/intro/tutorial05/](https://docs.djangoproject.com/en/3.1/intro/tutorial05/)
+[https://docs.djangoproject.com/en/3.1/intro/tutorial06/](https://docs.djangoproject.com/en/3.1/intro/tutorial06/)
+[https://docs.djangoproject.com/en/3.1/intro/tutorial07/](https://docs.djangoproject.com/en/3.1/intro/tutorial07/)
+[https://docs.djangoproject.com/en/3.1/intro/reusable-apps/](https://docs.djangoproject.com/en/3.1/intro/reusable-apps/)
