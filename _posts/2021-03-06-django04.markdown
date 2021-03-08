@@ -1,0 +1,230 @@
+---
+layout: post
+title:  "django - tutorial(4)"
+date:   2021-03-06
+last_modified_at: 2021-03-06
+categories: [django]
+tags: [django]
+---
+
+### GEODjango (django에서 geographic 다루기)
+
+#### 사전 설치
+
+- spatial database [버전 확인](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/)
+- OSGeo4W (PROJm GDAL, GEOS libraries 포함)
+- 환경변수 추가
+[설치가이드](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/)
+
+<br/>
+
+#### GDAL 이용한 shp 다루기
+
+ogrinfo world\data\TM_WORLD_BORDERS-0.3.shp   // shp파일 또는 다른 벡터 소스에 대한 info를 보여줌
+
+ogrinfo -so world\data\TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3 // -so option을 통해 중요한 summary 정보를 조회
+
+<br/>
+
+#### Geomgraphic Models
+
+```python
+from django.contrib.gis.db import models
+
+class WorldBorder(models.Model):
+    # Regular Django fields corresponding to the attributes in the
+    # world borders shapefile.
+    name = models.CharField(max_length=50)
+    area = models.IntegerField()
+    pop2005 = models.IntegerField('Population 2005')
+    fips = models.CharField('FIPS Code', max_length=2, null=True)
+    iso2 = models.CharField('2 Digit ISO', max_length=2)
+    iso3 = models.CharField('3 Digit ISO', max_length=3)
+    un = models.IntegerField('United Nations Code')
+    region = models.IntegerField('Region Code')
+    subregion = models.IntegerField('Sub-Region Code')
+    lon = models.FloatField()
+    lat = models.FloatField()
+
+    # GeoDjango-specific: a geometry field (MultiPolygonField)
+    mpoly = models.MultiPolygonField()
+
+    # Returns the string representation of the model.
+    def __str__(self):
+        return self.name
+```
+
+* migrate 실행
+- py manage.py makemigrations   //datebase migration 생성
+- py manage.py sqlmigrate world 0001    //migrate sql 조회
+- py manage.py migrate //migrate 실행
+
+<br/>
+
+#### GDAL Interface
+
+```shell script
+py manage.py shell
+```
+
+```python
+from pathlib import Path
+import world
+world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
+```
+
+```python
+from django.contrib.gis.gdal import DataSource
+ds = DataSource(str(world_shp))
+print(ds)               //datasource 조회
+print(len(ds))          //1
+lyr = ds[0]
+print(lyr)              //TM_WORLD_BORDERS-0.3
+print(lyr.geom_type)    //Polygon
+print(len(lyr))         //246
+srs = lyr.srs           
+print(srs)              //srs
+srs.proj4               //proj4
+print(lyr.fields)       //fields
+[fld.__name__ for fld in lyr.field_types]
+for feat in lyr:
+...    print(feat.get('NAME'), feat.geom.num_points)    //iterate feature
+lyr[0:2]                //object slice
+feat = lyr[234]
+print(feat.get('NAME')) //San Marino
+geom = feat.geom
+print(geom.wkt)         //POLYGON ((12.415798 43.957954,12.450554 ...
+print(geom.json)        /{ "type": "Polygon", "coordinates": [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
+```
+
+<br/>
+
+#### LayerMapping
+world 프로젝트에 load.py 생성
+```python
+from pathlib import Path
+from django.contrib.gis.utils import LayerMapping
+from .models import WorldBorder
+
+world_mapping = {
+    'fips' : 'FIPS',
+    'iso2' : 'ISO2',
+    'iso3' : 'ISO3',
+    'un' : 'UN',
+    'name' : 'NAME',
+    'area' : 'AREA',
+    'pop2005' : 'POP2005',
+    'region' : 'REGION',
+    'subregion' : 'SUBREGION',
+    'lon' : 'LON',
+    'lat' : 'LAT',
+    'mpoly' : 'MULTIPOLYGON',
+}
+
+world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
+
+def run(verbose=True):
+    lm = LayerMapping(WorldBorder, str(world_shp), world_mapping, transform=False)
+    lm.save(strict=True, verbose=verbose)
+```
+
+<br/>
+
+```shell script
+py manage.py shell
+```
+
+```shell script
+from world import load
+load.run()
+```
+
+<br/>
+
+* ogrinspect 
+- layer mapping 자동화
+```shell script
+py manage.py ogrinspect world\data\TM_WORLD_BORDERS-0.3.shp WorldBorder --srid=4326 --mapping --multi
+```
+
+#### Spatial Queries
+
+```shell script
+py manage.py shell
+
+pnt_wkt = 'POINT(-95.3385 29.7245)'
+
+from world.models import WorldBorder
+WorldBorder.objects.filter(mpoly__contains=pnt_wkt) //<QuerySet [<WorldBorder: United States>]>
+
+from django.contrib.gis.geos import Point
+pnt = Point(12.4604, 43.9420)
+WorldBorder.objects.get(mpoly__intersects=pnt)
+
+from django.contrib.gis.geos import GEOSGeometry, Point
+pnt = Point(954158.1, 4215137.1, srid=32140)
+pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
+
+qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
+print(qs.query)
+```
+
+<br/>
+
+* Raw quries
+```shell script
+from django.db import connection
+# or if you're querying a non-default database:
+from django.db import connections
+connection = connections['your_gis_db_alias']
+
+City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
+```
+
+<br/>
+
+* Lazy Geometries
+```shell script
+sm = WorldBorder.objects.get(name='San Marino')
+sm.mpoly  // <MultiPolygon object at 0x24c6798>
+sm.mpoly.wkt // MULTIPOLYGON (((12.4157980000000006 43.9579540000000009, 12.4505540000000003 43.9797209999999978, ...
+sm.mpoly.wkb // <read-only buffer for 0x1fe2c70, size -1, offset 0 at 0x2564c40>
+sm.mpoly.geojson //'{ "type": "MultiPolygon", "coordinates": [ [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
+```
+
+[함수](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/functions/)
+
+<br/>
+
+* Geographic Admin
+
+Django's admin application의 확장으로 geometry fields의 편집을 제공한다.
+
+world/admin.py
+```python
+from django.contrib.gis import admin
+from .models import WorldBorder
+
+admin.site.register(WorldBorder, admin.OSMGeoAdmin)
+```
+
+geodjango/urls.py
+```python
+from django.contrib.gis import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+```
+
+```shell script
+py manage.py createsuperuser
+
+py manage.py runserver
+```
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/)
+[https://docs.djangoproject.com/en/3.1/ref/contrib/gis/tutorial/](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/tutorial/)
