@@ -1,0 +1,144 @@
+---
+layout: post
+title:  "python - decorator"
+date:   2021-03-07
+last_modified_at: 2021-03-07
+categories: [python]
+tags: [python]
+---
+
+### @dataclass
+
+dataclasses 모듈에서 제공하는 @dataclass 데코레이터를 일반 클래스에 선언해주면 데이터 클래스가 된다.
+
+__init__(), __repr__(), __eq__()와 같은 메서드를 자동으로 생성
+
+데이터의 불변성이 필요한 경우 @dataclass(frozen=True)
+
+데이터 클래스 간에 대소비교가 필요한 경우 @dataclass(order=True)
+
+데이터 클래스의 인스턴스를 hashable하게 만들고 싶은 경우, @dataclass(unsafe_hash=True)
+
+
+```python
+from dataclasses import dataclass
+from datetime import date
+
+
+@dataclass
+class User:
+    id: int
+    name: str
+    birthdate: date
+    admin: bool = False
+```
+
+- 필드의 기본값은 인스턴스 간에 공유가 되기 때문에 가변 인수에 대한 기본값 할당이 허용되지 않음
+
+dataclasses 모듈에서 제공하는 field 함수의 default_factory 옵션을 사용해서 매번 새로운 리스트가 생성될 수 있도록 해줘야한다.
+
+```python
+class User:
+    friends: List[int] = field(default_factory=list)
+```
+
+<br/>
+
+### @property
+
+getter, setter 호출
+
+```python
+class Person:
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+
+    @property
+    def age(self):
+        return self._age
+
+    @age.setter
+    def age(self, age):
+        if age < 0:
+            raise ValueError("Invalid age")
+        self._age = age
+```
+
+```shell script
+>>> person = Person("John", "Doe", 20)
+>>> person.age
+20
+>>> person.age = -1
+ValueError: Invalid age
+>>> person.age = person.age + 1
+>>> person.age
+21
+```
+
+<br/>
+
+### @staticmethod
+
+```python
+class Calc:
+    
+    @staticmethod
+    def add(a ,b):
+        return a + b
+
+cal = Calc()
+cal.add(1,2)  # return 3
+```
+
+-인스턴스 메소드와 달리 self라는 인자를 갖지 않고 있다.
+
+<br/>
+
+### @classmethod
+
+```python
+class Calc:
+    
+    @classmethod
+    def add(a ,b):
+        return a + b
+cal = Calc()
+cal.add(1,2)  # return 3
+```
+
+-인스턴스 메소드와 달리 cls라는 인자를 갖는다.
+
+<br/>
+
+@classmethod와 @staticmethod의 차이
+
+```python
+class Drink:
+    default= "soda"
+    
+     def __init__(self):
+        self.data = self.default
+    
+    @classmethod
+    def class_drink(cls):
+        return cls()
+    
+    @staticmethod
+    def static_drink():
+        return Drink()
+    
+class WhatDrink(Drink):
+    default = "water"
+water = WhatDrink.class_drink()    # return water
+soda = WhatDrink.static_drink()   # return soda
+```
+
+<br/>
+
+출처
+
+[https://www.daleseo.com/python-dataclasses/](https://www.daleseo.com/python-dataclasses/)
+[https://www.daleseo.com/python-property/](https://www.daleseo.com/python-property/)
+[https://medium.com/@hckcksrl/python-%EC%A0%95%EC%A0%81%EB%A9%94%EC%86%8C%EB%93%9C-staticmethod-%EC%99%80-classmethod-6721b0977372](https://medium.com/@hckcksrl/python-%EC%A0%95%EC%A0%81%EB%A9%94%EC%86%8C%EB%93%9C-staticmethod-%EC%99%80-classmethod-6721b0977372)
