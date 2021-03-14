@@ -1,0 +1,56 @@
+---
+layout: post
+title:  "django - Views"
+date:   2021-03-12
+last_modified_at: 2021-03-12
+categories: [django]
+tags: [django]
+---
+
+#### Class-based views
+Django 가 제공하는 view class .
+
+모든 views는 view class으로 부터 상속 받아지며 view가 URL에 링크, http method dispatching 그리고 다른 특징들을 갖는다.
+
+- RedirectView : HTTP redirect 제공
+- TemplateView : render template
+
+<br/>
+
+* html을 view에 사용
+```python
+from django.urls import path
+from django.views.generic import TemplateView
+
+urlpatterns = [
+    path('about/', TemplateView.as_view(template_name="about.html")),
+]
+```
+
+<br/>
+
+* generic view를 사용하는 강력한 방법
+만들어둔 view에 상속받아 속성을 override 한다.
+```pyhon
+# some_app/views.py
+from django.views.generic import TemplateView
+
+class AboutView(TemplateView):
+    template_name = "about.html"
+```
+
+그리고 url conf에 view를 넣어둔다.
+
+```python
+# urls.py
+from django.urls import path
+from some_app.views import AboutView
+
+urlpatterns = [
+    path('about/', AboutView.as_view()),
+]
+```
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/topics/class-based-views/](https://docs.djangoproject.com/en/3.1/topics/class-based-views/)
