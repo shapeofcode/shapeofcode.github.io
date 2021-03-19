@@ -1,0 +1,77 @@
+---
+layout: post
+title:  "django - Urls"
+date:   2021-03-13
+last_modified_at: 2021-03-13
+categories: [django]
+tags: [django]
+---
+
+#### utility function
+
+- reverse()
+viewname이 URL pattern name이 될 수 있다. 
+
+```python
+from news import views
+
+path('archive/', views.archive, name='news-archive')
+```
+
+```python
+# using the named URL
+reverse('news-archive')
+
+# passing a callable object
+# (This is discouraged because you can't reverse namespaced views this way.)
+from news import views
+reverse(views.archive)
+```
+
+url이 arguments를 수용한다면, args로 넘길 수 있다.
+
+```python
+from django.urls import reverse
+
+def myview(request):
+    return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+```
+
+kwargs도 가능하다.
+
+```shell script
+>>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+'/admin/auth/'
+```
+
+<br/>
+
+- reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+
+* generic class-based view에서 reversed URL 제공
+* decorator에 reversed URL 제공
+* function signature에서 reversed URL을 default value로 제공
+
+<br/>
+
+- resolve(path, urlconf=None)
+
+path와 일치하는 url pattern을 돌려준다.
+
+```shell script
+match = resolve('/some/path/')
+# Print the URL pattern that matched the URL
+```
+Http404를 이용해 redirect 할 때 사용하기 좋다.
+
+<br/>
+
+- get_script_prefix()
+
+Django project base url을 return한다. Django project가 web server의 root면 항상 "/"
+
+<br/>
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/ref/urlresolvers/](https://docs.djangoproject.com/en/3.1/ref/urlresolvers/)
