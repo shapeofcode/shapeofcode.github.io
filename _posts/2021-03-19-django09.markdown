@@ -1,0 +1,107 @@
+---
+layout: post
+title:  "django - 페이징 처리"
+date:   2021-03-18
+last_modified_at: 2021-03-18
+categories: [django]
+tags: [django]
+---
+
+#### paginator class
+
+내부적으로, pagination의 모든 함수는 Paginator class를 사용
+
+QuerySet 분할 부터 Page 객체까지 모든 작업을 한다.
+
+```shell script
+>>> from django.core.paginator import Paginator
+>>> objects = ['john', 'paul', 'george', 'ringo']
+>>> p = Paginator(objects, 2)   # 한 페이지에 아이템 갯수
+
+>>> p.count #전체 갯수
+>>> p.num_pages #페이지 갯수
+>>> type(p.page_range)
+<class 'range'>
+
+>>> page1 = p.page(1)   # 첫 번째 페이지 객체
+>> page1.object_list
+['john', 'paul']
+
+>>> page2 = p.page(2)   # 두 번째 페이지 객체
+>>> page2.object_list
+['george', 'ringo']
+
+>>> page2.has_next() # 객체의 다음 페이지가 있는지 
+>>> page2.has_previous() # 객체의 이전 페이지가 있는지
+>>> page2.has_other_pages() # 다른 페이지가 있는지
+>>> page2.next_page_number() # 다음 페이지 번호
+>>> page2.previous_page_number() # 이전 페이지 번호
+>>> page2.start_index() # 시작점
+>>> page2.end_index() # 끝점
+```
+
+<br/>
+
+#### Paginating a ListView
+
+django.views.generic.list.ListView는 paginate을 builtin으로 제공한다.
+
+```python
+from django.views.generic import ListView
+
+from myapp.models import Contact
+
+class ContactList(ListView):
+    paginate_by = 2
+    model = Contact
+```
+```html
+{% for contact in page_obj %}
+    {# Each "contact" is a Contact model object. #}
+    {{ contact.full_name|upper }}<br>
+    ...
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+```
+
+<br/>
+
+#### Using paginator in a view function
+
+```python
+from django.core.paginator import Paginator
+from django.shortcuts import render
+
+from myapp.models import Contact
+
+def listing(request):
+    contact_list = Contact.objects.all()
+    paginator = Paginator(contact_list, 25) # Show 25 contacts per page.
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'list.html', {'page_obj': page_obj})
+```
+
+<br/>
+
+출처
+
+[https://docs.djangoproject.com/en/3.1/topics/pagination/](https://docs.djangoproject.com/en/3.1/topics/pagination/)
