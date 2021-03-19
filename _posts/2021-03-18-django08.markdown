@@ -1,0 +1,248 @@
+---
+layout: post
+title:  "django - ORM 모델 정의"
+date:   2021-03-18
+last_modified_at: 2021-03-18
+categories: [django]
+tags: [django]
+---
+
+- 일대일 관계
+
+```python
+from django.contrib.auth.models import User
+
+class UserParent(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    father_name = models.CharField(max_length=100)
+    mother_name = models.CharField(max_length=100)
+```
+
+```shell script
+>>> u1 = User.objects.get(first_name='Ritesh', last_name='Deshmukh')
+>>> u2 = User.objects.get(first_name='Sohan', last_name='Upadhyay')
+>>> p1 = UserParent(user=u1, father_name='Vilasrao Deshmukh', mother_name='Vaishali Deshmukh')
+>>> p1.save()
+>>> p1.user.first_name
+'Ritesh'
+>>> p2 = UserParent(user=u2, father_name='Mr R S Upadhyay', mother_name='Mrs S K Upadhyay')
+>>> p2.save()
+>>> p2.user.last_name
+'Upadhyay'
+
+# on_delete=models.CASCADE (하위 삭제), User u2, userParent p2 삭제
+>> u2.delete()
+```
+
+<br/>
+
+- 일대다 관계
+
+```python
+class Article(models.Model):
+    headline = mnodels.CharField(max_length=100)
+    pub_date = models.DateField()
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reporter')
+
+    def __str__(self):
+        return self.headline
+
+    class meta:
+        ordering = ('headline',)
+```
+
+```shell script
+>>> u1 = User(username='johny1', first_name='Johny', last_name='Smith', email='johny@example.com')
+>>> u1.save()
+>>> u2 = User(username='alien', first_name='Alien', last_name='Mars', email='alien@example.com')
+>>> u2.save()
+>>> from datetime import date
+>>> a1 = Article(headline="This is a test", pub_date=date(2018, 3, 6), reporter=u1)
+>>> a1.save()
+>>> a1.reporter.id
+13
+>>> a1.reporter
+<User: johny1>
+
+#상위 객체를 데이터베이스에 저장하지 않은 채로 하위 객체로 할당하려면 ValueError 예외가 발생
+>>> u3 = User(username='someuser', first_name='Some', last_name='User', email='some@example.com')
+>>> Article.objects.create(headline="This is a test", pub_date=date(2018, 3, 7), reporter=u3)
+Traceback (most recent call last):
+...
+ValueError: save() prohibited to prevent data loss due to unsaved related object 'reporter'.
+>>> Article.objects.create(headline="This is a test", pub_date=date(2018, 3, 7), reporter=u1)
+>>> Article.objects.filter(reporter=u1)
+<QuerySet [<Article: This is a test>, <Article: This is a test>]>
+```
+
+- 다대다 관계
+
+```python
+# 사용자가 다른 사용자를 '팔로우' 및 취소할 수 있습니다.
+# 사용자가 팔로우하는 다른 사용자가 작성한 트윗을 볼 수 있습니다.
+# 사용자가 트윗에 '마음에 들어요' 및 취소할 수 있습니다.
+class User(AbstartUser):
+    tweet = models.ManyToManyField(Tweet, blank=True)
+    follower = models.ManyToManyField(settings.AUTH_USER_MODEL, blank= True)
+    pass
+
+class Tweet(models.Model):
+    tweet = models.TextField()
+    favorite = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='user_favorite')
+
+    def __unicode__(self):
+        return self.tweet
+```
+
+```shell script
+>>> t1 = Tweet(tweet="I am happy today")
+>>> t1.save()
+>>> t2 = Tweet(tweet="This is my second Tweet")
+>>> t2.save()
+>>> u1 = User(username='johny1', first_name='Johny', last_name='Smith', email='johny@example.com')
+>>> u1.save()
+>>> u2 = User(username='johny1', first_name='Johny', last_name='Smith', email='johny@example.com')
+>>> u2.save()
+>>> u3 = User(username='someuser', first_name='Some', last_name='User', email='some@example.com')
+>>> u3.save()
+
+>>> u2.tweet.add(t1)
+>>> u2.save()
+>>> u2.tweet.add(t2)
+>>> u2.save()
+>>> # 사용자가 다른 사용자를 '팔로우' 할 수 있습니다.
+>>> u2.follow.add(u1)
+>>> u2.save()
+>>> # 트윗이 사용자에 연결되어 있습니다. 사용자들이 트윗에 마음에 들어요 및 취소를 할 수 있습니다.
+>>> t1.favorite.add(u1)
+>>> t1.save()
+>>> t1.favorite.add(u3)
+>>> t1.save()
+>>> # '마음에 들어요' 취소하기
+>>> t1.favorite.remove(u1)
+>>> t1.save()
+```
+
+<br/>
+
+- 모델에 자기 참조 외래 키
+```python
+class Employee(models.Model):
+    manager = models.ForeignKey('self', on_delete=models.CASCADE)
+
+# 또는
+
+class Employee(models.Model):
+    manager = models.ForeignKey("app.Employee", on_delete=models.CASCADE)
+``` 
+
+<br/>
+
+- 뷰에 대응하는 모델
+```python
+# Meta 클래스에 managed = False, db_teable="temp_user"와 같이 옵션을 설정
+class TempUser(models.Model):
+    first_name = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = "temp_user"
+
+>>> # 실제 표와 마찬가지로 뷰를 조회할 수 있습니다.
+>>> TempUser.objects.all().values()
+<QuerySet [{'first_name': 'Yash', 'id': 1}, {'first_name': 'John', 'id': 2}, {'first_name': 'Ricky', 'id': 3}, {'first_name': 'Sharukh', 'id': 4}, {'first_name': 'Ritesh', 'id': 5}, {'first_name': 'Billy', 'id': 6}, {'first_name': 'Radha', 'id': 7}, {'first_name': 'Raghu', 'id': 9}, {'first_name': 'Rishabh', 'id': 10}, {'first_name': 'John', 'id': 11}, {'first_name': 'Paul', 'id': 12}, {'first_name': 'Johny', 'id': 13}, {'first_name': 'Alien', 'id': 14}]>
+>>> # 그러나 뷰에 기록은 하지 못합니다.
+>>> TempUser.objects.create(first_name='Radhika', id=15)
+Traceback (most recent call last):
+...
+django.db.utils.OperationalError: cannot modify temp_user because it is a view
+```
+
+<br/>
+
+- 범용 모델
+```python
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+# ...
+
+class FlexCategory(models.Model):
+    name = models.SlugField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+
+class Hero(models.Model):
+    name = models.CharField(max_length=100)
+    flex_category = GenericRelation(FlexCategory, related_query_name='flex_category')
+    # ...
+
+
+class Villain(models.Model):
+    name = models.CharField(max_length=100)
+    flex_category = GenericRelation(FlexCategory, related_query_name='flex_category')
+    # ...
+```
+
+FlexCatergory 모델에 외래 키 필드(ForeignKey) 하나와 양의 정수 필드(PositiveIntegerField) 하나를 정의하여
+범용 외래 키 필드 (GenericForeignKey)를 사용할 수 있도록 한다. 그리고 분류를 이용할 모델에 범용 관게 필드(GenericRelation)를 추가한다.
+
+<br/>
+
+- 모델에 연결된 테이블의 이름을 지정
+
+```python
+class TempUser(models.Model):
+    first_name = models.CharField(max_length=100)
+    . . .
+    class Meta:
+        db_table = "temp_user"
+```
+
+<br/>
+
+- 모델 필드의 데이터베이스 열 이름을 지정
+
+```python
+class ColumnName(models.Model):
+    a = models.CharField(max_length=40,db_column='column1')
+    column2 = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.a
+```
+
+<br/>
+
+- null=True와 blan=True의 차이
+
+둘다 기본값은 false, null=True는 필드의 값이 NULL로 저장되는것을 허용, blank=True는 필드가 폼에서 빈채로 저장되는 것을 허용
+빈 값을 빈 문자열('')로 저장
+
+<br/>
+
+- 기본 키로 ID 대신 UUID 사용
+```python
+import uuid
+from django.db import models
+
+class Event(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    details = models.TextField()
+    years_ago = models.PositiveIntegerField()
+
+>>> eventobject = Event.objects.all()
+>>> eventobject.first().id
+'3cd2b4b0c36f43488a93b3bb72029f46'
+```
+
+<br/>
+
+출처
+
+[https://django-orm-cookbook-ko.readthedocs.io/en/latest](https://django-orm-cookbook-ko.readthedocs.io/en/latest)

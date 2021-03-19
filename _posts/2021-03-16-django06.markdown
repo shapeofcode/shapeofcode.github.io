@@ -1,0 +1,134 @@
+---
+layout: post
+title:  "django - ORM 생성, 갱신, 삭제"
+date:   2021-03-16
+last_modified_at: 2021-03-16
+categories: [django]
+tags: [django]
+---
+
+- 저장
+```shell script
+(modelClass).objects.create(필드명1=값1,필드명2=값2....)
+```
+
+<br/>
+
+- 여러 개의 행을 한번에 생성
+```shell script
+>>> Category.objects.all().count()
+2
+>>> Category.objects.bulk_create(
+    [Category(name="God"),
+     Category(name="Demi God"),
+     Category(name="Mortal")]
+)
+[<Category: God>, <Category: Demi God>, <Category: Mortal>]
+>>> Category.objects.all().count()
+5
+```
+
+<br/>
+
+- 기존에 저장된 행을 복사해 새로 저장
+```shell script
+hero = Hero.objects.first()
+hero.pk = None
+hero.save()
+```
+
+- 특정 모델의 항목이 하나만 생성되도록 강제하는 방법(싱글턴)
+```shell script
+class Origin(models.Model):
+    name = models.CharField(max_length=100)
+
+    def save(self, *args, **kwargs):
+      if self.__class__.objects.count():
+        self.pk = self.__class__.objects.first().pk
+    super().save(*args, **kwargs)
+```
+
+<br/>
+
+- 모델 인스턴스를 저장할 때, 다른 모델에 반정규화된 필드를 함께 갱신하는 방법
+
+모델 구성
+```pyhton
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    hero_count = models.PositiveIntegerField()
+    villain_count = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+
+class Hero(models.Model):
+    name = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    # ...
+
+
+class Villain(models.Model):
+    name = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+```
+
+Hero 모델과 Villian 모델의 항목을 새로 저장할 때, Category 모델의 hero_count 필드와 villian_count 필드를 갱신
+
+```python
+class Hero(models.Model):
+    # ...
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            Category.objects.filter(pk=self.category_id).update(hero_count=F('hero_count')+1)
+        super().save(*args, **kwargs)
+
+
+class Villain(models.Model):
+    # ...
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            Category.objects.filter(pk=self.category_id).update(villain_count=F('villain_count')+1)
+        super().save(*args, **kwargs)
+```
+
+<br/>
+
+- TRUNCATE 문을 수행
+
+```python
+class Category(models.Model):
+    @classmethod
+    def truncate(cls):
+        with connection.cursor() as cursor:
+            cursor.execute('TRUNCATE TABLE "{0}" CASCADE'.format(cls._meta.db_table))
+```
+
+<br/>
+
+- 시간 정보를 다른 양식으로 변환하여 데이터 베이스에 저장
+
+```shell script
+>>> user = User.objects.get(id=1)
+>>> data_str = "2018-03-11"
+>>> from django.utils.dateparse import parse_dateparse
+temp_date = parse_date(date_str)
+>>> a1 = Article(headline="String converted to date", pub_date=temp_date, reporter=user)
+>>> a1.save()
+>>> a1.pub_date
+datetime.date(2018, 3, 11)
+>>> from datetime import datetime
+>>> temp_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+>>> a2 = Article(headline="String converted to date way 2", pub_date=temp_date, reporter=user)
+>>> a2.save()
+>>> a2.pub_date
+datetime.date(2018, 3, 11)
+```
+
+<br/>
+
+출처
+[https://django-orm-cookbook-ko.readthedocs.io/en/latest](https://django-orm-cookbook-ko.readthedocs.io/en/latest)

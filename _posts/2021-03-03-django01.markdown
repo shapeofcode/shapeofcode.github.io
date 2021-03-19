@@ -333,6 +333,13 @@ c = q.choice_set.filter(choice_text__startswith='Just hacking')
 c.delete()
 
 ```
+
+<br/>
+
+기존 db를 models.py로 바꾸는 법
+```shell script
+py manage.py inspectdb --database [settings.py에 지정한 database명] > models.py
+```
 <br/>
 
 #### Django Admin
