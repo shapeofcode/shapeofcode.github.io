@@ -13,7 +13,7 @@ tags: [django]
 
 QuerySet 분할 부터 Page 객체까지 모든 작업을 한다.
 
-```shell script
+```console
 >>> from django.core.paginator import Paginator
 >>> objects = ['john', 'paul', 'george', 'ringo']
 >>> p = Paginator(objects, 2)   # 한 페이지에 아이템 갯수

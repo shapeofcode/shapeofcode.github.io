@@ -39,7 +39,7 @@ def myview(request):
 
 kwargs도 가능하다.
 
-```shell script
+```console
 >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
 '/admin/auth/'
 ```
@@ -58,7 +58,7 @@ kwargs도 가능하다.
 
 path와 일치하는 url pattern을 돌려준다.
 
-```shell script
+```console
 match = resolve('/some/path/')
 # Print the URL pattern that matched the URL
 ```

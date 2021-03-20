@@ -63,7 +63,7 @@ class WorldBorder(models.Model):
 
 #### GDAL Interface
 
-```shell script
+```console
 py manage.py shell
 ```
 
@@ -101,6 +101,7 @@ print(geom.json)        /{ "type": "Polygon", "coordinates": [ [ [ 12.415798, 43
 
 #### LayerMapping
 world 프로젝트에 load.py 생성
+
 ```python
 from pathlib import Path
 from django.contrib.gis.utils import LayerMapping
@@ -130,11 +131,11 @@ def run(verbose=True):
 
 <br/>
 
-```shell script
+```console
 py manage.py shell
 ```
 
-```shell script
+```console
 from world import load
 load.run()
 ```
@@ -143,13 +144,14 @@ load.run()
 
 * ogrinspect 
 - layer mapping 자동화
-```shell script
+
+```console
 py manage.py ogrinspect world\data\TM_WORLD_BORDERS-0.3.shp WorldBorder --srid=4326 --mapping --multi
 ```
 
 #### Spatial Queries
 
-```shell script
+```console
 py manage.py shell
 
 pnt_wkt = 'POINT(-95.3385 29.7245)'
@@ -172,7 +174,8 @@ print(qs.query)
 <br/>
 
 * Raw quries
-```shell script
+
+```console
 from django.db import connection
 # or if you're querying a non-default database:
 from django.db import connections
@@ -184,7 +187,8 @@ City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.op
 <br/>
 
 * Lazy Geometries
-```shell script
+
+```console
 sm = WorldBorder.objects.get(name='San Marino')
 sm.mpoly  // <MultiPolygon object at 0x24c6798>
 sm.mpoly.wkt // MULTIPOLYGON (((12.4157980000000006 43.9579540000000009, 12.4505540000000003 43.9797209999999978, ...
@@ -218,7 +222,7 @@ urlpatterns = [
 ]
 ```
 
-```shell script
+```console
 py manage.py createsuperuser
 
 py manage.py runserver

@@ -164,7 +164,11 @@ kubectl get pods -l app=myapp
 
 ## Debug Init Containers
 
+```console
+{% raw  %}
 kubectl get pod nginx --template '{{.status.initContainerStatuses}}'
+{% endraw  %}
+```
 
 **Pod status**
 - Init:N/M : M개 중 N개 완료

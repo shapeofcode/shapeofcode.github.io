@@ -9,7 +9,7 @@ tags: [django]
 
 - 쿼리셋을 오름차순/내림차순으로 정렬
 
-```shell script
+```console
 >>> User.objects.all().order_by('date_joined')  #오름차순
 >>> User.objects.all().order_by('-date_joined') #내림차순
 >>> User.objects.all().order_by('date_joined', '-last_login') #기준 필드 여러개
@@ -23,7 +23,7 @@ order_by 메서드로 쿼리셋을 정렬할 때, 텍스트 필드를 기준으�
 
 Lower를 사용하여 대소문자를 구별하지 않고 정렬
 
-```shell script
+```console
 >>> from django.db.models.functions.import Lower
 >>> User.objects.all().order_by(Lower('username')).values_list('username', flat=True)
 

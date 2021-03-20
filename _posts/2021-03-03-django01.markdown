@@ -11,7 +11,7 @@ tags: [django]
 
 시작할 폴더 위치를 만들고 다음 명령어 입력
 
-```shell script
+```console
 django-admin startproject mysite
 ```
 
@@ -37,19 +37,19 @@ mysite/
 <br/>
 
 * 서버 실행
-```shell script
+```console
 py manage.py runserver
 ```
 
 * 포트 옵션
-```shell script
+```console
 py manage.py runserver 8080
 ```
 
 ### 프로젝트 내부 app 생성
 
 manage.py와 같은 폴더에서 명령어 실행
-```shell script
+```console
 py manage.py startapp polls
 ```
 [실행 결과]
@@ -141,7 +141,7 @@ DATABASES = {
 
 
 필수 테이블 구성
-```shell script
+```console
 py manage.py migrate
 ```
 
@@ -189,36 +189,36 @@ INSTALLED_APPS = [
 ```
 
 * makemigrations : model에 변경이 있음을 Django에 알려준다. (migration 생성)
-```shell script
+```console
 py manage.py makemigrations polls
 ```
 
 polls/migrations/0001_initial.py 파일에 남겨진다.
 
 * sqlmigrate : migrate할 sql 구문을 보여준다. (실제 migration은 아니다.)
-```shell script
+```console
 py manage.py sqlmigrate polls 0001
 ```
 
 * migration이 안되었거나 database를 만졌는지 확인하는 명령
-```shell script
+```console
 py manage.py check
 ```
 
 * migrate : 전체 migration
-```shell script
+```console
  py manage.py migrate
 ```
 
 #### Python shell을 이용한 작업
 
-```shell script
+```console
 py manage.py shell
 ```
 
 manage.py가 DJANGO_SETTINGS_MODULE 변수에 mysite/settings.py 파일을 넣는다.
 
-```shell script
+```console
 from polls.models import Choice, Question
 
 Question.objects.all()
@@ -268,7 +268,7 @@ class Question(models.Model):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 ```
 
-```shell script
+```
 from polls.models import Choice, Question
 
 # Make sure our __str__() addition worked.
@@ -331,13 +331,12 @@ Choice.objects.filter(question__pub_date__year=current_year)
 # Let's delete one of the choices. Use delete() for that.
 c = q.choice_set.filter(choice_text__startswith='Just hacking')
 c.delete()
-
 ```
 
 <br/>
 
 기존 db를 models.py로 바꾸는 법
-```shell script
+```
 py manage.py inspectdb --database [settings.py에 지정한 database명] > models.py
 ```
 <br/>
@@ -346,7 +345,7 @@ py manage.py inspectdb --database [settings.py에 지정한 database명] > model
 
 계정 생성 명령
 
-```shell script
+```console
 py manage.py createsuperuser
 ```
 

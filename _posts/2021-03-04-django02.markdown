@@ -16,6 +16,7 @@ django는 mysite.urls를 로드하고 (settings.py의 ROOT_URLCONF 기반) 다�
 polls/urls.py의 <int:question_id>에 34가 매핑 된다.
 
 ```python
+{% raw  %}
 from django.urls import path
 
 from . import views
@@ -30,6 +31,7 @@ urlpatterns = [
     # ex: /polls/5/vote/
     path('<int:question_id>/vote/', views.vote, name='vote'),
 ]
+{% endraw  %}
 ```
 
 <br/>
@@ -43,6 +45,7 @@ template 폴더를 polls 밑에 넣는 이유는 django가 다른 프로젝트�
 
 polls/templates/polls/index.html
 ```html
+{% raw  %}
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
@@ -52,35 +55,44 @@ polls/templates/polls/index.html
 {% else %}
     <p>No polls are available.</p>
 {% endif %}
+{% endraw  %}
 ```
 
 #### 하드코드 삭제
 hardcode 
 ```html
+{% raw  %}
 <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+{% endraw  %}
 ```
 
 change 
 ```html
+{% raw  %}
 <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+{% endraw  %}
 ```
 
 polls.urls 모듈을 보면 
 
 ```python
 ...
+{% raw  %}
 # the 'name' value as called by the {% url %} template tag
 path('<int:question_id>/', views.detail, name='detail'),
+{% endraw  %}
 ...
 ```
 
 polls/specifics/12/로 요청하고 싶다면
 
 ```python
+{% raw  %}
 ...
 # added the word 'specifics'
 path('specifics/<int:question_id>/', views.detail, name='detail'),
 ...
+{% endraw  %}
 ```
 
 #### namespacing 추가
@@ -90,6 +102,7 @@ path('specifics/<int:question_id>/', views.detail, name='detail'),
 polls/urls.py
 
 ```python
+{% raw  %}
 from django.urls import path
 
 from . import views
@@ -101,10 +114,13 @@ urlpatterns = [
     path('<int:question_id>/results/', views.results, name='results'),
     path('<int:question_id>/vote/', views.vote, name='vote'),
 ]
+{% endraw  %}
 ```
 
 ```html
+{% raw  %}
 <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+{% endraw  %}
 ```
 
 <br/>
@@ -112,6 +128,7 @@ urlpatterns = [
 polls/views.py 의 index부분을 변경
 
 ```python
+{% raw  %}
 from django.shortcuts import get_object_or_404,render
 
 from .models import Question
@@ -125,7 +142,7 @@ def index(request):
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/detail.html', {'question': question})
-
+{% endraw  %}
 ```
 
 <br/>
@@ -140,12 +157,14 @@ def detail(request, question_id):
 polls/templates/polls/detail.html
 
 ```html
+{% raw  %}
 <h1>{{ question.question_text }}</h1>
 <ul>
 {% for choice in question.choice_set.all %}
     <li>{{ choice.choice_text }}</li>
 {% endfor %}
 </ul>
+{% endraw  %}
 ```
 question.choice_set.all 은 Phython code question.choice_set.all()와 같다.
 
@@ -156,10 +175,9 @@ question.choice_set.all 은 Phython code question.choice_set.all()와 같다.
 polls/templates/polls/detail.html
 
 ```html
+{% raw  %}
 <h1>{{ question.question_text }}</h1>
-
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
 <form action="{% url 'polls:vote' question.id %}" method="post">
 {% csrf_token %}
 {% for choice in question.choice_set.all %}
@@ -168,13 +186,15 @@ polls/templates/polls/detail.html
 {% endfor %}
 <input type="submit" value="Vote">
 </form>
+{% endraw  %}
 ```
 
-* 모든 POST form에는 {% csrf_token %}을 넣어서 Cross Site 요청 위조를 막는다.
+* 모든 POST form에는 {% raw  %}{% csrf_token %}{% endraw  %}을 넣어서 Cross Site 요청 위조를 막는다.
 
 polls/views.py
 
 ```python
+{% raw  %}
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -198,6 +218,7 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+{% endraw  %}
 ```
 
 * request.POST는 key name으로 data access를 할 수 있다. 이는 ID를 string으로 return 한다.
@@ -209,12 +230,14 @@ reverse() 함수 : view function에 url을 하드코드할 필요가 없다. /po
 race condition : 두 사용자가 동시에 눌렀을 경우 두번째 스레드는 원래 값을 기준으로 저장하기 때문에 첫번째 스레드는 날라간다. F() 함수를 이용해 해결 할 수 있다.
 
 ```python
+{% raw  %}
 reporter = Reporters.objects.get(name='Tintin')
 reporter.stories_filed = F('stories_filed') + 1
 reporter.save()
 
 reporter.name = 'Tintin Jr.'
 reporter.save()
+{% endraw  %}
 ```
 
 stories_filed 는 두번 업데이트 된다. 초기값이 1이면 결과값은 3
@@ -227,6 +250,7 @@ stories_filed 는 두번 업데이트 된다. 초기값이 1이면 결과값은 
 
 polls/urls.py
 ```python
+{% raw  %}
 from django.urls import path
 
 from . import views
@@ -238,6 +262,7 @@ urlpatterns = [
     path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
     path('<int:question_id>/vote/', views.vote, name='vote'),
 ]
+{% endraw  %}
 ```
 
 <question_id> 가 <pk>로 바뀐다.
@@ -245,7 +270,8 @@ urlpatterns = [
 * Amend views
 
 polls/views.py
-```pyhon
+```python
+{% raw  %}
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -275,6 +301,7 @@ class ResultsView(generic.DetailView):
 
 def vote(request, question_id):
     ... # same as above, no changes needed.
+{% endraw  %}
 ```
 
 default로 DetailView generic view는 <app name>/<model name>_detail.html을 부른다. 따라서 template_name 변수 지정. (ListView도 동일)

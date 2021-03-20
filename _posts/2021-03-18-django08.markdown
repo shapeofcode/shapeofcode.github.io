@@ -22,7 +22,7 @@ class UserParent(models.Model):
     mother_name = models.CharField(max_length=100)
 ```
 
-```shell script
+```console
 >>> u1 = User.objects.get(first_name='Ritesh', last_name='Deshmukh')
 >>> u2 = User.objects.get(first_name='Sohan', last_name='Upadhyay')
 >>> p1 = UserParent(user=u1, father_name='Vilasrao Deshmukh', mother_name='Vaishali Deshmukh')
@@ -55,7 +55,7 @@ class Article(models.Model):
         ordering = ('headline',)
 ```
 
-```shell script
+```console
 >>> u1 = User(username='johny1', first_name='Johny', last_name='Smith', email='johny@example.com')
 >>> u1.save()
 >>> u2 = User(username='alien', first_name='Alien', last_name='Mars', email='alien@example.com')
@@ -98,7 +98,7 @@ class Tweet(models.Model):
         return self.tweet
 ```
 
-```shell script
+```console
 >>> t1 = Tweet(tweet="I am happy today")
 >>> t1.save()
 >>> t2 = Tweet(tweet="This is my second Tweet")

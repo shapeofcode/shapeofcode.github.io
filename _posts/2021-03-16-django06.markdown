@@ -8,14 +8,14 @@ tags: [django]
 ---
 
 - 저장
-```shell script
+```console
 (modelClass).objects.create(필드명1=값1,필드명2=값2....)
 ```
 
 <br/>
 
 - 여러 개의 행을 한번에 생성
-```shell script
+```console
 >>> Category.objects.all().count()
 2
 >>> Category.objects.bulk_create(
@@ -31,14 +31,14 @@ tags: [django]
 <br/>
 
 - 기존에 저장된 행을 복사해 새로 저장
-```shell script
+```console
 hero = Hero.objects.first()
 hero.pk = None
 hero.save()
 ```
 
 - 특정 모델의 항목이 하나만 생성되도록 강제하는 방법(싱글턴)
-```shell script
+```console
 class Origin(models.Model):
     name = models.CharField(max_length=100)
 
@@ -53,7 +53,8 @@ class Origin(models.Model):
 - 모델 인스턴스를 저장할 때, 다른 모델에 반정규화된 필드를 함께 갱신하는 방법
 
 모델 구성
-```pyhton
+
+```python
 class Category(models.Model):
     name = models.CharField(max_length=100)
     hero_count = models.PositiveIntegerField()
@@ -111,7 +112,7 @@ class Category(models.Model):
 
 - 시간 정보를 다른 양식으로 변환하여 데이터 베이스에 저장
 
-```shell script
+```console
 >>> user = User.objects.get(id=1)
 >>> data_str = "2018-03-11"
 >>> from django.utils.dateparse import parse_dateparse

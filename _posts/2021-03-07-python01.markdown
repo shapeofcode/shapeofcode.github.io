@@ -66,7 +66,7 @@ class Person:
         self._age = age
 ```
 
-```shell script
+```console
 >>> person = Person("John", "Doe", 20)
 >>> person.age
 20
