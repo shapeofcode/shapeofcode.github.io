@@ -270,6 +270,7 @@ urlpatterns = [
 * Amend views
 
 polls/views.py
+
 ```python
 {% raw  %}
 from django.http import HttpResponseRedirect

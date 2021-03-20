@@ -130,6 +130,7 @@ class Tweet(models.Model):
 <br/>
 
 - 모델에 자기 참조 외래 키
+
 ```python
 class Employee(models.Model):
     manager = models.ForeignKey('self', on_delete=models.CASCADE)
@@ -143,6 +144,7 @@ class Employee(models.Model):
 <br/>
 
 - 뷰에 대응하는 모델
+
 ```python
 # Meta 클래스에 managed = False, db_teable="temp_user"와 같이 옵션을 설정
 class TempUser(models.Model):
@@ -165,6 +167,7 @@ django.db.utils.OperationalError: cannot modify temp_user because it is a view
 <br/>
 
 - 범용 모델
+
 ```python
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -227,6 +230,7 @@ class ColumnName(models.Model):
 <br/>
 
 - 기본 키로 ID 대신 UUID 사용
+
 ```python
 import uuid
 from django.db import models
