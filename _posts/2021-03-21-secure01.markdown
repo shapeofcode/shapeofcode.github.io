@@ -1,0 +1,64 @@
+---
+layout: post
+title:  "httpOnly"
+date:   2021-03-21
+last_modified_at: 2021-03-21
+categories: [Web Secure]
+tags: [Web Secure]
+---
+
+#### 사전지식
+
+- Cookie : 하이퍼 텍스트의 기록서(HTTP)의 일종으로서 인터넷 사용자가 어떠한 웹사이트를 방문할 경우 
+그 사이트가 사용하고 있는 서버를 통해 인터넷 사용자의 컴퓨터에 설치되는 작은 기록 정보 파일을 일컫는다.
+
+    - 구현 : 쿠키가 일반적으로 웹 서버에 의해 설정되지만 자바스크립트와 같은 스크립트 언어를 사용하여 클라이언트에 의해 설정이 가능하다.
+    (스크립트 언어에 의해 쿠키를 수정하지 못하게 하는 쿠키의 HttpOnly 플래그가 설정되어 있지 않는 경우에 한해)
+    
+    - 설정 : Set-Cookie: <cookie-name>=<cookie-value>
+    
+    *서버 헤더의 쿠키 전달
+    
+    ```text
+      HTTP/1.0 200 OK
+      Content-type: text/html
+      Set-Cookie: yummy_cookie=choco
+      Set-Cookie: tasty_cookie=strawberry
+      
+      [page content]
+    ```
+  
+  *브라우저 쿠키 회신
+  
+  ```text
+    GET /sample_page.html HTTP/1.1
+    Host: www.example.org
+    Cookie: yummy_cookie=choco; tasty_cookie=strawberry
+  ```
+  
+  - 라이프 타임 : 세션쿠키는 현재 세션이 끝날때 삭제된다. 영속적인 쿠키는 Expires 속성에 명시된 날짜에 삭제되거나,
+  Max-Age 속성에 명시된 기간 이후에 삭제된다.
+  
+  ```text
+    Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+  ```
+  
+#### HttpOnly
+    
+Secure 쿠키는 HTTPS 프로토콜 상에서 암호화된 요청일 경우에만 전송된다. 그러나 민감한 정보는 절대 쿠키에 저장되면 안된다.
+chrome52 또는 firefox52로 시작한다면 http는 쿠키에 Secure 설정을 지시할 수 없다.
+
+Cross-site(XSS) 공격을 방지하기 위해, HttpOnly 쿠키는 Javascript의 Document.cookie API에 접근할 수 없다.
+(= 브라우저에서 쿠키에 접근할 수 없다)
+
+```text
+Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly
+```
+
+<br/>
+
+출처
+
+[https://developer.mozilla.org/ko/docs/Web/HTTP/Cookies](https://developer.mozilla.org/ko/docs/Web/HTTP/Cookies)
+[https://ko.wikipedia.org/wiki/HTTP_%EC%BF%A0%ED%82%A4](https://ko.wikipedia.org/wiki/HTTP_%EC%BF%A0%ED%82%A4)
+[https://nsinc.tistory.com/121](https://nsinc.tistory.com/121)
