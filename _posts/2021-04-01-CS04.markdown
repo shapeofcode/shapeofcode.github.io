@@ -1,0 +1,190 @@
+---
+layout: post
+title:  "메모리"
+date:   2021-04-01
+last_modified_at: 2021-04-01
+categories: [CS]
+tags: [CS]
+---
+
+##### 메모리 주소
+
+- C에서는 변수의 메모리상 주소를 받기 위해 '&'이라는 연산자를 사용할 수 있습니다.
+```
+#include <stdio.h>
+
+int main(void)
+{
+    int n = 50;
+    printf("%p\n", &n);
+}
+```
+
+<br/>
+
+- 반대로 *를 사용하면 그 메모리 주소에 있는 실제 값을 얻을 수 있습니다.
+```
+#include <stdio.h>
+
+int main(void)
+{
+    int n = 50;
+    printf("%i\n", *&n);
+}
+```
+
+<br/>
+
+##### 포인터
+
+```
+#include <stdio.h>
+
+int main(void)
+{
+   int n = 50;
+   int *p = &n;
+   printf("%p\n", p);
+   printf("%i\n", *p);
+}
+```
+
+*p라는 포인터 변수에 &n 이라는 값, 즉 변수 n의 주소를 저장
+
+<br/>
+
+##### 메모리 할당과 해제
+
+- malloc 함수를 이용하여 메모리를 할당한 후에는 free라는 함수를 이용하여 메모리를 해제해줘야한다.
+  (메모리 누수 방지)
+  
+<br/>
+
+```
+#include <stdlib.h>
+
+void f(void)
+{
+    int *x = malloc(10 * sizeof(int));
+    x[10] = 0;
+}
+
+int main(void)
+{
+    f();
+    return 0;
+}
+```
+
+x[10]=0; 코드로 인해 버퍼 오버플로우 발생, free(x)라는 코드를 추가해줌으로써 해결.
+
+<br/>
+
+##### 메모리 교환, 스택, 힙
+
+- 머신 코드 영역에는 프로그램이 컴파일된 바이너리가 저장
+- 글로벌 영역에는 프로그램 안에서 저장된 전역 변수가 저장
+- 힙 영역에는 malloc으로 할당된 메모리의 데이터가 저장
+- 스택에는 프로그램 내의 함수와 관련된 것들이 저장
+
+```
+#include <stdio.h>
+
+void swap(int *a, int *b);
+
+int main(void)
+{
+    int x = 1;
+    int y = 2;
+
+    printf("x is %i, y is %i\n", x, y);
+    swap(&x, &y);
+    printf("x is %i, y is %i\n", x, y);
+}
+
+void swap(int *a, int *b)
+{
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+```
+
+<br/>
+
+##### 파일쓰기
+
+힙 영역에서는 malloc 에 의해 메모리가 더 할당될수록, 점점 사용하는 메모리의 범위가 아래로
+늘어난다.
+
+스택 영역에서도 함수가 더 많이 호출 될수록 사용하는 메모리의 범위가 점점 위로 늘어난다.
+
+제한된 메모리 용량하에서는 기존의 값을 침범하는 상황이 발생. 이를 힙 오버플로우 또는 스택 오버플로우라고 한다.
+
+```
+#include <cs50.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    FILE *file = fopen("phonebook.csv", "a");
+    char *name = get_string("Name: ");
+    char *number = get_string("Number: ");
+    fprintf(file, "%s,%s\n", name, number);
+    fclose(file);
+}
+```
+
+fopen이라는 함수를 이용하여 FILE 자료형으로 불러올 수 있다.
+
+fopen 함수의 첫번째 인자는 파일의 이름, 두번째 인자는 모드로 r은 읽기, w는 쓰기, a는 덧붙이기
+
+fprintf 함수를 이용하여 printf에서처럼 파일에 직접 내용을 출력
+
+작업이 끝난 후에는 fclose 함수로 파일에 대한 작업을 종료
+
+<br/>
+
+##### 파일 읽기
+
+```
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+
+    if (file == NULL)
+    {
+        return 1;
+    }
+ 
+   unsigned char bytes[3];
+    fread(bytes, 3, 1, file);
+
+    if (bytes[0] == 0xff && bytes[1] == 0xd8 && bytes[2] == 0xff)
+    {
+        printf("Maybe\n");
+    }
+    else
+    {
+        printf("No\n");
+    }
+    fclose(file);
+}
+```
+
+- 마지막으로 읽어 들인 각 바이트가 각각 OxFF, OxD8, OxFF 인질르 확인
+JPEG 형식의 파일을 정의할 때 만든 약속, JPEG 파일의 시작점에 꼭 포함되어야 한다.
+
+<br/>
+
+출처
+
+[모두를 위한 컴퓨터 CS50 2019](https://www.boostcourse.org/cs112/lecture/119027?isDesc=false)
