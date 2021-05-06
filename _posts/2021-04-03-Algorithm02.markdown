@@ -1,0 +1,36 @@
+---
+layout: post
+title:  "삽입 정렬과 합병 정렬"
+date:   2021-04-03
+last_modified_at: 2021-04-03
+categories: [Algorithm]
+tags: [Algorithm]
+---
+
+삽입 정렬
+
+실행시간 : O(n^2) , O(n^2) 비교와 O(n^2) 스왑
+
+<br/>
+
+이진 삽입 정렬 : 이진 탐색은 O(log n) 시간이 걸림. 하지만 삽입 후 
+항목을 옮기는 것도 O(n) 시간이 걸림.
+
+복잡도: O(nlogn)비교 , (n^2) 스왑
+
+<br/>
+
+합병 정렬
+
+분할 정복 A[1..n]
+1. n = 1 일 때, 바로 끝(정렬할 거 없음). O(1)
+2. 그 외의 경우, A[1..n/2]과 A[n/2+1..n]을 재귀적으로 정렬. 2T(n/2)
+3. 두 정렬된 보조 배열 합병 O(n)
+
+T(n) = 2T(n/2) + cn
+
+<br/>
+
+출처
+
+[MIT 파이썬을 이용한 알고리즘](https://www.edwith.org/introalgorithm/lecture/26419/?isDesc=false)
