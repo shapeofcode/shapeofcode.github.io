@@ -1,0 +1,214 @@
+---
+layout: post
+title:  "일정 예약과 이진 탐색 트리"
+date:   2021-04-05
+last_modified_at: 2021-04-05
+categories: [Algorithm]
+tags: [Algorithm]
+---
+
+<br/>
+
+활주로 예약 시스템
+- 활주로가 매우 혼잡하고 단 하나뿐인 공항 (보스턴)
+- 향후 착률을 위한 예약
+- 비행기가 착률하면 대기 중인 사건 집합에서 제거하기
+- 각각의 착률 요청에는 요청 예약 시간 t가 명시 되어 있음
+- t로부터 k분 전이나 k분 후에 다른 착륙 예약이 없다면, t를 집합에 추가함, k 값은 변할 수 있음
+- 그 외의 경우는 에러로 보고, 예약을 잡지 않음
+
+목표 : O(log n) 시간 안에 효율적으로 운영하기
+
+<br/>
+
+이진 탐색 트리 (BTS)
+
+이진 트리의 각 노드 x에는 키인 key(x)가 있다. 루트가 아닌 다른 노드는 부모인 p(x)가 있다.
+노드에는 왼쪽 자식인 left(x)와 오른쪽 자식인 right(x)이 있다. 이것들은 힙과는 달리 포인터이다.
+
+불변성 : 모든 노드 x와 x의 왼쪽 하위 트리에 있는 모든 노드 y에 대해서 key(y) <= key(x)이다.
+또한 x의 오른쪽 하위 트리에 있는 모든 노드 y에 대해 key(y) >= key(x)이다.
+
+<br/>
+
+삽입 : insert(val)
+알맞은 위치를 찾을 때까지 왼쪽 및 오른쪽 포인터를 따라 내려간다. 삽입을 하는 도웆에
+활주로 예약 시스템에서 k=3 내에 다른 예약이 있는지 확인이 가능하다.
+루트에서부터 보았을 때, 삽입을 원하는 값의 k=3 이내에 있는 다른 요소를 발견하게 되면, 
+과정을 중단하고 삽입하지 않는다.
+
+<br/>
+
+이진 탐색 트리에 값이 존재하는 경우, 그 값 찾기 : find(val)
+값을 찾거나 NIL에 도달할 때까지 왼쪽과 오른쪽 포인터들을 따라간다.
+
+<br/>
+
+이진 탐색 트리에서 최소 요소 찾기 : findmin()
+더 이상 왼쪽으로 갈 수 없을 때까지 왼쪽으로 가는 것이 중요하다.
+
+<br/>
+
+복잡성
+이진 탐색 트리의 높이가 h일 때, 모든 연산 과정에는 O(h)가 소요된다.
+
+<br/>
+
+다음으로 큰 요소 찾기: next-larger(x)
+x는 값이 아니라 이진 탐색 트리에서의 노드라는 점 주의.
+
+오른쪽 자식이 NIL이 아닐 경우, minimum(right)를 리턴하기 
+
+NIL인 경우, y = parent(x)
+
+y가 NIL이 아니고 x = right(y)인 경우,
+    
+    x=y; y=parent(y)
+
+return(y);
+
+<br/>
+
+이진 탐색트리 파이썬
+
+```python
+class BST(object):
+    """
+Simple binary search tree implementation.
+This BST supports insert, find, and delete-min operations.
+Each tree contains some (possibly 0) BSTnode objects, representing nodes,
+and a pointer to the root.
+"""
+
+    def __init__(self):
+        self.root = None
+
+    def insert(self, t):
+        """Insert key t into this BST, modifying it in-place."""
+        new = BSTnode(t)
+        if self.root is None:
+            self.root = new
+        else:
+            node = self.root
+            while True:
+                if t < node.key:
+                    # Go left
+                    if node.left is None:
+                        node.left = new
+                        new.parent = node
+                        break
+                    node = node.left
+                else:
+                    # Go right
+                    if node.right is None:
+                        node.right = new
+                        new.parent = node
+                        break
+                    node = node.right
+        return new
+
+    def find(self, t):
+        """Return the node for key t if is in the tree, or None otherwise."""
+        node = self.root
+        while node is not None:
+            if t == node.key:
+                return node
+            elif t < node.key:
+                node = node.left
+            else:
+                node = node.right
+        return None
+
+    def delete_min(self):
+        """Delete the minimum key (and return the old node containing it)."""
+        if self.root is None:
+            return None, None
+        else:
+            # Walk to leftmost node.
+            node = self.root
+            while node.left is not None:
+                node = node.left
+            # Remove that node and promote its right subtree.
+            if node.parent is not None:
+                node.parent.left = node.right
+            else: # The root was smallest.
+                self.root = node.right
+            if node.right is not None:
+                node.right.parent = node.parent
+            parent = node.parent
+            node.disconnect()
+            return node, parent
+
+    def __str__(self):
+        if self.root is None: return '<empty tree>'
+        def recurse(node):
+            if node is None: return [], 0, 0
+            label = str(node.key)
+            left_lines, left_pos, left_width = recurse(node.left)
+            right_lines, right_pos, right_width = recurse(node.right)
+            middle = max(right_pos + left_width - left_pos + 1, len(label), 2)
+            pos = left_pos + middle // 2
+            width = left_pos + middle + right_width - right_pos
+            while len(left_lines) < len(right_lines):
+                left_lines.append(' ' * left_width)
+            while len(right_lines) < len(left_lines):
+                right_lines.append(' ' * right_width)
+            if (middle - len(label)) % 2 == 1 and node.parent is not None and \
+               node is node.parent.left and len(label) < middle:
+                label += '.'
+            label = label.center(middle, '.')
+            if label[0] == '.': label = ' ' + label[1:]
+            if label[-1] == '.': label = label[:-1] + ' '
+            lines = [' ' * left_pos + label + ' ' * (right_width - right_pos),
+                     ' ' * left_pos + '/' + ' ' * (middle-2) +
+                     '\\' + ' ' * (right_width - right_pos)] + \
+              [left_line + ' ' * (width - left_width - right_width) +
+               right_line
+               for left_line, right_line in zip(left_lines, right_lines)]
+            return lines, pos, width
+        return '\n'.join(recurse(self.root) [0])
+
+class BSTnode(object):
+    """
+Representation of a node in a binary search tree.
+Has a left child, right child, and key value.
+"""
+    def __init__(self, t):
+        """Create a new leaf with key t."""
+        self.key = t
+        self.disconnect()
+    def disconnect(self):
+        self.left = None
+        self.right = None
+        self.parent = None
+
+def test(args=None, BSTtype=BST):
+    import random, sys
+    if not args:
+        args = sys.argv[1:]
+    if not args:
+        print 'usage: %s <number-of-random-items | item item item ...>' % \
+              sys.argv[0]
+        sys.exit()
+    elif len(args) == 1:
+        items = (random.randrange(100) for i in xrange(int(args[0])))
+    else:
+        items = [int(i) for i in args]
+
+    tree = BSTtype()
+    print tree
+    for item in items:
+        tree.insert(item)
+        print
+        print tree
+
+if __name__ == '__main__': test()
+```
+
+
+
+<br/>
+
+출처
+
+[MIT 파이썬을 이용한 알고리즘](https://www.boostcourse.org/cs113/lecture/540276?isDesc=false)
