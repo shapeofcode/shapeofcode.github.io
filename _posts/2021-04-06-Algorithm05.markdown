@@ -1,0 +1,40 @@
+---
+layout: post
+title:  "균형 이진 탐색 트리"
+date:   2021-04-06
+last_modified_at: 2021-04-06
+categories: [Algorithm]
+tags: [Algorithm]
+---
+
+<br/>
+
+노드의 높이 = 단말 노드까지의 가장 긴 하향 경로의 길이
+
+균형을 이루는 것의 중요성
+- 이진 탐색 트리는 삽입, 삭제, 최솟값, 최댓값, 다음으로 큰 값 찾기, 다음으로 작은 값 찾기 등을 
+O(h)안에 실행할 수 있음. 이 때 h=트리의 높이(=루트의 높이)
+- h는 logn과 n사이에 있음
+- 균형 이진 탐색 트리는 h = O(log n)로 유지됨 -> 모든 작업은 O(log n) 시간 안에 실행
+
+<br/>
+
+AVL 트리 : Adel'son-Vel'skii & Landis 1962
+
+모든 노드에 대해, 왼쪽과 오른쪽 자식들의 높이 차는 최대 +-1
+- nil 트리는 -1의 높이로 취급.
+- 각 노드는 자신의 높이를 저장
+
+<br/>
+
+AVL 삽입 
+1. 간단한 이진 탐색 트리로 삽입
+2. 트리를 따라 올라가면서 처리, AVL 속성 회복(올라가면서 높이 값도 갱신).
+
+<img src="../../../assets/images/avl_insert.PNG" alt="avl-insert" />
+
+<br/>
+
+출처
+
+[MIT 파이썬을 이용한 알고리즘](https://www.boostcourse.org/cs113/lecture/540277?isDesc=false)
