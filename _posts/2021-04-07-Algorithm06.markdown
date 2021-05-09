@@ -1,0 +1,46 @@
+---
+layout: post
+title:  "선형 시간 정렬"
+date:   2021-04-07
+last_modified_at: 2021-04-07
+categories: [Algorithm]
+tags: [Algorithm]
+---
+
+<br/>
+
+O(n) 정렬 알고리즘
+
+계수정렬
+- 모든 항목을 다 세어야함 (메모리에 배열을 할당)
+
+리스트를 이용한 알고리즘 O(n+k)
+
+```python
+for j in range(n):              O(k)
+    L(key[A[j]]).append(A[j])   O(1)
+output = []
+for i in range(k):              
+    output.extend(L[i])         O(|L|+1)
+```
+
+<br/>
+
+기수정렬
+
+계수정렬을 서브루틴으로 사용
+
+Sort by digit using Counting Sort O(n+b)
+
+Total time : O(n+b)*d) = O((n+b)log<sub>b</sub><sup>k</sup>)
+
+min when b = \theta(n) = O(nlog<sub>b</sub><sup>k</sup>)
+
+if k <= n^c then O(nc)
+
+
+<br/>
+
+출처
+
+[MIT 파이썬을 이용한 알고리즘](https://www.edwith.org/introalgorithm/lecture/26419/?isDesc=false)
