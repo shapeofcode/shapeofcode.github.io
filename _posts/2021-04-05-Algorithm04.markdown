@@ -17,6 +17,8 @@ tags: [Algorithm]
 - t로부터 k분 전이나 k분 후에 다른 착륙 예약이 없다면, t를 집합에 추가함, k 값은 변할 수 있음
 - 그 외의 경우는 에러로 보고, 예약을 잡지 않음
 
+<br/>
+
 목표 : O(log n) 시간 안에 효율적으로 운영하기
 
 <br/>
@@ -63,7 +65,7 @@ NIL인 경우, y = parent(x)
 
 y가 NIL이 아니고 x = right(y)인 경우,
     
-    x=y; y=parent(y)
+x=y; y=parent(y)
 
 return(y);
 
