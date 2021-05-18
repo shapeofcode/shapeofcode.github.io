@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "컵퓨팅 사고"
+title:  "컴퓨팅 사고"
 date:   2021-03-23
 last_modified_at: 2021-03-23
 categories: [CS]

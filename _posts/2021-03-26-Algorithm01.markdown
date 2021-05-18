@@ -25,11 +25,12 @@ tags: [Algorithm]
 
 • Θ(1) 시간 안에 할 수 있는 일
 
+
+```
 – 레지스터 ri 에 있는 워드를 레지스터 rj 으로 불러오기
-
 – 레지스터에서 (+, −, ∗, /, &, |, ˆ) 계산
-
 – 레지스터 rj 를 ri 에 있는 메모리에 저장
+```
 
 <br/>
 
@@ -47,6 +48,8 @@ tags: [Algorithm]
 
 문서거리 문제 : 유사한 문서 탐색이나 중복과 표절 발견, 웹 검색에 적용
 
+<br/>
+
 정의 
 - 단어 = 영어와 숫자로 이루어진 문자열
 - 문서 = 단어의 나열(공백, 문장, 부호 등 무시)
@@ -57,27 +60,29 @@ tags: [Algorithm]
 
 첫번째 시도, 문서 거리의 정의 
 
-<img src="../../../assets/images/mit_algo_doc_1.PNG" alt="doc1" />
+<img src="../../../assets/images/mit_algo1_doc_1.PNG" alt="doc1" />
 
 <br/>
 
 문서의 규모에 따라 변할 수 있다. 따라서 단어의 개수로 정규화 한다.
 
-<img src="../../../assets/images/mit_algo_doc_2.PNG" alt="doc2" />
+<img src="../../../assets/images/mit_algo1_doc_2.PNG" alt="doc2" />
 
 기하학적 해석(재구성)
 
-<img src="../../../assets/images/mit_algo_doc_3.PNG" alt="doc3" />
+<img src="../../../assets/images/mit_algo1_doc_3.PNG" alt="doc3" />
 
 문서 거리는 두 벡터 사이의 각도이다. 0 도는 두 문서가 같다는 것을 의미, 90도는 공통 단어가 없다는 것을 의미
 
-##### 문서거리 알고리즘
+<br/>
+
+#### 문서거리 알고리즘
 
 1. 각 문서를 단어들로 쪼갠다.
 2. 단어 빈도를 센다.(문서 벡터)
 3. 내적을 계산 한다. (& 나눈다.)
 
-<img src="../../../assets/images/mit_algo_doc_4.PNG" alt="doc4" />
+<img src="../../../assets/images/mit_algo1_doc_4.PNG" alt="doc4" />
 
 
 
