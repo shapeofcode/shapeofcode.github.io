@@ -3,8 +3,8 @@ layout: post
 title:  "알고리즘 유형 - Greedy"
 date:   2021-04-26
 last_modified_at: 2021-04-26
-categories: [Algorithm]
-tags: [Algorithm]
+categories: [Algorithm-Type]
+tags: [Algorithm-Type]
 ---
 
 <br/>
