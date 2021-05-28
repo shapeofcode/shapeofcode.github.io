@@ -1,0 +1,106 @@
+---
+layout: post
+title:  "최단경로 1:도입"
+date:   2021-04-15
+last_modified_at: 2021-04-15
+categories: [Algorithm]
+tags: [Algorithm]
+---
+
+<br/>
+
+공식화: 가중 그래프 G(V,E) W : E -> R의 문제
+
+두 알고리즘 : 다익스라 O(VlogV+E)는 음이 아닌 가중치를 가정,
+벨만-포드 O(V E)는 일반적인 알고리즘
+
+<br/>
+
+가중 그래프 G(V,E), W : E -> R의 모델
+- V = 정점(도로의 교차점)
+- E = 간선(거리, 도로); 방향 간선 (일반통행 도로)
+- W(U,V) = 간선 (u,v)의 가중치 (거리, 통행료)
+
+<img src="../../../assets/images/shrt_path.PNG" alt="shrt_path" />
+
+<br/>
+
+p는 V<sub>0</sub>에서 V<sub>k</sub>까지의 경로 p를 의미한다. (V<sub>0</sub>)는
+V<sub>0</sub>에서 V<sub>0</sub>까지의 가중치 0인 경로를 의미한다.
+
+<br/>
+
+u에서 v까지 최단 경로의 가중치를 다음과 같이 정의한다.
+
+<img src="../../../assets/images/shrt_path2.PNG" alt="shrt_path2" />
+
+<br/>
+
+단일 출발 최단 경로 : 
+
+G(V,E), w와 시작 정점 S가 주어져 있을 때, S부터 각각의 v ∈ V 까지의 δ(S, V )[와 최단 경로]를 찾아라.
+
+자료구조
+
+<img src="../../../assets/images/shrt_path3.PNG" alt="shrt_path3" />
+
+d[v]는 v로 가는 더 좋은 경로를 찾을 때 마다 줄어든다.
+
+<br/>
+
+음의 가중치 간선
+- 몇몇 적용에는 자연스럽다.(예, 가중치로 로그가 쓰이는 경우)
+- 몇몇 알고리즘은 음의 가중치를 갖는 간선을 허용하지 않는다. (예, 다익스트라)
+- 음의 가중치를 갖는 간선이 있으면, 음의 사이클이 있을 수 도 있다. -> 최단 경로가 없을 수 도 있다.
+
+음의 간선이 있는 경우, 최단 경로 알고리즘은 음의 사이클을 찾을 수 있어야 한다.(예, 벨만-포드)
+
+<br/>
+
+최단 경로 알고리즘의 일반적인 구조 (음의 사이클이 없는 경우)
+
+<img src="../../../assets/images/shrt_path4.PNG" alt="shrt_path4" />
+
+<br/>
+
+n개의 간선이 있고 첫 세 개의 간선이 2^n/2의 가중치를 갖고, 두 번째 간선들은
+2^(n/2)-1의 가중치를 갖는 식으로 된다. 경로적으로 간선을 선택하면 
+d(v<sub>n-1</sub>)의 첫 값이 (2^n/2+2^(n/2)-1+...+4+2+1)이 될 것이다. 이 순서로,
+V<sub>n-3</sub>과 V<sub>n-1</sub>을 연결하는 가중치가 1인 간선을 완화할 수 있을 것이다.
+그러면, d(V<sub>n-1</sub>)는 1이 줄어들 것이다. 그리고 V<sub>n-5</sub>와 
+V<sub>n-3</sub>을 연결하는 가중치 2인 간선에 대해 완화하면, d(V<sub>n-2</sub>)가
+2만큼 줄어들 것이다. 그 후로, d(V<sub>n-1</sub>)을 1만큼 줄이기 위해 간선
+(d(V<sub>n-3</sub>),d(V<sub>n-2</sub>))와 (V<sub>n-2</sub>, V<sub>n-1</sub>)에 
+대해 완화할 수 있다. 그리고 또, 간선 (V<sub>n-3</sub>,V<sub>n-1</sub>)에 대해 완화한다.
+이런 식으로 d(V<sub>n-1</sub>)를 한 번 완화할 때마다 1씩 줄이면서 (2^n/2+2^(n/2)-1+...+4+2+1)까지
+줄일 수 있을 것이다. 이는 O(2^n/2) 시간이 걸린다.
+
+<br/>
+
+최적 부분 구조
+
+정리 : 최단 경로의 부분 경로는 최단 경로이다.
+
+p =< v0 , v1 , ..., vk > 를 최단 경로라고 하고
+
+pij =< v0 , vi+1 , ..., vj > 0 ≤ i ≤ j ≤ k 라고 하면
+
+pij는 최단 경로이다.
+
+<img src="../../../assets/images/shrt_path5.PNG" alt="shrt_path5" />
+
+<br/>
+
+만약 pij'가 pij보다 작다고 하면, pij대신 pij'를 사용하게 되면 p보다 작아진다.
+
+삼각부등식
+
+정리 : 모든 u,v,x ∈ X 에 대해
+
+<img src="../../../assets/images/shrt_path6.PNG" alt="shrt_path6" />
+
+<br/>
+
+출처
+
+[MIT 파이썬을 이용한 알고리즘](https://www.edwith.org/introalgorithm/lecture/26419/?isDesc=false)
