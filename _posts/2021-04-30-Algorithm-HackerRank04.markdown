@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "HackerRank - Minium Swaps2"
+title:  "HackerRank - Minimum Swaps2"
 date:   2021-04-30
 last_modified_at: 2021-04-30
 categories: [Algorithm]
