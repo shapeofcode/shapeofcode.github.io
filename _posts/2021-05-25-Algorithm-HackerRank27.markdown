@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "HackerRank - Castle on the Grid"
-date:   2021-05-23
-last_modified_at: 2021-05-23
+date:   2021-05-25
+last_modified_at: 2021-05-25
 categories: [Algorithm]
 tags: [Algorithm]
 ---
