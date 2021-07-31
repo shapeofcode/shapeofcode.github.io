@@ -1,0 +1,120 @@
+---
+layout: post
+title:  "Web Secure - Cookie and Session"
+date:   2021-05-28
+last_modified_at: 2021-05-28
+categories: [Web Secure]
+tags: [Web Secure]
+---
+
+<br/>
+
+### HTTP 쿠키
+
+<br/>
+
+서버가 사용자의 웹 브라우저에 전송하는 작은 데이터 조각.
+
+<br/>
+
+목적
+- 세션 관리 : 서버에 저장해야할 로그인, 장바구니 등의 정보 관리
+- 개인화 : 사용자 선호, 테마 등의 세팅
+- 트래킹 : 사용자 행동을 기록하고 분석하는 용도
+
+<br/>
+
+현재는 정보를 클라이언트 측에 저장하려면 Modern APIs의 종류인 웹스토리지 API(localStrorage, sessionStrogae 사용)
+
+<br/>
+
+#### 쿠키 만들기
+
+Set-Cookie HTTP 응답 헤더는 서버로부터 사용자 에이전트로 전송
+
+Set-Cookie: <cookie-name>=<cookie-value>
+
+```
+HTTP/1.0 200 OK
+Content-type: text/html
+Set-Cookie: yummy_cookie=choco
+Set-Cookie: tasty_cookie=strawberry
+```
+
+```
+GET /sample_page.html HTTP/1.1
+Host: www.example.org
+Cookie: yummy_cookie=choco; tasty_cookie=strawberry
+```
+
+<br/>
+
+#### 쿠키의 라이프 타임
+
+현재 세션이 끝날 때 삭제가 된다. 세션을 복원해 세션 쿠키가 무기한 존재할 수 있도록 한다.
+
+명시된 날짜에 삭제되거나, Max-Age 속성에 명시된 기간 이후에 삭제된다.
+
+```
+Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+```
+
+
+#### Secure과 HttpOnly 쿠키
+
+Secure 쿠키는 HTTPS 프로토콜 상에서 암호화된 요청일 경우에만 전송된다. (하지만 민감한 정보는 절대 쿠키에 저장되면 안된다.)
+
+Cross-Site 스크립팅( XSS) 공격을 방지하기 위해, HttpOnly 쿠키는 JavasScript의 Document.cookie API에 접근할 수 없다. 따라서 서버쪽에서 지속되고 있는 세션의 쿠키는 JavaScript를 사용할 필요성이 없기 때문에 HttpOnly 프랠그가 설정될 것이다.
+
+Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly
+
+<br/>
+
+#### 쿠키의 스코프
+
+Domain 그리고 Path 디렉티브는 쿠키의 스코프를 정의한다.
+
+Domain은 쿠키가 전송되게 될 호스트들을 명시한다. 도메인이 명시되면, 서브 도메인들을 항상 포함된다. (Domain=mozilla.org 이면 developer.mozilla.org 와 같은 서브도메인 상에 포함)
+
+Path=/docs
+- /docs
+- /docs/Web/
+- /docs/Web/HTTP
+
+<br/>
+
+#### SameSite 쿠키
+쿠키가 cross-site 요청과 함께 전송되지 않았음을 요구하게 만들어, cross-site 요청 위조 공격(CSRF)에 대해 어떤 보호 방법을 제공한다.
+
+Document.cookie를 사용한 자바스크립트 접근
+
+```
+document.cookie = "yummy_cookie=choco";
+document.cookie = "tasty_cookie=strawberry";
+console.log(document.cookie);
+// logs "yummy_cookie=choco; tasty_cookie=strawberry"
+```
+
+
+#### 서버가 접근한 클라이언트를 식별하는 방법
+
+서버는 접근한 클라이언트에게 response-header field인 set-cookie 값으로 클라이언트 식별자인 session-id를 발행한다.
+
+서버로 발행된 session-id는 해당 서버와 클라이언트 메모리에 저장된다.
+
+서버로부터 발행된 session을 통해 개인화를 위한 데이터로 활용할 수 있다.
+
+<br/>
+
+첫번째 요청 시 클라이언트로부터 발송된 session-id가 없으므로 서버는 session-id를 생성해 클라이언트에게 발행한다.
+
+두번째 요청 시 클라이언트는 서버로부터 발행된 session-id를 request-header cookie 값으로 포함하고 있다.
+
+서버로부터 발행된 session-id는 해당 서버와 클라이언트 메모리에 저장된다. 이때 사용되는 cookie 타입은 세션 종료 시 같이 소멸되는 memory cookie가 사용된다.
+
+클라이언트 접속 종료 시 서버에 저장된 session-id는 소멸된다.
+
+<br/>
+
+[https://developer.mozilla.org/ko/docs/Web/HTTP/Cookies](https://developer.mozilla.org/ko/docs/Web/HTTP/Cookies)
+[https://mohwaproject.tistory.com/entry/HTTP-Session-%EC%9D%B4%EB%9E%80](https://mohwaproject.tistory.com/entry/HTTP-Session-%EC%9D%B4%EB%9E%80)
