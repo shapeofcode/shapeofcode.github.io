@@ -1,0 +1,79 @@
+---
+layout: post
+title:  "Web Secure - OAuth"
+date:   2021-05-27
+last_modified_at: 2021-05-27
+categories: [Web Secure]
+tags: [Web Secure]
+---
+
+<br/>
+
+새로운 프레임워크를 개발하게 되었고 기존에 있던 다른 프레임워크와 연동하는 과정이 필요했다. 따라서 서비스간 인증 절차에 관한 방법론에 대해 공부하고 적용해보기로 했다.
+
+<br/>
+
+#### OAuth란? 
+
+인증을 위한 오픈 스탠더드 프로토콜. 
+API 접근 위임에 대한 표준안을 만들기 위해 생겨 낳고 2010 Oauth 1.0 프로토콜 표준안이 RFC5849로 발표되었다.
+
+<br/>
+
+<img src="../../../assets/images/OAuth5.png" alt="auth5" />
+
+<br/>
+
+OAuth의 Auth는 Authentication(인증)과 Authorization(허가)의 의미를 담고있다.
+
+<br/>
+
+#### OAuth의 대표 용어
+
+<img src="../../../assets/images/OAuth6.png" alt="auth6" />
+
+<br/>
+
+#### 다양한 Oauth Scheme
+
+기밀 Scheme - 애플리케이션이 클라이언트 시크릿의 비밀을 유지할 수 있을 때 적합.
+
+<img src="../../../assets/images/OAuth1.png" alt="auth1" />
+
+<br/>
+
+비밀번호 플로우 - 사용자는 사용자의 데이터에 액세스하는 데 사용할 수 있는 사용자 이름 및 비밀번호를 애플리케이션에 제공. 그 다음, 클라이언트는 제공자 API에 직접 연결하여 액세스 토큰을 요청(사용자의 비밀번호가 애플리케이션에 공개되므로 사용자와 애플리케이션 사이에 신가 존재)
+
+<img src="../../../assets/images/OAuth2.png" alt="auth2" />
+
+<br/>
+
+액세스 코드 플로우 - 애플리케이션은 권한을 부여하는 경우 애플리케이션에 권한 코드 제공하는 게이트웨이 서버에서 제공하는 양식을 통해 사용자가 권한을 제공하도록 한다. 권한 코드를 제공자 API에 전송하며 리턴시 액세스 토큰을 받는다.
+
+<img src="../../../assets/images/OAuth4.png" alt="auth4" />
+
+공용 스킴 - 애플리케이션이 클아이언트 시크릿의 비밀을 유지할 수 없는 경우에 적합. 애플리케이션의 소스 코드 내부와 같은 사용자의 디바이스에 시크릿을 저장해야하는 컴퓨터 또는 모바일에서 애플리케이션이 고유한 경우에 해당.
+
+RFC 6749 Oauth 2.0 Authorizatino Framework에서의 설명
+
+Roles(4)
+
+Resource owner - 보호된 자원에 접근할 수 있는 객체, 사람이라면 end-user
+
+Resource server - access tokens로 보호된 자원을 hosting하는 서버
+
+Client - 보호된 리소스를 요청하는 애플리케이션
+
+Authorization server - resource owner 인지 검증하고 권한을 얻게 한 후 acces tokens를 client에게 발행한다.
+
+<img src="../../../assets/images/OAuth3.png" alt="auth3" />
+
+<br/>
+
+출처
+
+금융보안원 - Oauth 2.0 개요 및 보안 고려사항
+[https://d2.naver.com/helloworld/24942](https://d2.naver.com/helloworld/24942)
+[https://opentutorials.org/course/3405](https://opentutorials.org/course/3405)
+[https://www.ibm.com/docs/ko/acfc?topic=endpoint-tutorial-securing-api-by-using-oauth-20](https://www.ibm.com/docs/ko/acfc?topic=endpoint-tutorial-securing-api-by-using-oauth-20)
+[https://datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)
