@@ -1,0 +1,72 @@
+---
+layout: post
+title:  "JavaScript - XMLHttpRequest"
+date:   2021-06-02
+last_modified_at: 2021-06-02
+categories: [JavaScript]
+tags: [JavaScript]
+---
+
+<br/>
+
+#### 소개
+XMLHttpRequest(XHR) 객체는 서버와 상호작용하기 위해 사용되고 URL로부터 데이터를 받아올 수 있다. 
+AJAX프로그래밍에 주로 사용된다.
+
+HTTP 이외에 file ftp 프로토콜도 사용 가능하다.
+
+생성자를 통해 초기화 한다.
+
+<br/>
+
+#### 속성
+
+- XMLHttpRequest.onreadystatechange (en-US) : readyState 어트리뷰트가 변경될때마다 호출되는 event handler.
+- XMLHttpRequest.readyState (en-US) Read only : 요청의 상태를 unsigned short 로 반환.
+- XMLHttpRequest.response (en-US) Read only : 응답 엔티티 바디를 갖는하는 XMLHttpRequest.responseType (en-US) 의 값에 따라 ArrayBuffer, Blob, Document, JavaScript 객체, 또는 DOMString 을 반환.
+- XMLHttpRequest.responseText (en-US) Read only : 요청에 대한 응답을 텍스트로 갖는 DOMString 을 반환합니다. 요청이 성공하지 못했거나 아직 전송되지 않았을 경우 null 을 반환.
+- XMLHttpRequest.responseType (en-US) : 응답 타입을 정의하는 열거형 값.
+- XMLHttpRequest.responseURL (en-US) Read only : 응답의 연속된 URL 을 반환. URL 이 null 인 경우 빈 문자열을 반환.
+- XMLHttpRequest.responseXML (en-US) Read only : 요청에 대한 응답을 갖는 Document 를 반환. 요청이 성공하지 못했거나, 아직 전송되지 않았거나, XML 또는 HTML 로 파싱할 수 없는 경우 null 을 반환. workers 에서는 사용이 불가.
+- XMLHttpRequest.status (en-US) Read only : 요청의 응답 상태를 갖는 unsigned short 를 반환.
+- XMLHttpRequest.statusText (en-US) Read only : HTTP 서버에 의해 반환된 응답 문자열을 갖는 DOMString 을 반환. XMLHTTPRequest.status (en-US) 와는 다르게, 응답 메시지의 전체 텍스트를 갖는다(예, "200 OK"). 
+- XMLHttpRequest.timeout : 요청이 자동으로 종료될때까지 걸린 시간을 밀리초 단위로 나타내는 unsigned long. 
+- XMLHttpRequestEventTarget.ontimeout : 요청 시간 초과때마다 호출되는 event handler.
+- XMLHttpRequest.upload Read only : 업로드 과정을 나타내는 XMLHttpRequestUpload.
+- XMLHttpRequest.withCredentials (en-US) : 사이트 간 Access-Control 요청이 쿠키나 인증 헤더와 같은 자격 증명을 사용해야하는지 여부를 나타내는 Boolean.
+
+<br/>
+
+#### 이벤트 핸들러
+
+XMLHttpRequest 인스턴스의 속성으로써 onreadystatechange 는 모든 브라우저에서 지원. (onload, onerror, onprogress, 등등.).
+Firefox 를 포함해, 더 최신 브라우저는 on* 속성을 핸들러 함수로 설정하는것 뿐만 아니라 표준 addEventListener() API 를 통해 
+XMLHttpRequest 이벤트 리스닝도 지원.
+
+<br/>
+
+#### 메소드
+
+- XMLHttpRequest.abort() (en-US) : 이미 전송된 요청을 중지.
+- XMLHttpRequest.getAllResponseHeaders() (en-US) : 모든 응답 헤더를 CRLF (en-US) 로 구분한 문자열로 반환. 응답을 받지 않은 경우 null.
+- XMLHttpRequest.getResponseHeader() (en-US) : 지정한 헤더의 텍스트를 갖는 문자열을 반환. 응답을 아직 받지 못했거나 응답에 헤더가 존재하지 않을 경우 null.
+- XMLHttpRequest.open() (en-US) : 요청을 초기화. 이 메소드는 네이티브 코드로부터의 요청을 초기화하기 위해 JavaScript 코드에 의해 사용. 대신 openRequest() 를 사용.
+- XMLHttpRequest.overrideMimeType() (en-US) : 서버에의해 반환된 MIME 타입을 오버라이드.
+- XMLHttpRequest.send() (en-US) : 요청을 보낸다. 요청이 비동기인 경우(기본값), 이 메소드는 요청이 보내진 즉시 반환.
+- XMLHttpRequest.setRequestHeader() : HTTP 요청 헤더의 값을 설정. open() 후, send() 전에 setRequestHeader() 를 호출.
+
+<br/>
+
+#### 이벤트
+
+- abort (en-US) : 예를 들어 프로그램이 XMLHttpRequest.abort() (en-US)를 호출해서 요청이 중단되면 발생. onabort (en-US) 속성을 통해서도 가능.
+- error (en-US) : 요청에 에러가 생기면 발생. onerror (en-US) 속성을 통해서도 가능.
+- load (en-US) : XMLHttpRequest 처리 과정이 성공적으로 완료되면 발생. onload (en-US) 속성을 통해서도 가능.
+- loadend (en-US) : 요청이 성공이든 (load (en-US) 다음) 실패든 (abort (en-US) 또는 error (en-US) 다음) 완료되면 발생. onloadend 속성을 통해서도 가능. 
+- loadstart (en-US) : 요청이 데이터를 받기 시작하면 발생. onloadstart (en-US) 속성을 통해서도 가능.
+- progress (en-US) : 요청이 데이터를 받는 동안 주기적으로 발생. onprogress (en-US) 속성을 통해서도 가능.
+
+<br/>
+
+출처
+[https://developer.mozilla.org/ko/docs/Web/API/XMLHttpRequest](https://developer.mozilla.org/ko/docs/Web/API/XMLHttpRequest)
