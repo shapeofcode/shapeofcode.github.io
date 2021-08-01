@@ -1,0 +1,345 @@
+---
+layout: post
+title:  "JavaScript - Fetch API"
+date:   2021-06-03
+last_modified_at: 2021-06-03
+categories: [JavaScript]
+tags: [JavaScript]
+---
+
+<br/>
+
+request, response 같은 http pipeline을 생성할 수 있게 해주는 javascript interace를 제공한다.
+
+fecth는 jQuery.ajax()와 다른 점이 있다.
+
+1. fetch로 부터 return 된 promise는 HTTP error status에 대한 거절이 없다. (404 or 500 에러일지라도.)
+200~299 사이의 코드가 아닐경우 response의 ok property를 false로 바꾼다. 네트워크 실패나 request를 막는 요청일 경우를 제외하곤.
+
+2. fetch는 cross-origin cookies를 보내진 않는다. credentials options을 주지 않는한. default credentials 정책은
+same-origin이다.
+
+가장 간단한 사용 방법
+
+```javascript
+fetch('http://example.com/movies.json')
+  .then(response => response.json())
+  .then(data => console.log(data));
+```
+
+전체 옵션
+
+```javascript
+// Example POST method implementation:
+async function postData(url = '', data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json'
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(data) // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
+postData('https://example.com/answer', { answer: 42 })
+  .then(data => {
+    console.log(data); // JSON data parsed by `data.json()` call
+  });
+
+```
+
+mode : no-cors 옵션은 hedaers에 담을 수 있는 내용이 제한된다.
+
+- Accept
+- Accept-Language
+- Content-Language
+- Content-Type with a value of application/x-www-form-urlencoded, multipart/form-data, or text/plain
+
+
+<br/>
+
+credentials를 포함한 request 요청
+
+```javascript
+fetch('https://example.com', {
+  credentials: 'include'
+});
+```
+
+* Access-Control-Allow-Origin 은 credentials: 'include'에서 금지된다.
+
+<br/>
+
+url이 same origin이면 send credentials을 하고 싶을 경우
+credentials: 'same-origin'을 사용한다.
+
+credentials를 포함하고 싶지 않은 경우 
+credentials : 'omit' 을 사용한다.
+
+<br/>
+
+JSON 데이터를 upload하는 경우
+
+```javascript
+const data = { username: 'example' };
+
+fetch('https://example.com/profile', {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Success:', data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+```
+
+<br/>
+
+파일을 업로드하는 경우
+
+<input type="file"/> 을 사용하고 Formdata() fetch를 사용한다.
+
+```javascript
+const formData = new FormData();
+const fileField = document.querySelector('input[type="file"]');
+
+formData.append('username', 'abc123');
+formData.append('avatar', fileField.files[0]);
+
+fetch('https://example.com/profile/avatar', {
+  method: 'PUT',
+  body: formData
+})
+.then(response => response.json())
+.then(result => {
+  console.log('Success:', result);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+```
+
+<br/>
+
+파일을 여러개 업로드하는 경우
+
+<input type="file" multiple/> 을 사용하고 Formdata() fetch를 사용한다.
+
+```javascript
+const formData = new FormData();
+const photos = document.querySelector('input[type="file"][multiple]');
+
+formData.append('title', 'My Vegas Vacation');
+for (let i = 0; i < photos.files.length; i++) {
+  formData.append('photos', photos.files[i]);
+}
+
+fetch('https://example.com/posts', {
+  method: 'POST',
+  body: formData,
+})
+.then(response => response.json())
+.then(result => {
+  console.log('Success:', result);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+```
+
+<br/>
+
+텍스트 파일을 한라인씩 프로세싱하는 경우
+
+response로 부터 읽어드린 chunk가 line boundaries에서 꺠지지 않았거나 Unit8Arrays일때
+(UTF-8에 fetch error는 handling하지 않는다고 가정)
+
+```javascript
+async function* makeTextFileLineIterator(fileURL) {
+  const utf8Decoder = new TextDecoder('utf-8');
+  const response = await fetch(fileURL);
+  const reader = response.body.getReader();
+  let { value: chunk, done: readerDone } = await reader.read();
+  chunk = chunk ? utf8Decoder.decode(chunk) : '';
+
+  const re = /\n|\r|\r\n/gm;
+  let startIndex = 0;
+  let result;
+
+  for (;;) {
+    let result = re.exec(chunk);
+    if (!result) {
+      if (readerDone) {
+        break;
+      }
+      let remainder = chunk.substr(startIndex);
+      ({ value: chunk, done: readerDone } = await reader.read());
+      chunk = remainder + (chunk ? utf8Decoder.decode(chunk) : '');
+      startIndex = re.lastIndex = 0;
+      continue;
+    }
+    yield chunk.substring(startIndex, result.index);
+    startIndex = re.lastIndex;
+  }
+  if (startIndex < chunk.length) {
+    // last line didn't end in a newline char
+    yield chunk.substr(startIndex);
+  }
+}
+
+async function run() {
+  for await (let line of makeTextFileLineIterator(urlOfFile)) {
+    processLine(line);
+  }
+}
+
+run();
+```
+
+<br/>
+
+fetch가 성공적인지에 대한 코드
+
+```javascript
+fetch('flowers.jpg')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.blob();
+  })
+  .then(myBlob => {
+    myImage.src = URL.createObjectURL(myBlob);
+  })
+  .catch(error => {
+    console.error('There has been a problem with your fetch operation:', error);
+  });
+```
+
+network error이거나 CORS 문제일 경우 respose.ok가 false이다.
+
+<br/>
+
+request object를 직접 생성하는 경우
+
+```javascript
+const myHeaders = new Headers();
+
+const myRequest = new Request('flowers.jpg', {
+  method: 'GET',
+  headers: myHeaders,
+  mode: 'cors',
+  cache: 'default',
+});
+
+fetch(myRequest)
+  .then(response => response.blob())
+  .then(myBlob => {
+    myImage.src = URL.createObjectURL(myBlob);
+  });
+```
+
+<br/>
+
+#### 헤더
+
+헤더 interface를 통해 직접 헤더를 만들 수 있다.
+
+```javascript
+const content = 'Hello World';
+const myHeaders = new Headers();
+myHeaders.append('Content-Type', 'text/plain');
+myHeaders.append('Content-Length', content.length.toString());
+myHeaders.append('X-Custom-Header', 'ProcessThisImmediately');
+```
+
+```javascript
+const myHeaders = new Headers({
+  'Content-Type': 'text/plain',
+  'Content-Length': content.length.toString(),
+  'X-Custom-Header': 'ProcessThisImmediately'
+});
+```
+
+헤더를 쓰기 좋은 예제 (프로세스 전에 content-type 이 맞는지 체크)
+
+```javascript
+fetch(myRequest)
+  .then(response => {
+     const contentType = response.headers.get('content-type');
+     if (!contentType || !contentType.includes('application/json')) {
+       throw new TypeError("Oops, we haven't got JSON!");
+     }
+     return response.json();
+  })
+  .then(data => {
+      /* process your data further */
+  })
+  .catch(error => console.error(error));
+```
+
+<br/>
+
+#### Response Objects
+
+- Response.status - 응답 코드
+- Response.statusText - 응답 코드 메세지 (HTTP/2는 지원하지 않음)
+- Response.ok - 200-299 응답에 있는 체크
+
+<br/>
+
+respondWith로 받았을 때 사용 가능
+
+```javascript
+const myBody = new Blob();
+
+addEventListener('fetch', function(event) {
+  // ServiceWorker intercepting a fetch
+  event.respondWith(
+    new Response(myBody, {
+      headers: { 'Content-Type': 'text/plain' }
+    })
+  );
+});
+```
+
+#### Body
+
+types
+
+- ArrayBuffer
+- ArrayBufferView (Uint8Array and friends)
+- Blob/File
+- string
+- URLSearchParams
+- FormData
+
+<br/>
+
+Request와 Response interface는 body를 추출하기 위해 함수를 공유한다.
+
+- Request.arrayBuffer() / Response.arrayBuffer()
+- Request.blob() / Response.blob()
+- Request.formData() / Response.formData()
+- Request.json() / Response.json()
+- Request.text() / Response.text()
+
+<br/>
+
+출처
+[https://developer.mozilla.org/ko/docs/Web/API/Fetch_API](https://developer.mozilla.org/ko/docs/Web/API/Fetch_API)
+[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
