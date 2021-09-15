@@ -24,9 +24,9 @@ tags: [Algorithm]
 
 제약사항
 
-- 1 <= target <= 109 
-- 1 <= nums.length <= 105
-- 1 <= nums[i] <= 105
+- 1 <= target <= 10^9 
+- 1 <= nums.length <= 10^5
+- 1 <= nums[i] <= 10^5
 
 <br/>
    
