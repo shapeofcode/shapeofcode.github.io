@@ -99,12 +99,20 @@ export default App;
 
 3. List Views
 
+<br/>
+
 3-1. FlatList. 화면에 보여지는것만 render한다.
+
+<br/>
 
 FlatList  component는 두개의 속성을 갖는다. Data와 renderItem. Data는 list의
 Data를 의미하고 renderItem은 source로부터 하나의 아이템을 가져와 formatted된 component를 render할 수 있게 return시킨다.
 
+<br/>
+
 3-2 SectionList. iOS의 UITableView와 유사하며 data set을 logical sections으로 구분하고 싶다면 headers 이용하여 render한다.
+
+<br/>
 
 출처
 
