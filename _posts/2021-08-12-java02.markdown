@@ -20,7 +20,7 @@ List<Object> list = new LinkedList<>();
 
 <br/>
 
-java8기준 사용가능한 class들
+java8기준 사용 가능한 class들
 
 AbstractList, AbstractSequentialList, ArrayList, AttributeList, CopyOnWriteArrayList, LinkedList, RoleList, RoleUnresolvedList, Stack, Vector
 
