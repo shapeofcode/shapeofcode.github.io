@@ -1,0 +1,65 @@
+---
+layout: post
+title:  "JAVA - String 기본"
+date:   2021-07-07
+last_modified_at: 2021-07-07
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+#### String 기본
+
+- string은 unicode characters의 배열이다. 
+- java에서는 "=="가 object가 같은지 비교한다.
+- C++에서는 mutable하고 java에서는 immutable하다. 
+- finding operation (indexOf, lastIndexOf)는 String 길이가 N이면 time complexity가 O(N)이다.
+
+<br/>
+
+#### java string immutable
+
+concatenation은 새로운 String에 충분한 공간을 할당하고 이전 String을 복사하고 새로운 String을 붙인다.
+
+time complexity는 O(n^2)이다. 
+
+<br/>
+
+String을 mutable하게 사용하려면 char array로 바꾸면 된다.
+
+```java
+// "static void main" must be defined in a public class.
+public class Main {
+    public static void main(String[] args) {
+        String s = "Hello World";
+        char[] str = s.toCharArray();
+        str[5] = ',';
+        System.out.println(str);
+    }
+}
+```
+
+<br/>
+
+concatenate 작업이 빈번하게 발생하면 StringBuilder를 사용하면 된다. O(n) complexity를 갖는다.
+
+```java
+// "static void main" must be defined in a public class.
+public class Main {
+    public static void main(String[] args) {
+        int n = 10000;
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            str.append("hello");
+        }
+        String s = str.toString();
+    }
+}
+```
+
+<br/>
+
+출처
+
+[https://leetcode.com/explore/learn/card/array-and-string/203/introduction-to-string/1158/](https://leetcode.com/explore/learn/card/array-and-string/203/introduction-to-string/1158/)
