@@ -1,0 +1,35 @@
+---
+layout: post
+title:  "Network - forward proxy, reverse proxy"
+date:   2021-08-13
+last_modified_at: 2021-08-13
+categories: [NETWORK]
+tags: [NETWORK]
+---
+
+<br/>
+
+#### Forward Proxy
+
+사용자가 google.com에 연결하려고 하면 포워드 프록시 서버가 요청을 받아서 google.com에 연결하여 그 결과를 클라이언트에 전달한다.
+
+장점 : 정해진 사이트만 연결하게 제한할 수 있으므로 보안에 활용
+
+#### Reverse Proxy
+
+사용자가 example.com에 데이터를 요청하면 Reverse Proxy는 이 요청을 받아서 내부 서버에서 데이터를 받은 후 이 데이터를 사용자에게 전달한다.
+
+장점 : DMZ 내에 외부에 서비스를 제공하는 서버(메일서버, 웹서버, DNS 서버)를 배치하고 방화벽을 만들고 WAS를 내부에 배치하여 
+보안을 높일 수 있다.
+
+리버스 프록시 앞에 L4 나 load balancer를 붙이면 Round Robin, Least connection 등 상황에 맞는 분배 알고리즘을 적용할 수 있다.
+
+<br/>
+
+apache webserver는 mod_proxy 모듈을 통해 forawrd proxy, reverse proxy 두 기능 모두 제공한다.
+
+<br/>
+
+출처
+
+[https://www.lesstif.com/system-admin/forward-proxy-reverse-proxy-21430345.html](https://www.lesstif.com/system-admin/forward-proxy-reverse-proxy-21430345.html)
