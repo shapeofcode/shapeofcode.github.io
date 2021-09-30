@@ -1,0 +1,32 @@
+---
+layout: post
+title:  "JAVA - List , ArrayList 차이"
+date:   2021-08-12
+last_modified_at: 2021-08-12
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+List는 인터페이스고 ArrayList는 클래스.
+
+List로 선언하고 다른 implementing classes를 사용할 수 있다. (다형성)
+
+```java
+List<Object> list = new List<>();
+List<Object> list = new LinkedList<>();
+```
+
+<br/>
+
+java8기준 사용가능한 class들
+
+AbstractList, AbstractSequentialList, ArrayList, AttributeList, CopyOnWriteArrayList, LinkedList, RoleList, RoleUnresolvedList, Stack, Vector
+
+<br/>
+
+출처
+
+[https://docs.oracle.com/javase/8/docs/api/java/util/List.html](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)
+[https://yoon-dailylife.tistory.com/7](https://yoon-dailylife.tistory.com/7)
