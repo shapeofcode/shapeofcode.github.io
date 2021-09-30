@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "React Native - Platform Specific Code"
-date:   2021-08-05
-last_modified_at: 2021-08-05
+date:   2021-08-08
+last_modified_at: 2021-08-08
 categories: [React Native]
 tags: [React Native]
 ---

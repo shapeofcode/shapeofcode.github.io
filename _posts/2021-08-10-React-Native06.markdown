@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "React Native - Linking Libraries"
-date:   2021-08-05
-last_modified_at: 2021-08-05
+date:   2021-08-10
+last_modified_at: 2021-08-10
 categories: [React Native]
 tags: [React Native]
 ---

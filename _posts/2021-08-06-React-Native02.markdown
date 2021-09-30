@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "React Native - Text Input, ScrollView, List Views"
-date:   2021-08-05
-last_modified_at: 2021-08-05
+date:   2021-08-06
+last_modified_at: 2021-08-06
 categories: [React Native]
 tags: [React Native]
 ---
