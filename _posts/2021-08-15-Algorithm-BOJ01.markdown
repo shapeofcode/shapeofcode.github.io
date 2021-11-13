@@ -52,7 +52,6 @@ public class Main {
     static StringBuilder sb = new StringBuilder();
     
     static void input() {
-        FastReader scan = new FastReader();
         N = scan.nextInt();
         M = scan.nextInt();
         selected = new int[M + 1];
