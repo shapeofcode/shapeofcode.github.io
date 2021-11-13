@@ -56,6 +56,7 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+    static FastReader scan = new FastReader();
     static StringBuilder sb = new StringBuilder();
     
     static void input() {
