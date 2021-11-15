@@ -103,7 +103,7 @@ public class Main {
         
         Arrays.sort(chars, 1, N + 1);
         rec_func(1);
-        System.out.println(ans);
+        System.out.println(sb.toString());
     }
 
     static class FastReader {
