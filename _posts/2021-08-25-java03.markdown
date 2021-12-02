@@ -1,0 +1,41 @@
+---
+layout: post
+title:  "JAVA - Comparable , Comparator 차이"
+date:   2021-08-25
+last_modified_at: 2021-08-25
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+[JAVA Comparable DOC](https://docs.oracle.com/javase/8/docs/api/java/lang/Comparable.html#method.summary)
+
+Comparable 인터페이스에는 compareTo(T o) 메소드 하나가 선언되어있고 사용하려면 compareTo 메소드를 재정의 해주어야 한다.
+= 자기 자신과 매개변수 객체를 비교
+
+<br/>
+
+[JAVA Comparator DOC](https://docs.oracle.com/javase/8/docs/api/java/util/Comparator.html#method.summary)
+
+Comparator 인터페이스는 compare(T o1, T o2)를 구현해야 한다.
+= 두 매개변수 객체를 비교 
+
+<br/>
+
+Java8부터는 interface에서도 인반 메소드를 구현할 수 있도록 변경되었다. default나 static으로 선언된 메소드가 아니면
+추상메소드라는 의미로 반드시 재정의를 해주어야 한다.(default와 static의 차이라면 default로 선언된 메소드는 재정의를
+할 수 있고, static은 재정의를 할 수 없다는 차이가 있다. - bool equals 메소드는 default나 static이 안붙어있음에도
+구현이 강제되지 않는 이유는 모든 객체의 최상위 타입인 Object 클래스에서 정의되기 때문이다.)
+
+<br/>
+
+** 비교를 구현할땐 언제나 Overflow, Underflow에 대해 염두해 두고 구현한다.
+
+
+
+<br/>
+
+출처
+
+[https://st-lab.tistory.com/243](https://st-lab.tistory.com/243)
