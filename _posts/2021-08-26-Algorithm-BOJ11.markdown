@@ -153,4 +153,4 @@ public class Main {
 
 출처
 
-[BOJ 문제](https://www.acmicpc.net/problem/15663)
+[BOJ 문제](https://www.acmicpc.net/problem/1015)
