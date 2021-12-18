@@ -1,0 +1,164 @@
+---
+layout: post
+title:  "JAVA - Arrays.sort()"
+date:   2021-08-27
+last_modified_at: 2021-08-27
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+Arrays.sort()가 내부적으로 사용하는 3개의 Sorting
+
+- Insertion Sort
+- Merge Sort
+- QuickSort
+
+<br/>
+
+1. Insertion Sort와 Merge Sort를 섞은것은 Tim Sort
+- primitive 원소 정렬
+- 최선 O(N)
+- 최악 O(N^2)
+- 평균 O(NlogN)
+
+2. Insertion Sort와 Quick Sort를 섞은 것은 Dual Quick Sort
+- Object 원소 정렬
+- 최선 O(N)
+- 최악 O(NlogN)
+- 평균 O(NlogN)
+
+<br/>
+
+### Dual pivot quick sort
+
+2011년 Java7이 나온 이래로, 전통적인 quick sort 알고리즘에서 DualPivotQuickSort 알고리즘이 사용되었다.
+
+Insertion Sort는 정렬할 요소의 수가 적을 때 더 빠른 실행 시간을 가지며 요소의 수가 47개 이하 일 때 
+Insertion Sort를 수행합니다. 
+
+이름에서 알 수 있듯이 DualPivotQuickSort 알고리즘은 2개의 피벗을 선택합니다. 배열을 2개의 피벗을 중심으로 세 부분으로 분할합니다.
+
+<br/>
+
+LP : 왼쪽 피벗, RP : 오른쪽 피벗
+
+LP보다 낮은 1그룹, LP~RP 사이의 그룹(LP, RP는 제외), RP 보다 큰 그룹
+
+LP < RP 성립
+
+<br/>
+
+```java
+// Java program to implement
+// dual pivot QuickSort
+class GFG{
+  
+static void swap(int[] arr, int i, int j)
+{
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+  
+static void dualPivotQuickSort(int[] arr, 
+                               int low, int high)
+{
+    if (low < high)
+    {
+          
+        // piv[] stores left pivot and right pivot.
+        // piv[0] means left pivot and
+        // piv[1] means right pivot
+        int[] piv;
+        piv = partition(arr, low, high);
+          
+        dualPivotQuickSort(arr, low, piv[0] - 1);
+        dualPivotQuickSort(arr, piv[0] + 1, piv[1] - 1);
+        dualPivotQuickSort(arr, piv[1] + 1, high);
+    }
+}
+  
+static int[] partition(int[] arr, int low, int high)
+{
+    if (arr[low] > arr[high])
+        swap(arr, low, high);
+          
+    // p is the left pivot, and q 
+    // is the right pivot.
+    int j = low + 1;
+    int g = high - 1, k = low + 1,
+        p = arr[low], q = arr[high];
+          
+    while (k <= g) 
+    {
+          
+        // If elements are less than the left pivot
+        if (arr[k] < p)
+        {
+            swap(arr, k, j);
+            j++;
+        }
+          
+        // If elements are greater than or equal
+        // to the right pivot
+        else if (arr[k] >= q) 
+        {
+            while (arr[g] > q && k < g)
+                g--;
+                  
+            swap(arr, k, g);
+            g--;
+              
+            if (arr[k] < p)
+            {
+                swap(arr, k, j);
+                j++;
+            }
+        }
+        k++;
+    }
+    j--;
+    g++;
+      
+    // Bring pivots to their appropriate positions.
+    swap(arr, low, j);
+    swap(arr, high, g);
+  
+    // Returning the indices of the pivots
+    // because we cannot return two elements
+    // from a function, we do that using an array.
+    return new int[] { j, g };
+}
+  
+// Driver code
+public static void main(String[] args)
+{
+    int[] arr = { 24, 8, 42, 75, 29, 77, 38, 57 };
+      
+    dualPivotQuickSort(arr, 0, 7);
+      
+    System.out.print("Sorted array: ");
+    for (int i = 0; i < 8; i++)
+        System.out.print(arr[i] + " ");
+          
+    System.out.println();
+}
+}
+  
+// This code is contributed by Gourish Sadhu
+```
+
+<br/>
+
+### tim sort
+
+on studying...
+
+출처
+
+[https://defacto-standard.tistory.com/38](https://defacto-standard.tistory.com/38)
+[https://awdesh.medium.com/dual-pivot-quick-sort-javas-default-sorting-algorithm-for-primitive-types-77342e1df5e5](https://awdesh.medium.com/dual-pivot-quick-sort-javas-default-sorting-algorithm-for-primitive-types-77342e1df5e5)
+[https://www.geeksforgeeks.org/dual-pivot-quicksort/](https://www.geeksforgeeks.org/dual-pivot-quicksort/)
+[https://d2.naver.com/helloworld/0315536](https://d2.naver.com/helloworld/0315536)
