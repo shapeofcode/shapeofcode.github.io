@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "JAVA - Arrays.sort()"
-date:   2021-08-27
-last_modified_at: 2021-08-27
+date:   2021-08-28
+last_modified_at: 2021-08-28
 categories: [JAVA]
 tags: [JAVA]
 ---
