@@ -1,0 +1,74 @@
+---
+layout: post
+title:  "JAVA - Junit"
+date:   2022-01-12
+last_modified_at: 2022-01-12
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+- 단위 테스트 도구. 
+
+<br/>
+
+#### Annotation
+
+@Test - 테스트 메소드인것을 표시
+
+@AfterEach - 현재 class내에서 @Test, @RepeatedTest, @ParameterizedTest 또는 @TestFactory가 실행 된 후 실행된다.
+
+@BeforeEach - AfterEach와 반대.
+
+<br/>
+
+Java assert method - 테스트 작성에 편한 assertion methods 실패한 assertions만 기록된다.
+
+Assert.assertEquals(…)로 바로 써도 되지만 가독성을 위해 static import를 한다.
+
+```java
+import static org.junit.Assert.*;
+…
+assertEquals(…);
+```
+
+#### 주요 Method
+
+- assertEquals(x,y) 두 객체가 같으면 통과
+- assertFalse(x) x가 false이면 통과
+- assertNotNull(x) x가 not null이면 통과
+- assertNotSame(x,y) 두 객체가 같은 객체를 참조하고 있지 않으면 통과
+- assertNull(x) x가 null이면 통과
+- assertThat(x, matcher) 객체가 비교로직에 맞으면 통과
+
+<br/>
+
+#### Junit 기본 지원 매쳐
+
+- allOf - 내부에 선언된 모든 매쳐가 정상일 경우 통과
+asserThat("myValue", allOf(startsWith("my"), containsString("val")))
+
+
+- anyOf - 내부에 선언된 매쳐중 하나 이상 통과할 경우 통과
+asserThat("myValue", anyOf(startsWith("foo"), containsString("Va")))
+
+
+- both - both A and B 형식으로 matcher를 사용할 수 있게 해 준다.
+A,B 매쳐 둘다 통과할 경우 테스트가 성공.
+<br/>
+assertThat("fab", both(containsString("a")).and(containsString("b")))
+
+
+- either - either A or B 형식으로 matcher를 사용할 수 있게 해 준다.
+A,B 매쳐 둘중 하나가 성공할 경우 테스트 성공
+<br/>
+assertThat("fan", either(containsString("a")).or(containsString("b")))
+
+<br/>
+
+출처  
+
+[https://junit.org/junit5/docs/current/user-guide/](https://junit.org/junit5/docs/current/user-guide/)
+[http://junit.sourceforge.net/javadoc/org/junit/Assert.html](http://junit.sourceforge.net/javadoc/org/junit/Assert.html)
+[https://beomseok95.tistory.com/250](https://beomseok95.tistory.com/250)
