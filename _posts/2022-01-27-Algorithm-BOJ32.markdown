@@ -63,52 +63,32 @@ public class Main {
     static FastReader scan = new FastReader();
     static StringBuilder sb = new StringBuilder();
 
-    static int N;
-    static int[][] info;
+    static int N, S;
+    static int[] A;
 
     static void input() {
         N = scan.nextInt();
-        info = new int[N + 1][3];
-        for (int i = 1; i <=N; i++) {
-            for(int j = 0; j < 3; j++) info[i][j] = scan.nextInt();
+        S = scan.nextInt();
+        A = new int[N+1];
+        for(int i = 1; i <= N; i++) {
+            A[i] = scan.nextInt();
         }
-    }
-
-    static int count(int A, int C, int B, int X) {
-        if (X < A) return 0;
-        if (C < X) return (C - A) / B + 1;
-        return (X - A) / B + 1;
-    }
-
-    static boolean determination(int candidate) {
-        long sum = 0;
-        for(int i = 1; i <= N ; i++) {
-            sum += count(info[i][0], info[i][1], info[i][2], candidate);
-        }
-        return sum % 2 == 1;
     }
 
     static void pro() {
-        long L = 1, R = Integer.MAX_VALUE, ans = 0, ansCnt = 0;
-        while(L <= R) {
-            long mid = (L + R) / 2;
-            if(determination((int) mid)) {
-                ans = mid;
-                R = mid - 1;
-            } else {
-                L = mid + 1;
-            }
+        int R = 0, sum = 0, ans = N + 1;
+        for(int L = 1; L <= N; L++) {
+            sum -= A[L-1];
+            while(R + 1 <=N && sum < S)
+                sum += A[++R];
+
+            if(sum >= S)
+                ans = Math.min(ans, R - L + 1);
         }
-        if (ans == 0) {
-            System.out.println("NOTHING");
-        } else {
-            for (int i = 1; i <= N; i++) {
-                if (info[i][0] <= ans && ans <= info[i][1] && (ans - info[i][0]) % info[i][2] == 0) {
-                    ansCnt++;
-                }
-            }
-            System.out.println(ans + " " + ansCnt);
-        }
+
+        if(ans == N + 1)
+            ans = 0;
+        System.out.println(ans);
     }
 
     public static void main(String[] args) {
