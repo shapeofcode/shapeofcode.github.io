@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Network - port forwarding"
+title:  "Network - 네트워크 연결 테스트"
 date:   2022-02-10
 last_modified_at: 2022-02-10
 categories: [Network]
