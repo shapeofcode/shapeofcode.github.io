@@ -3,8 +3,8 @@ layout: post
 title:  "Network - forward proxy, reverse proxy"
 date:   2021-08-13
 last_modified_at: 2021-08-13
-categories: [NETWORK]
-tags: [NETWORK]
+categories: [Network]
+tags: [Network]
 ---
 
 <br/>

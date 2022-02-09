@@ -3,8 +3,8 @@ layout: post
 title:  "Network - port forwarding"
 date:   2021-08-14
 last_modified_at: 2021-08-14
-categories: [NETWORK]
-tags: [NETWORK]
+categories: [Network]
+tags: [Network]
 ---
 
 <br/>
