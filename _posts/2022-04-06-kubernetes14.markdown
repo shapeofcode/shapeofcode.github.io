@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "CKA (Trouble Shooting) - etcd backup & restore"
+date:   2022-04-06
+last_modified_at: 2022-04-06
+categories: [CKA]
+tags: [CKA]
+---
+
+* etcd : key, value 형태의 데이터 저장소
+
+1.backup
+
+
+
+* ssh 접근, sudo user 인지 확인, etcdctl 버전 확인
+
+```shell
+
+whoami
+
+etcdctl version
+
+sudo ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=<trusted-ca-file> \
+  --cert=<cert-file> \
+  --key=<key-file> \
+  snapshot save <backup-file-location>
+
+```
+
+<br/>
+
+2.restore
+
+* 새로운 저장소 공간 지정
+
+```shell
+
+sudo ETCDCTL_API=3 etcdctl --data-dir <data-dir-location> \
+snapshot restore snapshotdb
+
+```
+
+/etc/kubernetes/manifest/etcd.yaml 의 hostpath 경로 변경.
+
+sudo docker ps -a | grep etcd로 확인.
+
+<br/>
+
+출처
+
+[https://youtu.be/dv_5WCYS5P8](https://youtu.be/dv_5WCYS5P8)
+

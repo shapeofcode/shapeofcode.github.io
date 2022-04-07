@@ -1,0 +1,40 @@
+---
+layout: post
+title:  "CKA (Pod) - Static Pod"
+date:   2022-04-07
+last_modified_at: 2022-04-07
+categories: [CKA]
+tags: [CKA]
+---
+
+* static pod는 각 노드의 kubelet(daemon)이 실행
+
+/var/lib/-/config.yaml에 static pod 의 위치 -> /etc/kubernetes/manifest/ 하위 yaml
+
+메모장에 준비
+
+kubectl run <pod-name> --image=<image-name> --dry-run=client -o yaml > pod.yaml
+
+```shell
+
+ssh <node-name>
+
+sudo -i
+
+cat /var/lib/kubelet/config.yaml
+
+cd /etc/kubernetes/manifests
+
+cat > pod.yaml
+
+exit
+
+exit
+
+kubectl get pods
+
+```
+
+출처
+
+[https://youtu.be/u0Wg0HBVmmk](https://youtu.be/u0Wg0HBVmmk)
