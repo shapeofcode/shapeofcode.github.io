@@ -5,6 +5,7 @@ date:   2022-04-06
 last_modified_at: 2022-04-06
 categories: [CKA]
 tags: [CKA]
+published: false
 ---
 
 1.namespace 생성

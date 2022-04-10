@@ -5,6 +5,7 @@ date:   2022-04-07
 last_modified_at: 2022-04-07
 categories: [CKA]
 tags: [CKA]
+published: false
 ---
 
 * static pod는 각 노드의 kubelet(daemon)이 실행
