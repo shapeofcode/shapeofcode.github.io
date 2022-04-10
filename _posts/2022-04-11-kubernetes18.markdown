@@ -1,0 +1,31 @@
+---
+layout: post
+title:  "CKA (Pod) - Side-car Container Pod"
+date:   2022-04-11
+last_modified_at: 2022-04-11
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+기존 컨테이너는 냅두고 사이드카 컨테이너를 추가
+
+```shell
+
+kubetctl get pos/<기존> -o yaml > sidecar.yaml
+
+sidecar 추가
+
+kubectl delete pod <기존>
+
+kubectl apply -f sidecar.yaml
+
+kubectl logs <기존> -c sidecar
+
+```
+
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
