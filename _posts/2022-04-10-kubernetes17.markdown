@@ -1,0 +1,27 @@
+---
+layout: post
+title:  "CKA (Pod) - multi-container Pod"
+date:   2022-04-10
+last_modified_at: 2022-04-10
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+```shell
+
+kubectl run <pod-name> --image=<image-name> --dry-run=client -o yaml > mulyi.yaml
+
+vi multi.yaml
+
+image name 추가
+
+kubectl apply -f multi.yaml
+
+```
+
+```
+
+출처
+
+[https://youtu.be/60DZhzvuCqQ](https://youtu.be/60DZhzvuCqQ)
