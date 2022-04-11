@@ -1,0 +1,63 @@
+---
+layout: post
+title:  "CKA - Deployment & Pod Scale"
+date:   2022-04-11
+last_modified_at: 2022-04-11
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+1. Deployment를 scale out
+
+```shell
+
+kubectl scale deployment <deplyment-name> -n devops --replicas=5
+
+kubectl get pods -n devops
+
+```
+
+2. deployment 생성하고 scale out
+
+label: app_env_stage=dev
+
+```shell
+
+kubectl create deployment <deployment-name> --image=<image-name> --replicas=2 --dry-run=client -o yaml > deployment.yaml
+
+vi deployment.yaml
+
+spec 섹션의 matchlabels는 template의 metadata labels와 일치.
+
+...
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app_env_stage: dev
+    template:
+      metadata:
+        labels:
+          app_env_stage: dev
+        spec:
+          containers:
+          - image: nginx:1.14
+            name: webserver
+            ports:
+            - containerPort: 80
+
+kubectl apply -f deployment.yaml
+
+kubectl get deployment.apps -o wide
+
+kubectl scale deployment <deployment-name> --replicas=3
+
+kubectl get pods --show-labels
+
+
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
