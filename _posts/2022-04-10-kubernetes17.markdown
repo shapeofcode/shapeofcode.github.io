@@ -20,8 +20,6 @@ kubectl apply -f multi.yaml
 
 ```
 
-```
-
 출처
 
 [https://youtu.be/60DZhzvuCqQ](https://youtu.be/60DZhzvuCqQ)
