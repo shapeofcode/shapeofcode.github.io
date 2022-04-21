@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-주요 관심사: GIS, 아키텍처, 3D
+주요 관심사: Web, GIS, 아키텍처, 3D
 
 [jekyll-paper]: https://github.com/ghosind/Jekyll-Paper
 [jekyll-paper-github]: https://github.com/ghosind/Jekyll-Paper-Github
