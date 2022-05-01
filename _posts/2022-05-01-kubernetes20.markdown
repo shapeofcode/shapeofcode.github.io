@@ -1,0 +1,49 @@
+---
+layout: post
+title:  "CKA - Rolling Update & Roll Back"
+date:   2022-05-01
+last_modified_at: 2022-05-01
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Rolling Update
+
+1.Deployment 생성
+
+```shell
+kubectl create deployment nginx-app --image=nginx:1.11.10-alpine --replicas=3 --dry-run=client -o yaml
+kubectl create deployment nginx-app --image=nginx:1.11.10-alpine --replicas=3
+kubectl get deployments.apps nginx-app
+kubectl get pods | grep nginx-app
+```
+
+<br/>
+
+2.Rolling Update
+
+```shell
+kubectl set image deployment nginx-app nginx=nginx:1.11.13-alpine --record
+kubectl rollout status deployment nginx-app
+kubectl get pods | grep nginx-app
+
+kubectl rollout history  deployment nginx-app
+```
+
+<br/>
+
+3.Roll Back
+
+```shell
+kubectl rollout undo deployment nginx-app
+kubectl get pods | grep nginx-app
+
+kubectl rollout history deployment nginx-app
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
