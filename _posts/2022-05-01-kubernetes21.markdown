@@ -1,0 +1,33 @@
+---
+layout: post
+title:  "CKA - NodeSelector"
+date:   2022-05-01
+last_modified_at: 2022-05-01
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+1. worker node lable 확인
+
+```shell
+kubectl get node --show-labels
+kubectl get node -L disktype
+
+kubectl run eshop-store --image=nginx --dry-run=client -o yaml > eshop-store.yaml
+
+vi eshop-store.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+   name: eshop-store
+spec:
+   nodeSelector:
+      disktype: ssd
+      ...
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
