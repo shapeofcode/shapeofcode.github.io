@@ -1,0 +1,32 @@
+---
+layout: post
+title:  "CKA - Node 관리"
+date:   2022-05-01
+last_modified_at: 2022-05-01
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+cordon : 노드에 더이상 실행 못하게 막는것
+
+uncordon : cordon된걸 푸는것
+
+drain : 현재 노드에 실행 중인 pods를 삭제하고 node를 사용안하게 하는것
+
+
+Set the node named k8s-worker1 as unavailable and reschedule all the pods running on it
+
+```shell
+
+kubectl drain k8s-worerk1 --ignore-daemonsets --force
+
+kubectl get nodes
+
+kubectl get pods -o wide
+
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
