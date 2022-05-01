@@ -1,0 +1,39 @@
+---
+layout: post
+title:  "CKA - Node 정보 수집"
+date:   2022-05-01
+last_modified_at: 2022-05-01
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Check Ready Nodes
+
+Check to see how many nodes are ready (not including nodes tainted NoScedule) and write the number to /var/CKA2022/RN0001
+
+```shell
+kubectl get nodes | grep -i -w ready
+
+kubectl describe node hk8s-m | grep -i NoSchedule
+
+kubectl describe node hk8s-w1 | grep -i NoSchedule
+kubectl describe node hk8s-w1 | grep -i taints
+
+echo "1" > /var/CKA2022/RN0001
+
+```
+
+Count the Number of NOdes That are ready to run normal workloads
+
+Determine how many nodes in the cluster are ready to run normal workloads. 
+Output this number to the file /var/CKA2022/NODE-Count
+
+```shell
+kubectl get nodes | grep -i -w ready | wc -l > /var/CKA2022/NODE-Count
+cat /var/CKA2022/Node-Count
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
