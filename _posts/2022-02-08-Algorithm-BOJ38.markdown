@@ -85,8 +85,6 @@ public class Main {
             max = Math.max(max, sum);
         }
         
-        System.out.println(ans);
-        
         System.out.println(max);
     }
 
