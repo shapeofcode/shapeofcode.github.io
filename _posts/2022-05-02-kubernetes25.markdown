@@ -1,0 +1,25 @@
+---
+layout: post
+title:  "CKA - Pod Log 추출"
+date:   2022-05-22
+last_modified_at: 2022-05-22
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Monitor the logs of pod custom-app and Extract log lines corresponding to error file not found Write them to /var/CKA2022/podlog.
+
+<br/>
+
+```shell
+
+kubectl get pods custom-app
+kubectl logs custom-app | grep `file not found` > /var/CKA2022/podlog
+cat /var/CKA2022/podlog
+      
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
