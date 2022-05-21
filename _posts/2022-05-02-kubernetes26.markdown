@@ -1,0 +1,25 @@
+---
+layout: post
+title:  "CKA - CPU 사용량이 높은 Pod 검색"
+date:   2022-05-22
+last_modified_at: 2022-05-22
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+From the pod label name=overloaded-cpu, find pods running high CPU workloads and write the name of the pod 
+consuming most CPU to the file /var/CKA2022/cpu_load_pod.txt
+
+<br/>
+
+```shell
+
+kubectl top pods -l name=overloaded-cpu --sort-by-cpu
+echo "POD_NAME" > /var/CKA2022/cpu_load_pod.txt
+
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
