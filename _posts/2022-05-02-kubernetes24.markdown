@@ -1,0 +1,73 @@
+---
+layout: post
+title:  "CKA - Deployment & Expose the Service"
+date:   2022-05-22
+last_modified_at: 2022-05-22
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Reconfigure the existing deployment front-end and add a port specification named http exposing port 80/tcp of the 
+existing container nginx.
+
+create a new service name front-end-svc exposing the container port http.
+
+configure the new service to also expose the individual Pods via a NodePort on the nodes on which they are scheduled
+
+<br/>
+
+```shell
+
+kubectl get deployments.apps front-end
+kubectl get deploy front-end -o yaml > front-end.yaml
+
+vi front-end.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: front-end
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+         run: nginx
+   template:
+      metadata:
+         labels:
+            run: nginx
+      spec:
+         containers:
+         - image: nginx
+           name: http
+         - ports:
+           - containerPort: 80
+             name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: front-end-svc
+spec:
+   type: NodePort
+   selector:
+      run: nginx
+   ports:
+      - name: http
+        protocol: TCP
+        port: 80
+        targetPort: http
+
+kubectl delete deployments.apps front-end
+kubectl apply -f front-end.yaml
+
+kubectl get deployments.apps front-end
+kubectl get svc front-end-svc
+
+curl k8s-worker1:#####
+      
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
