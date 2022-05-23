@@ -1,0 +1,51 @@
+---
+layout: post
+title:  "CKA - init container"
+date:   2022-05-24
+last_modified_at: 2022-05-24
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+- Add an init container to web-pod(which has been defined in spec file /data/cka/webpod.yaml).
+- The init container should create an empty file named /workdir/data.txt.
+- If /workdir/data.txt is not detected, the Pod sould exit.
+- Once the spec file has been updated with the init container definition, the Pod sould be created.
+
+<br/>
+
+```shell
+cat /data/cka/webpod.yaml
+
+vi /data/cka/webpod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+name: web-pod
+spec:
+containers:
+- image: busybox:1.28
+  name: main
+  command: ['sh','-c',if [ !-f /workdir/data.txt ]; then exit 1; else sleep 300;fi']
+  volumeMounts:
+    - name: workdir
+      mountPath: "/workdir"
+      initContainers:
+- name: init
+  image: busybox:1.28
+  command: ['sh','-c','touch /workdir/data.txt']
+  volumeMounts:
+    - name: workdir
+      mountPath: "/workdir"
+      volumes:
+    - name: workdir
+
+kubectl apply -f /data/cka/webapp.yaml
+
+kubectl exec web-pod -c main -- ls /workdir/data.txt
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)

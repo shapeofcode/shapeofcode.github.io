@@ -1,0 +1,39 @@
+---
+layout: post
+title:  "CKA - NodePort 서비스 생성"
+date:   2022-05-24
+last_modified_at: 2022-05-24
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Create the service as type NodePort with the port:32767 for the nginx pod with the pod selector app:webui
+
+<br/>
+
+```shell
+kubectl get pods -l app=webui --show-labels
+
+vi myservice.yaml
+apiVersion: v1
+kind: Service
+metadata:
+name: my-service
+spec:
+type: NodePort
+selector:
+app: webui
+ports:
+- port: 80
+  targetPort: 80
+  nodePort: 32767
+
+kubectl apply -f myservice.yaml
+kubectl get svc
+curl k8s-worker1:32767
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)

@@ -1,0 +1,56 @@
+---
+layout: post
+title:  "CKA - ConfigMap 운영"
+date:   2022-05-24
+last_modified_at: 2022-05-24
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+- All operations is this questing should be performed in the ckad namespace.
+- Create a ConfigMap called web-config that contains the following two entries:
+  -- connection_string=localhost:80
+  -- external_url=cncf.io
+- Run a pod called web-pod with a single container running the nginx:1.19.8-alpine image, and expose these
+  configuration settings as environment variables inside the container.
+
+<br/>
+
+```shell
+kubectl create namespace ckad
+kubectl get namespaces
+
+kubectl create configmap web-config \
+--from-literal=connection_string=localhost:80 \
+--from-literal=external_url=cncf.io \
+--namespace=ckad
+
+kubectl get configmap -n ckad
+kubectl describe configmaps web-config -n ckad
+
+kubectl run web-pod --image=nginx:1.19.8-alpine --port 80 -n ckad --dry-run=client -o yaml > web-pod.yaml
+vi web-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+name:web-pod
+namespace: ckad
+spec:
+containers:
+- image: nginx:1.19.8-alpine
+  name: web-pod
+  envFrom:
+    - configMapRef:
+      name: web-config
+      ports:
+    - containerPort: 80
+
+kubectl apply -f web-pod.yaml
+
+kubectl exec web-pod -n ckad --env
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
