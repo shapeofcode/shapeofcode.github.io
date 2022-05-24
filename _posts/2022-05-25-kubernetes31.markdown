@@ -1,0 +1,158 @@
+---
+layout: post
+title:  "Kubernetes - Pod Auto Scaler - HPA"
+date:   2022-05-25
+last_modified_at: 2022-05-25
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+## hpa(Horizontal Pod Autoscaling) 수평적 포드 스케일링
+
+- kubernetes에서, workload resource(deployment, statefulset)을 자동으로 업데이트하며,
+  workload 크기를 수요에 맞게 자동으로 scailing하는 것을 목표로 한다.
+
+- hpa는 부하 증가에 대해 pod를 더 배치하는것을 뜻한다. pod의 수가 최소 설정값 이상인 경우, HPA는 workload resource에게
+  scale down을 지시한다.
+
+- hpa는 크기 조절이 불가능한 오브젝트(daemonset)에는 적용할 수 없다.
+
+<br/>
+
+### hpa 작동 원리
+
+hpa는 controller loop 형태로 구현했고 kube-controller-manager의 --horizontal-pod-autoscaler-sync-period 파라미터에 의해
+설정된다.
+
+각 주기마다, controller-manager는 hpa 정의에 지정된 메트릭에 대해 resource 사용률을 질의한다. controller-manager는 scaleTargetRef에 의해
+정의된 target resource를 찾고 나서, target resource의 .spec.selector label을 보고 pod를 선택하며, resource metric API 또는
+custom metric API로부터 metric을 수집한다.
+
+<br/>
+
+### hpa 연습
+
+* kubernetes 1.23 버전 이상 준비 (kubectl version)
+* metric server 배포 및 구성
+
+1.php-apache 서버 구동 및 노출
+
+<br/>
+
+```Dockerfile
+FROM php:5-apache
+COPY index.php /var/www/html/index.php
+RUN chmod a+rx index.php
+```
+
+<br/>
+
+index.php
+
+```php
+<?php
+  $x = 0.0001;
+  for ($i = 0; $i <= 1000000; $i++) {
+    $x += sqrt($x);
+  }
+  echo "OK!";
+?>
+```
+
+<br/>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+spec:
+  selector:
+    matchLabels:
+      run: php-apache
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: php-apache
+    spec:
+      containers:
+      - name: php-apache
+        image: k8s.gcr.io/hpa-example
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+  labels:
+    run: php-apache
+spec:
+  ports:
+  - port: 80
+  selector:
+    run: php-apache
+```
+
+kubectl apply -f https://k8s.io/examples/application/php-apache.yaml
+
+<br/>
+
+
+```shell
+deployment.apps/php-apache created
+service/php-apache created
+```
+
+<br/>
+
+hpa controller는 평균 cpu 사용량을 50%로 유지하기 위해 replicaset 개수를 늘리고 줄인다.
+
+kubectl run으로 각 pod는 200 밀리코어를 요청하므로 평균 cpu 사용은 100 밀리코어이다.
+
+2.hpa 생성
+
+```shell
+kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
+
+# 상태 확인
+kubectl get hpa
+```
+
+<br/>
+
+3.부하 증가
+
+```shell
+kubectl run -i --tty load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+```
+
+1분 후 부하 증가 시 replicaset 증가 확인
+
+```shell
+kubectl get hpa
+
+NAME         REFERENCE                     TARGET      MINPODS   MAXPODS   REPLICAS   AGE
+php-apache   Deployment/php-apache/scale   305% / 50%  1         10        1          3m
+
+NAME         REFERENCE                     TARGET      MINPODS   MAXPODS   REPLICAS   AGE
+php-apache   Deployment/php-apache/scale   305% / 50%  1         10        7          3m
+
+kubectl get deployment php-apache
+
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+php-apache   7/7      7           7           19m
+```
+
+<br/>
+
+[https://kubernetes.io/ko/docs/tasks/run-application/horizontal-pod-autoscale/](https://kubernetes.io/ko/docs/tasks/run-application/horizontal-pod-autoscale/)
+[https://kubernetes.io/ko/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/](https://kubernetes.io/ko/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/)
