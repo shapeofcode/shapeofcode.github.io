@@ -1,0 +1,117 @@
+---
+layout: post
+title:  "Kubernetes - Pod Auto Scaler - VPA"
+date:   2022-05-24
+last_modified_at: 2022-05-24
+categories: [Kubernetes]
+tags: [Kubernetes]
+---
+
+Pod Auto Scaler - VPA
+
+## vpa(Vertical Pod Autoscaler) 수직적 포드 스케일링
+
+<br/>
+
+### 특징
+
+- metric server를 통해 pod들의 resource 사용량을 관찰하고 pod 업데이트
+- 리소스로 설정해서 Deployment에 적용할 수 있다.
+
+<br/>
+
+### kubernetes 버전에 따른 VPA 버전
+
+| VPA version     | Kubernetes version |
+| --------------- | ------------------ |
+| 0.9+            | 1.16+              |
+| 0.8             | 1.13+              |
+| 0.4 to 0.7      | 1.11+              | 
+| 0.3.X and lower | 1.7+               |
+
+<br/>
+
+### 필요사항
+
+- VPA를 설치하고 싶은곳에 kubectl이 cluster에 연결되어있어야 한다.
+- metrics server가 cluster에 deploy 되어야 한다.
+- GKE Kubernetes cluster를 사용한다면, Google identity(cluster-admin) 권한을 부여해야한다.
+
+<br/>
+
+```shell
+$ gcloud info | grep Account    # get current google identity
+Account: [myname@example.org]
+
+$ kubectl create clusterrolebinding myname-cluster-admin-binding --clusterrole=cluster-admin --user=myname@example.org
+Clusterrolebinding "myname-cluster-admin-binding" created
+```
+
+<br/>
+
+- 이미 다른 버전의 VPA가 설치되어있는 경우 기존 설치를 내려야한다.
+
+<br/>
+
+```shell
+./hack/vpa-down.sh
+```
+
+<br/>
+
+### 설치방법
+
+git clone https://github.com/kubernetes/autoscaler.git
+
+vertical-pod-autoscaler 디렉토리 이동
+
+./hack/vpa-up.sh 명령어 실행
+
+* unknown option -addext 에러가 떨어지면 openssl을 1.1.1 또는 상위 버전으로 업그레이드 필요
+
+설치 테스트 (2개의 pods를 가진 deployment를 생성하고, 각각의 single container들이 100 millicores request 부터 500 millicores까지 올린다.
+또한 VPA config pointing을 deployment에 생성한다. VPA가 pods의 행동을 관찰하고 5분후에 더 높은 CPU request로 업데이트한다.)
+
+kubectl create -f examples/hamster.yaml
+
+<br/>
+
+```shell
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: my-app-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       my-app
+  updatePolicy:
+    updateMode: "Auto"
+```
+<br/>
+
+### VPA 4가지 모드
+
+- Auto : VPA는 resource requests를 pod 생성 시 할당하고 존재하는 pods에도 update mechanism에 의해 update한다.
+- Recreate : VPA는 pod 생성 시 resource requests를 할당할 뿐만 아니라 resource request가 새 권장 사항과 크게 다를 때 이를 제거하여
+  기존 pod에서 update한다.
+- Initial : VPA는 pod 생성 시에만 resource request를 할당하고 나중에 변경하지 않는다.
+- Off : VPA는 pod의 resource request 사항을 자동으로 변경하지 않는다. 권장 사항이 계산되고 vpa 개체에서 검사할 수 있다.
+
+<br/>
+
+vpa 명령어
+
+```shell
+kubectl get vpa [vpa 이름] --output yaml
+kubectl describe vpa [vpa 이름]
+```
+
+<br/>
+
+출처
+
+[https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
+[https://haereeroo.tistory.com/25](https://haereeroo.tistory.com/25)
+[https://bcho.tistory.com/1349](https://bcho.tistory.com/1349)
