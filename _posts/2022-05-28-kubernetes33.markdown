@@ -1,0 +1,82 @@
+---
+layout: post
+title:  "CKA - Secret 운영"
+date:   2022-05-28
+last_modified_at: 2022-05-28
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+Create a Kubernetes secret and expose using a file in the pod.
+
+1.Create a kubernetes Secret as follows:
+
+- Name: super-secret
+- Data: password=secretpass
+
+2. Create a Pod named pod-secrets-via-file. using the redis image, which mounts a secret named super-secret at /secrets.
+3. Create a second Pod named pod-secrets-via-env, using the redis image, which exports password as PASSWORD.
+
+<br/>
+
+```shell
+kubectl create secret generic super-secret --from-literal=password=secretpass
+
+vi pod-secrets-via-file.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-secrets-via-file
+spec:
+  containers:
+  - image: redis
+    name: pod-secret
+    volumeMounts:
+    - name: secret-data
+      mountPath: /secrets
+   volumes:
+   - name: secret-data
+     secret:
+      secretNmae: super-secret
+      
+kubectl apply -f pod-secrets-vail-file.yaml
+kubectl get pods
+kubectl exec -it pod-secrets-via-file -- /bin/bash
+cd /secrets/
+ls
+password
+cat password
+secretpass
+exit
+
+cp pod-secrets-via-file.yaml pod-secrets-via-env.yaml
+vi pod-secrets-via-env.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-secrets-via-env
+spec:
+  containers:
+  - image: redis
+    name: pod-secret
+    env:
+      - name: PASSWORD
+        volumeFrom:
+          secretKeyRef:
+            name: super-secret
+            key: password
+
+kubectl apply -f pod-secrets-via-env.yaml
+kubectl get pods
+kubectl exec -it pod-secrets-via-env -- /bin/bash
+env
+pasword=secretpass
+
+exit
+    
+```
+
+출처
+
+[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
