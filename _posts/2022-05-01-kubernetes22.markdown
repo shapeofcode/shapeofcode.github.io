@@ -29,4 +29,4 @@ kubectl get pods -o wide
 
 출처
 
-[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
+[https://youtu.be/Knm8WZTyUiI](https://youtu.be/Knm8WZTyUiI)

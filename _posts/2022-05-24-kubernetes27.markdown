@@ -48,4 +48,4 @@ kubectl exec web-pod -c main -- ls /workdir/data.txt
 
 출처
 
-[https://youtu.be/uACioswfZI8](https://youtu.be/uACioswfZI8)
+[https://youtu.be/nh7bBIPXCIg](https://youtu.be/nh7bBIPXCIg)
