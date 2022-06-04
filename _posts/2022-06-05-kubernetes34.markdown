@@ -1,0 +1,69 @@
+---
+layout: post
+title:  "CKA - Ingress 구성"
+date:   2022-06-05
+last_modified_at: 2022-06-05
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+- ingress-nginx namespace에 nginx이미지를 api=nginx 레이블을 가지고 실행하는 nginx pod를 구성하세요.
+- 앞서 생성한 nginx Pod를 서비스하는 nginx service를 생성하시오.
+- 현재 appjs-service Service는 이미 동작 중입니다. 별도 구성이 필요 없습니다.
+- app-ingress.yaml 파일을 생성하여 다음 조건의 ingress 서비스를 구성하시오.
+  - ingress name: app-ingress
+  - NODE_PORT:30080/ 접속했을 때 nginx 서비스로 연결
+  - NODE_PORT:30080/app 접속했을 때 appjs-service 서비스로 연결
+  - Ingress 구성에 다음의 annotations를 포함시키시오. kubernetes.io/ingress.class: nginx
+  
+  - 
+
+<br/>
+
+```shell
+
+kubectl run nginx --image=nginx --labels=app=nginx -n ingress-nginx
+
+kubectl expose -n ingress-nginx pod nginx --port 80 --target-port=80
+
+kubectl get svc -n ingress-nginx 
+
+cat > app-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ingress-nginx
+  name: app-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx
+              port:
+                number: 80
+      - path: /app
+        pathType: Prefix
+        backend:
+          service:
+            name: appjs-service
+            port:
+              number: 80
+
+kubectl apply -f app-ingress.yaml
+kubectl describe ingredd -n ingress-nginx
+
+curl k8s-worker1:30080/
+curl k8s-worker1:30080/app
+  
+```
+
+출처
+
+[https://youtu.be/bSY6_-ax-2w](https://youtu.be/bSY6_-ax-2w)
