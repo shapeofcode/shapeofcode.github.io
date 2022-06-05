@@ -1,0 +1,61 @@
+---
+layout: post
+title:  "JAVA - JVM Thread Dump"
+date:   2022-06-05
+last_modified_at: 2022-06-05
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+여러 서버의 동시 처리 문제로 인한 스레드에서의 데드락 발생이나 시스템의 치명적인 에러에 대한 문제를 파악할 수 있다.
+
+### Java에서의 Thread
+
+- Monitor를 이용해 스레드를 동기화한다. 모든 Java 객체는 하나의 Monitor를 가지고 있다.
+그리고 Monitor는 하나의 스레드만 소유할 수 있다.
+- 어떠한 스레드가 소유한 Monitor를 다른 스레드가 획득하려면 해당 Monitor를 소유하고 있는
+스레드가 Monitor를 해제할 때까지 Wait Queue에서 대기하고 있어야 한다.
+
+<br/>
+
+### Java Thread 상태
+- java.lang.Thread 클래스 내부에 State라는 이름을 가진 Enumerated Types으로 선언되어 있다.
+  - NEW : 스레드가 생성되었지만 아직 실행되지 않은 상태
+  - RUNNABLE : 현재 CPU를 점유하고 작업을 수행 중인 상태. 운영체제의 자원 분배로 인해 WAITING 상태가 될 수 도 있다.
+  - BLOCKED : Monitor를 획득하기 위해 다른 스레드가 락을 해제하기를 기다리는 상태
+  - WAITING : wait() 메서드, join() 메서드, park() 메서드 등을 이용해 대기하고 있는 상태
+  - TIMED_WAITING : sleep() 메서드, wait() 메서드, join() 메서드, park() 메서드 등을 이용해 대기하고 있는 상태.
+WAITING 상태와의 차이점은 메서드의 인수로 최대 대기 시간을 명시할 수 있어 외부적인 변화뿐만 아니라 시간에 의해서도
+WAITING 상태가 해제될 수 있다.
+
+<br/>
+
+### Java Thread 종류
+- 데몬 스레드, 비데몬 스레드
+- 데몬 스레드는 다른 비데몬 스레드가 없다면 동작을 중지
+
+<br/>
+
+### Thread Dump 획득
+
+#### JDK 1.6 이상을 사용하고 있다면 jstack을 이용해 스레드 덤프를 획득
+
+1. jps -v (Java application process PID 확인)
+2. jstack [PID]
+
+#### Java VisualVM사용 (GUI 프로그램)
+
+#### kill 사용
+kill -3 [PID]
+
+<br/>
+
+<img src="../../../assets/images/thread-dump-info.PNG" alt="thread-dump-info" />
+
+<br/>
+
+출처  
+
+[https://steady-coding.tistory.com/597](https://steady-coding.tistory.com/597)
