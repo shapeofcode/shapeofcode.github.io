@@ -5,7 +5,7 @@ date:   2022-04-11
 last_modified_at: 2022-04-11
 categories: [CKA]
 tags: [CKA]
-published: false
+published: true
 ---
 
 1. Deployment를 scale out

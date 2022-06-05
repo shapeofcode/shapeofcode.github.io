@@ -5,7 +5,7 @@ date:   2022-05-24
 last_modified_at: 2022-05-24
 categories: [CKA]
 tags: [CKA]
-published: false
+published: true
 ---
 
 Create the service as type NodePort with the port:32767 for the nginx pod with the pod selector app:webui

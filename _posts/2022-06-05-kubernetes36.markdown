@@ -5,7 +5,7 @@ date:   2022-06-05
 last_modified_at: 2022-06-05
 categories: [CKA]
 tags: [CKA]
-published: false
+published: true
 ---
 
 - Create a new PersistentVolumeClaim

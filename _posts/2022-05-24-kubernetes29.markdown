@@ -5,7 +5,7 @@ date:   2022-05-24
 last_modified_at: 2022-05-24
 categories: [CKA]
 tags: [CKA]
-published: false
+published: true
 ---
 
 - All operations is this questing should be performed in the ckad namespace.

@@ -5,7 +5,7 @@ date:   2022-04-11
 last_modified_at: 2022-04-11
 categories: [CKA]
 tags: [CKA]
-published: false
+published: true
 ---
 
 기존 컨테이너는 냅두고 사이드카 컨테이너를 추가
