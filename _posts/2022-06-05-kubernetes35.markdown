@@ -1,0 +1,38 @@
+---
+layout: post
+title:  "CKA - Persistence Volume"
+date:   2022-06-05
+last_modified_at: 2022-06-05
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+- Create a persistent volume with name app-config of capacity 1Gi
+and access mode RedaWriteMany.
+- storageClass:az-c
+- The type of volume is hostPath and its location is /src/app-config
+
+```shell
+cat > app-config.yaml
+kind: PersistentVolume
+metadata:
+    name: app-config
+spec:
+    capacity:
+        storage: 1Gi
+    accessModes:
+        - ReadWriteMany
+    storageClassName: az-c
+    hostPath:
+        path: /src/app-config
+
+kubectl apply -f app-config.yaml
+kubectl get pv
+```
+
+
+
+출처
+
+[https://youtu.be/-OL_goK-vzQ](https://youtu.be/-OL_goK-vzQ)
