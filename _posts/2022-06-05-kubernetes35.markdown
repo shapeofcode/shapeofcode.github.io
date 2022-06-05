@@ -13,6 +13,8 @@ and access mode RedaWriteMany.
 - storageClass:az-c
 - The type of volume is hostPath and its location is /src/app-config
 
+<br/>
+
 ```shell
 cat > app-config.yaml
 kind: PersistentVolume
