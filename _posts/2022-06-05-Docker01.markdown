@@ -1,0 +1,52 @@
+---
+layout: post
+title:  "Docker - Container Network"
+date:   2022-06-05
+last_modified_at: 2022-06-05
+categories: [Docker]
+tags: [Docker]
+---
+
+### Container Network Model
+
+- docker0
+  - virtual ethernet bridge: 172.17.0.0/16
+  - L2 통신기반
+  - container 생성 시 veth 인터페이스 생성(sandbox)
+  - 모든 컨테이너는 외부 통신을 docker0 통해 진행
+  - container running 시 172.17.x.y로 IP 주소 할당
+  
+#### uesr-defined bridge network 생성
+
+```shell
+docker network create --driver bridge \
+--subnet 192.168.100.0/24 \
+--gateway 192.168.100.254 \
+mynet
+ 
+docker network ls
+
+docker run -d --name appjs \
+--net mynet --ip 192.168.100.100 \
+-p 8080:8080 \
+smlinux/appjs
+
+curl localhost:8080
+```
+
+#### 두개의 컨테이너 연결(server & client)
+
+```shell
+docker run -d --name mysql -v /dbdata:/var/lib/mysql -e
+MYSQL_ROOT_PASSWORD=wordpress -e
+MYSQL_PASSWORD=wordpress mysql:5.7
+
+docker run -d --name wordpress --link mysql:mysql -e
+WORDPRESS_DB_PASSWORD=wordpress - 80:8080 wordpress:4
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/jOX80bXND2w](https://youtu.be/jOX80bXND2w)
