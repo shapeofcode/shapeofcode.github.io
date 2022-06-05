@@ -1,0 +1,65 @@
+---
+layout: post
+title:  "CKA - Persistence Volume Claim을 사용하는 Pod 운영"
+date:   2022-06-05
+last_modified_at: 2022-06-05
+categories: [CKA]
+tags: [CKA]
+published: false
+---
+
+- Create a new PersistentVolumeClaim
+  - Name: app-volume
+  - StorageClass: app-hostpath-sc
+  - Capacity: 10Mi
+- Create a new Pod which mounts the PersistentVolumeClaim as a volume
+  - Name: web-server-pod
+  - Image: nginx
+  - Mount path: /usr/share/nginx/html
+- Configure the new Pod to have ReadWriteMany access on the volume. 
+
+<br/>
+
+```shell
+cat > app-volume-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-volume
+spec:
+  accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: 10Mi
+    storageClassName: app-hostpath-sc
+
+kubectl apply -f app-volume-pvc.yaml
+kubectl get pvc
+
+# pod 생성
+cat > web-server-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server-pod
+spec:
+  containers:
+    - name: web-server-pod
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/share/nginx/html"
+        name: html
+  volumes:
+    - name: html
+      persistentVolumeClaim:
+        claimName: app-volume
+
+kubectl apply -f web-server-pod.yaml    
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/_YXuNtfJVio](https://youtu.be/_YXuNtfJVio)
