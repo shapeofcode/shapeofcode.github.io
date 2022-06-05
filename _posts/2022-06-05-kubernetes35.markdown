@@ -31,7 +31,7 @@ kubectl apply -f app-config.yaml
 kubectl get pv
 ```
 
-
+<br/>
 
 출처
 
