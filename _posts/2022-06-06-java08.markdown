@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "JAVA - JVM Class Loader"
-date:   2022-06-05
-last_modified_at: 2022-06-05
+date:   2022-06-06
+last_modified_at: 2022-06-06
 categories: [JAVA]
 tags: [JAVA]
 ---
