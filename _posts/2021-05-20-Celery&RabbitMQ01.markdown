@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "HackerRank - Celery & RabbitMQ (1)"
+title:  "Celery & RabbitMQ (1)"
 date:   2021-05-20
 last_modified_at: 2021-05-20
 categories: [Asynchronous]
