@@ -1,0 +1,25 @@
+---
+layout: post
+title:  "CKA - Check Resource Information"
+date:   2022-06-13
+last_modified_at: 2022-06-13
+categories: [CKA]
+tags: [CKA]
+published: true
+---
+
+- List all "PV's sorted by name saving the full kubectl output to /var/CKA2022/my_volumes
+- Use kubectl's own functionally for sorting the output, and do not manipulate it any further
+
+<br/>
+
+```shell
+kubectl get pv --sort-by=.metadata.name > /var/CKA2022/my_volumes
+cat /var/CKA2022/my_volumes  
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/uVLgYum32L4](https://youtu.be/uVLgYum32L4)
