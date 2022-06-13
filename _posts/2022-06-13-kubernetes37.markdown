@@ -8,7 +8,7 @@ tags: [CKA]
 published: true
 ---
 
-- List all "PV's sorted by name saving the full kubectl output to /var/CKA2022/my_volumes
+- List all "PV"s sorted by name saving the full kubectl output to /var/CKA2022/my_volumes
 - Use kubectl's own functionally for sorting the output, and do not manipulate it any further
 
 <br/>
