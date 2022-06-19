@@ -1,0 +1,91 @@
+---
+layout: post
+title:  "CKA - Kubernetes Upgrade"
+date:   2022-06-19
+last_modified_at: 2022-06-19
+categories: [CKA]
+tags: [CKA]
+published: true
+---
+
+<br/>
+
+1. Determine which version to upgrade to
+
+```shell
+apt update
+apt-cache madison kubeadm
+# find the latest 1.24 version in the list
+# it should look like 1.24.x-00, where x is the latest patch
+```
+
+2. Upgrading control plane nodes
+
+```shell
+# replace x in 1.24.x-00 with the latest patch version
+apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm=1.24.x-00 && \
+apt-mark hold kubeadm
+ 
+kubeadm version
+ 
+kubeadm upgrade plan
+ 
+# replace x with the patch version you picked for this upgrade
+sudo kubeadm upgrade apply v1.24.x
+
+# For the other control plane nodes
+sudo kubeadm upgrade node
+```
+
+3. Upgrade kubelet and kubectl
+
+```shell
+# replace x in 1.24.x-00 with the latest patch version
+apt-mark unhold kubelet kubectl && \
+apt-get update && apt-get install -y kubelet=1.24.x-00 kubectl=1.24.x-00 && \
+apt-mark hold kubelet kubectl
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+```
+
+4. Uncordon the node
+
+```shell
+# replace <node-to-drain> with the name of your node
+kubectl uncordon <node-to-drain>
+```
+
+5. Upgrade worker nodes
+
+```shell
+# replace x in 1.24.x-00 with the latest patch version
+apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm=1.24.x-00 && \
+apt-mark hold kubeadm
+
+sudo kubeadm upgrade node
+
+# replace <node-to-drain> with the name of your node you are draining
+kubectl drain <node-to-drain> --ignore-daemonsets
+
+# replace x in 1.24.x-00 with the latest patch version
+apt-mark unhold kubelet kubectl && \
+apt-get update && apt-get install -y kubelet=1.24.x-00 kubectl=1.24.x-00 && \
+apt-mark hold kubelet kubectl
+
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+# replace <node-to-drain> with the name of your node
+kubectl uncordon <node-to-drain>
+
+kubectl get nodes
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/s75Wyu0z4Xo](https://youtu.be/s75Wyu0z4Xo)
