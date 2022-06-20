@@ -5,6 +5,7 @@ date:   2022-06-21
 last_modified_at: 2022-06-21
 categories: [JPA]
 tags: [book]
+published: true
 ---
 
 ### N+1 문제란?
