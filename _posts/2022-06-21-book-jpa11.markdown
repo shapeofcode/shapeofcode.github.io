@@ -1,0 +1,119 @@
+---
+layout: post
+title:  "자바 ORM표준 JPA 프로그래밍 - N+1"
+date:   2022-06-21
+last_modified_at: 2022-06-21
+categories: [JPA]
+tags: [book]
+---
+
+### N+1 문제란?
+
+JPA가 JPQL을 분석해서 SQL을 생성할때는 글로벌 패치 전략을 참고하지 않고 JPQL 자체만을 사용해서 N개의 쿼리가 발생하는 상황.
+
+### 발생 과정에 대한 코드분석
+
+Member : Orders 회원과 주문정보는 1:N, N:1 양방향 연관관계.
+
+```java
+List <Order> orders = em.createQuery("select o from Order o", Order.class).getResultList();
+
+# N 개의 Member 조회 SQL 발생
+```
+
+1. select o from Order o JPQL을 분석해서 select * from Order SQL을 생성.
+2. DB에서 결과를 받아 order 엔티티 인스턴스를 새성.
+3. Order.member의 글로벌 페치 전략이 즉시 로딩이므로 order를 로딩하는 즉시 연관된 member도 로딩.
+4. 연관된 member를 영속성 컨텍스트에서 찾는다.
+5. 만약 영속성 컨텍스트에 없으면 SELECT * FROM MEMBER WHERE id=? SQL을 조회한 order 엔티티 수만큼 실행.
+
+### 해결방안
+
+1. 지연로딩 사용 - JPQL에서는 문제가 생기지 않는다. but! order 컬렉션을 실제 사용할 때 N+1 발생.
+
+```java
+for (Member member : members) {
+	System.out.println("member = " + member.getOrders().size());   
+}
+
+# 회원과 연관된 N개의 주문 조회 쿼리 발생
+```
+
+2. 페치 조인 사용
+SQL 조인을 사용해서 연관된 엔티티를 함께 조회.(일대다 조인을 했으므로 중복된 결과가 나타날 수 있고 distinct를 사용해서 중복을 제거)
+
+3. Hibernate @BatchSize를 사용하여 SQL 실행을 제한
+
+```java
+@org.hibernate.annotations.BatchSize(size=5)
+@OneToMany(mapperBy = "member", fetch = FetchType.EAGER)
+private List<Order> orders = new ArrayList<Order>();
+```
+
+조회한 회원이 10명이라면 배치사이즈가 5이기 때문에 5건의 데이터를 미리 로딩해두고 6번째 데이터를 사용하면 다음 SQL을 추가로 실행.
+
+```sql
+SELECT * FROM ORDERS
+WHERE MEMBER+ID IN (?,?,?,?,?)
+```
+
+* 애플리케이션 전체에 기본 배치 사이즈 적용법
+
+```xml
+<property name="hibernate.default_batch_fetch_size" value="5"/>
+```
+
+4. Hibernate @Fetch(FetchMode.SUBSELECT)
+
+서브 쿼리를 사용하여 N+1 문제를 해결.
+
+```java
+@Entity
+public class Member {
+    ```
+	@org.hibernate.annotations.Fetch(FetchMOde.SUBSELECT)
+	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+	private List<Order> orders = new ArrayList<Order>();
+    ```
+}
+```
+
+```sql
+select m from Mebmer m where m.id > 10
+```
+
+즉시 로딩으로 설정하면 조회시점에, 지연 로딩으로 설정하면 지연 로딩된 엔티티를 사용하는 시점에 다음 SQL이 실행
+
+```sql
+SELECT O FROM ORDERS O
+	WHERE O.MEMBER_ID IN (
+		SELECT
+	    	M.ID
+	    FROM
+	    	MEMBER M 
+	    WHERE M.ID > 10
+	)
+```
+
+<br/> 
+
+### 정리
+
+즉시 로딩은 사용하지 않는다. - N+1 문제 포함 비즈니스 로직에 필요하지 않은 엔티티를 로딩해야하는 상황이 자주 발생.
+
+카장 큰 단점은 성능 최적화가 어렵다.
+
+모두 지연 로딩을 사용하고 성능 최적화가 꼭 필요한 곳에서는 JPQL 페치 조인을 사용한다.
+
+JPQ 글로벌 페치 전략 기본값
+
+- @OneToOne, @ManyToOne: 기본 페치 전략은 즉시 로딩
+- @OneToMany, @ManyToMany: 기본 페치 전략은 지연 로딩
+
+@OneToOne과 @ManyToOne은 fetch = FetchType.LAZY로 설정해서 지연 로딩 전략을 사용한다.
+
+<br/>
+
+출처 : 자바 ORM 표준 JPA 프로그래밍 김영한 지음
+
+<br/>
