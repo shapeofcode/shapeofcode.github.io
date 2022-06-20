@@ -11,6 +11,8 @@ tags: [book]
 
 JPA가 JPQL을 분석해서 SQL을 생성할때는 글로벌 패치 전략을 참고하지 않고 JPQL 자체만을 사용해서 N개의 쿼리가 발생하는 상황.
 
+<br/> 
+
 ### 발생 과정에 대한 코드분석
 
 Member : Orders 회원과 주문정보는 1:N, N:1 양방향 연관관계.
@@ -27,6 +29,8 @@ List <Order> orders = em.createQuery("select o from Order o", Order.class).getRe
 4. 연관된 member를 영속성 컨텍스트에서 찾는다.
 5. 만약 영속성 컨텍스트에 없으면 SELECT * FROM MEMBER WHERE id=? SQL을 조회한 order 엔티티 수만큼 실행.
 
+<br/> 
+
 ### 해결방안
 
 1. 지연로딩 사용 - JPQL에서는 문제가 생기지 않는다. but! order 컬렉션을 실제 사용할 때 N+1 발생.
@@ -39,8 +43,12 @@ for (Member member : members) {
 # 회원과 연관된 N개의 주문 조회 쿼리 발생
 ```
 
+<br/> 
+
 2. 페치 조인 사용
 SQL 조인을 사용해서 연관된 엔티티를 함께 조회.(일대다 조인을 했으므로 중복된 결과가 나타날 수 있고 distinct를 사용해서 중복을 제거)
+
+<br/> 
 
 3. Hibernate @BatchSize를 사용하여 SQL 실행을 제한
 
@@ -62,6 +70,8 @@ WHERE MEMBER+ID IN (?,?,?,?,?)
 ```xml
 <property name="hibernate.default_batch_fetch_size" value="5"/>
 ```
+
+<br/> 
 
 4. Hibernate @Fetch(FetchMode.SUBSELECT)
 
