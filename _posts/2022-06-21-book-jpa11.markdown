@@ -21,7 +21,7 @@ Member : Orders 회원과 주문정보는 1:N, N:1 양방향 연관관계.
 ```java
 List <Order> orders = em.createQuery("select o from Order o", Order.class).getResultList();
 
-# N 개의 Member 조회 SQL 발생
+<!-- N 개의 Member 조회 SQL 발생 -->
 ```
 
 1. select o from Order o JPQL을 분석해서 select * from Order SQL을 생성.
