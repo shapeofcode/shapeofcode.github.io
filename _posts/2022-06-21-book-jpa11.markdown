@@ -41,7 +41,7 @@ for (Member member : members) {
 	System.out.println("member = " + member.getOrders().size());   
 }
 
-# 회원과 연관된 N개의 주문 조회 쿼리 발생
+<!--회원과 연관된 N개의 주문 조회 쿼리 발생-->
 ```
 
 <br/> 
