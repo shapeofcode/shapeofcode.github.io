@@ -54,7 +54,7 @@ public class Main {
 
 <br/>
 
-3.Functional Interfaces and Lambda Expressions
+3. Functional Interfaces and Lambda Expressions
 
 하나의 추상 메소드가 있는 인터페이스는 기능 인터페이스가 되고 단일 추상 메소드 run()이 있는 java.lang.Runnable은 기능적 인터페이스의 좋은 예이다.
 
@@ -76,7 +76,7 @@ Runnable r1 = () -> {
 
 <br/>
 
-4.Java Stream API for Bulk Data Operations on Collections
+4. Java Stream API for Bulk Data Operations on Collections
 
 큰 데이터를 처리하기에 유용.
 
@@ -144,7 +144,7 @@ Date, Time, Time Zones를 다루기 유용하다.
 
 <br/>
 
-6.Collection API improvements
+6. Collection API improvements
 
 - Iterator forEachRemaining(Consumer action) 모든 요소가 처리되거나 작업이 예외를 throw할 때까지 나머지 각 요소에 대해
 지정된 작업을 수행하는 기본 메서드
@@ -155,7 +155,7 @@ Date, Time, Time Zones를 다루기 유용하다.
 
 <br/>
 
-7.Concurrency API improvements
+7. Concurrency API improvements
 
 - ConcurrentHashMap compute(), forEach(), forEachEntry(), forEachKey(), forEachValue(), merge(), reduce() and search() 메서드
 - CompletableFuture 명시적으로 완료될 수 있다.
@@ -163,7 +163,7 @@ Date, Time, Time Zones를 다루기 유용하다.
 
 <br/>
 
-8.Java IO improvements
+8. Java IO improvements
 
 - Files.list(Path dir) 느리게 채워진 Stream을 반환.
 - Files.lines(Path path) Stream으로 파일의 모든 라인을 읽는다.
