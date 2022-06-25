@@ -13,9 +13,6 @@ published: true
 - 2014년 3월 release
 
 1. forEach() method in Iterable interface
-   
-<br/>
-
 2. default and static methods in Interfaces
 
 <br/>
@@ -53,8 +50,6 @@ public class Main {
 }
 ```
 
-<br/>
-
 3. Functional Interfaces and Lambda Expressions
 
 하나의 추상 메소드가 있는 인터페이스는 기능 인터페이스가 되고 단일 추상 메소드 run()이 있는 java.lang.Runnable은 기능적 인터페이스의 좋은 예이다.
@@ -74,8 +69,6 @@ Runnable r1 = () -> {
             System.out.println("My Runnable");
         };
 ```
-
-<br/>
 
 4. Java Stream API for Bulk Data Operations on Collections
 
@@ -137,13 +130,9 @@ High Nums sequential=98
 High Nums sequential=99
 ```
 
-<br/>
-
 5. Java Time API
 
 Date, Time, Time Zones를 다루기 유용하다.
-
-<br/>
 
 6. Collection API improvements
 
@@ -154,15 +143,11 @@ Date, Time, Time Zones를 다루기 유용하다.
 - Map replaceAll(), compute(), merge() 메서드
 - HashMap 키 충돌의 개선
 
-<br/>
-
 7. Concurrency API improvements
 
 - ConcurrentHashMap compute(), forEach(), forEachEntry(), forEachKey(), forEachValue(), merge(), reduce() and search() 메서드
 - CompletableFuture 명시적으로 완료될 수 있다.
 - Executors newWorkStealingPool() 사용 가능한 모든 프로세서를 대상 병렬 처리 수준으로 사용하여 work-stealing pool을 만드는 방법.
-
-<br/>
 
 8. Java IO improvements
 
