@@ -14,8 +14,6 @@ tags: [JAVA]
 1. forEach() method in Iterable interface
 2. default and static methods in Interfaces
 
-<br/>
-
 #### default method와 static method의 차이
 
 default method는 라이브러리의 인터페이스에 새 기능을 추가하고 해당 인터페이스의 이전 버전용으로 작성된 코드와
