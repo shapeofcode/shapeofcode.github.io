@@ -9,12 +9,13 @@ tags: [JAVA]
 
 <br/>
 
-- 2014년 3월 release
+### 2014년 3월 release
 
-1. forEach() method in Iterable interface
-2. default and static methods in Interfaces
+#### forEach() method in Iterable interface
 
-default method와 static method의 차이
+#### default and static methods in Interfaces
+
+##### default method와 static method의 차이
 
 default method는 라이브러리의 인터페이스에 새 기능을 추가하고 해당 인터페이스의 이전 버전용으로 작성된 코드와
 바이너리 호환성을 보장.
@@ -47,7 +48,7 @@ public class Main {
 }
 ```
 
-3. Functional Interfaces and Lambda Expressions
+#### Functional Interfaces and Lambda Expressions
 
 하나의 추상 메소드가 있는 인터페이스는 기능 인터페이스가 되고 단일 추상 메소드 run()이 있는 java.lang.Runnable은 기능적 인터페이스의 좋은 예이다.
 
@@ -67,7 +68,7 @@ Runnable r1 = () -> {
         };
 ```
 
-4. Java Stream API for Bulk Data Operations on Collections
+#### Java Stream API for Bulk Data Operations on Collections
 
 큰 데이터를 처리하기에 유용.
 
@@ -127,11 +128,11 @@ High Nums sequential=98
 High Nums sequential=99
 ```
 
-5. Java Time API
+#### Java Time API
 
 Date, Time, Time Zones를 다루기 유용하다.
 
-6. Collection API improvements
+#### Collection API improvements
 
 - Iterator forEachRemaining(Consumer action) 모든 요소가 처리되거나 작업이 예외를 throw할 때까지 나머지 각 요소에 대해
 지정된 작업을 수행하는 기본 메서드
@@ -140,13 +141,13 @@ Date, Time, Time Zones를 다루기 유용하다.
 - Map replaceAll(), compute(), merge() 메서드
 - HashMap 키 충돌의 개선
 
-7. Concurrency API improvements
+#### Concurrency API improvements
 
 - ConcurrentHashMap compute(), forEach(), forEachEntry(), forEachKey(), forEachValue(), merge(), reduce() and search() 메서드
 - CompletableFuture 명시적으로 완료될 수 있다.
 - Executors newWorkStealingPool() 사용 가능한 모든 프로세서를 대상 병렬 처리 수준으로 사용하여 work-stealing pool을 만드는 방법.
 
-8. Java IO improvements
+#### Java IO improvements
 
 - Files.list(Path dir) 느리게 채워진 Stream을 반환.
 - Files.lines(Path path) Stream으로 파일의 모든 라인을 읽는다.
