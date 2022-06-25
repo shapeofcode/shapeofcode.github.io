@@ -5,7 +5,6 @@ date:   2022-06-05
 last_modified_at: 2022-06-05
 categories: [CKA]
 tags: [CKA]
-published: true
 ---
 
 - ingress-nginx namespace에 nginx이미지를 api=nginx 레이블을 가지고 실행하는 nginx pod를 구성하세요.
