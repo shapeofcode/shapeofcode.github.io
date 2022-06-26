@@ -1,0 +1,170 @@
+---
+layout: post
+title:  "JAVA - Java11 특징"
+date:   2022-06-26
+last_modified_at: 2022-06-26
+categories: [JAVA]
+tags: [JAVA]
+---
+
+<br/>
+
+### Java8 이후 LTS releas 버전
+
+<br/>
+
+#### Running Java File with single command
+
+javac를 이용해 컴파일할 필요 없이 java 커맨드로 돌릴 수 있다.
+
+<br/>
+
+#### Java String Methods
+
+* isBlank() - 빈문자열과 white spaces로만 되어있는 String에 대하여 true를 리턴한다.
+
+```java
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Your code here!
+        
+        System.out.println(" ".isBlank()); //true
+        
+        String s = "Anupam";
+        System.out.println(s.isBlank()); //false
+        String s1 = "";
+        System.out.println(s1.isBlank()); //true
+    }
+}
+```
+
+* lines() - lines으로 구분된 substring의 collecion인 stream을 리턴한다.
+
+```java
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        
+        String str = "JD\nJD\nJD"; 
+        System.out.println(str);
+        System.out.println(str.lines().collect(Collectors.toList()));
+    }
+}
+```
+
+아웃풋
+
+```shell
+JD
+JD
+JD
+[JD, JD, JD]
+```
+
+* strip(), stripLeading(), stripTrailing() - 문자열의 앞 뒤 공백을 지워준다. trim 과 다르게 unicode를 인식한다.
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Your code here!
+        
+        String str = " JD "; 
+        System.out.print("Start");
+        System.out.print(str.strip());
+        System.out.println("End");
+        
+        System.out.print("Start");
+        System.out.print(str.stripLeading());
+        System.out.println("End");
+        
+        System.out.print("Start");
+        System.out.print(str.stripTrailing());
+        System.out.println("End");
+    }
+}
+```
+
+아웃풋
+
+```shell
+StartJDEnd
+StartJD End
+Start JDEnd
+```
+
+* repeat(int) - 문자열을 반복한다.
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Your code here!
+        
+        String str = "=".repeat(2);
+        System.out.println(str); //prints ==
+    }
+}
+```
+
+<br/>
+
+#### Local-Variable Syntax for Lambda Parameters
+
+람다 파라미터로 지역 변수 Syntax를 사용
+
+Java8에 있다가 10에서 삭제 됐었고 다시 11로 돌아옴
+
+```java
+(var s1, s2) -> s1 + s2 //no skipping allowed
+(var s1, String y) -> s1 + y //no mixing allowed
+
+var s1 -> s1 //not allowed. Need parentheses if you use var in lambda.
+```
+
+<br/>
+
+#### Nested Based Access Control
+
+Java11 이전에 중첩 클래스에 접근시 IllegalStateException 발생하는 문제를 접근 가능하도록 변경.
+
+Java Reflection API Class에 새로운 메서드 추가
+
+getNestHost() - nest host 이름을 반환
+isNestmateOf() -  class가 nestmate인지 반환
+getNestMembers() - class와 인터페이스에 nest members 배열을 반환
+
+
+
+<br/>
+
+#### JEP 328: Flight Recorder 
+
+가상 머신에 내장된 이벤트 레코더이고 오픈 소스로 공개되고 OpenJDK 11의 일부로 출시된다.
+
+<br/>
+
+#### JEP 321: HTTP Client 
+
+HTTP/1.1과 HTTP/2를 지원하고 request와 response의 성능이 향상되었고 WebSockets을 지원한다.
+
+<br/>
+
+#### Reading/Writing Strings to and from the Files 
+
+파일에 string을 읽고 쓸 수 있다.
+
+```java
+Path path = Files.writeString(Files.createTempFile("test", ".txt"), "This was posted on JD");
+System.out.println(path);
+String s = Files.readString(path);
+System.out.println(s); //This was posted on JD
+```
+
+<br/>
+
+출처  
+
+[https://www.journaldev.com/24601/java-11-features](https://www.journaldev.com/24601/java-11-features)
+[https://www.studytonight.com/java-11/nestbased-access-control-in-java-11](https://www.studytonight.com/java-11/nestbased-access-control-in-java-11)
