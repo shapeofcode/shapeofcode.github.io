@@ -1,0 +1,37 @@
+---
+layout: post
+title:  "CKA - Kubernetes TroubleShooting(1)"
+date:   2022-07-02
+last_modified_at: 2022-07-02
+categories: [CKA]
+tags: [CKA]
+---
+
+<br/>
+
+A Kubernetes worker node, named hk8s-w2 is in state NotReady.
+Investigate why this is the case, and perform any appropriate steps to 
+bring the node to a Ready state, ensuring that any changes are made permanent.
+
+### worker node - ready 조건
+
+- docker running
+- kubelete running
+- kube-proxy running
+- CNI running
+
+<br/>
+
+```shell
+ssh hk8s-w2
+sudo -i
+systemctl status kubelet
+systemctl enable --now kubelet
+systemctl status kubelet
+```
+
+<br/>
+
+출처
+
+[https://youtu.be/s75Wyu0z4Xo](https://youtu.be/s75Wyu0z4Xo)
