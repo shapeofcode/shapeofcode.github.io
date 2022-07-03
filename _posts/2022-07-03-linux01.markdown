@@ -1,0 +1,31 @@
+---
+layout: post
+title:  "Linux - Directory"
+date:   2022-07-03
+last_modified_at: 2022-07-03
+categories: [linux]
+tags: [linux]
+---
+
+<br/>
+
+### 디렉토리 역할
+
+- / : 최상의 디렉토리
+- /bin : 리눅스 기본 명령어
+- /sbin : 리눅스 시스템 관리용 명령어
+- /usr :  애플리케이션이나 유틸리티 설치 디렉토리
+- /etc : 시스템 설정 파일
+- /var : 빠르게 변하는 파일들이나 애플리케이션 데이터
+- /tmp : 임시디렉토리
+- /proc : 메모리에서 동작중인 프로세스 정보를 확인
+- /sys : 시스템 하드웨어 정보나 가상 파일 시스템들
+- /root : 시스템 최고 관리자이 root 사용자의 홈디렉토리 
+- /home : 일반 사용자들의 홈디렉토리
+- /dev : 하드웨어 장치 파일
+
+<br/>
+
+출처
+
+[https://youtu.be/9roLmjSFfDg](https://youtu.be/9roLmjSFfDg)
