@@ -7,6 +7,10 @@ categories: [Vue.js]
 tags: [book]
 ---
 
+책 리뷰 : Vue에 관한 전반적으로 쉽고 빠르게 접근할 수 있는 책
+
+<br/>
+
 ### Vuejs 키워드
 
 프론트엔드 프레임워크
@@ -22,7 +26,9 @@ tags: [book]
 화면 개발을 위한 기본 단위, 돔 요소를 지정
 
 뷰 인스턴스의 라이프 사이클 
+
 <br/>
+
 인스턴스 생성 -> beforeCreate -> created -> beforeMount -> mounted -> 인스턴스를 화면에 부착 -> beforeUpdate -> updated
 -> 인스턴스 내용 갱신 -> beforeDestroy -> destroyed -> 인스턴스 소멸
 
@@ -44,10 +50,6 @@ this.$emit, v-on, 이벤트 버스 방식
 SPA에서 주로 사용
 - 네스티드 라우터
 - 네임드 뷰
-
-<br/>
-
-그외 기타 데이터 동기화나 웹팩 등 Vue에 관한 전반적으로 쉽고 빠르게 접근할 수 있는 책
 
 <br/>
 
